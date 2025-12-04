@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 export default function PromoPopup() {
     const [showPromo, setShowPromo] = useState(false)
     const [email, setEmail] = useState("")
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [message, setMessage] = useState("")
 
     useEffect(() => {
         // Verificar si el usuario ya vio el popup
@@ -20,6 +22,40 @@ export default function PromoPopup() {
     const handleClosePromo = () => {
         setShowPromo(false)
         localStorage.setItem("hasSeenBlackFridayPromo", "true")
+    }
+
+    const handleSubscribe = async () => {
+        if (!email || !email.includes('@')) {
+            setMessage("Bitte gib eine gültige E-Mail-Adresse ein")
+            return
+        }
+
+        setIsSubmitting(true)
+        setMessage("")
+
+        try {
+            const response = await fetch('/api/newsletter/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            })
+
+            if (response.ok) {
+                setMessage("Vielen Dank! Prüfe deine E-Mails.")
+                setTimeout(() => {
+                    handleClosePromo()
+                }, 2000)
+            } else {
+                setMessage("Ein Fehler ist aufgetreten. Bitte versuche es erneut.")
+            }
+        } catch (error) {
+            console.error('Error subscribing:', error)
+            setMessage("Ein Fehler ist aufgetreten. Bitte versuche es erneut.")
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     if (!showPromo) return null
@@ -66,14 +102,24 @@ export default function PromoPopup() {
                             placeholder="Deine E-Mail-Adresse"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
                             className="w-full bg-white border-gray-200 text-gray-900 placeholder:text-gray-400 h-12 rounded-lg focus:border-[#651A1A] focus:ring-[#651A1A]/10 transition-all font-light"
+                            disabled={isSubmitting}
                         />
                         <Button
-                            onClick={handleClosePromo}
-                            className="w-full bg-[#1a1a1a] text-white hover:bg-[#651A1A] font-medium py-6 text-sm rounded-lg tracking-widest uppercase transition-all duration-300 shadow-lg hover:shadow-xl"
+                            onClick={handleSubscribe}
+                            disabled={isSubmitting}
+                            className="w-full bg-[#1a1a1a] text-white hover:bg-[#651A1A] font-medium py-6 text-sm rounded-lg tracking-widest uppercase transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            Anmelden & Genießen
+                            {isSubmitting ? 'Wird gesendet...' : 'Anmelden & Genießen'}
                         </Button>
+                        {message && (
+                            <p className={`text-sm text-center font-medium ${
+                                message.includes('Danke') ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                                {message}
+                            </p>
+                        )}
                     </div>
                     <p className="text-[10px] text-center text-gray-400 font-light">
                         Abmeldung jederzeit möglich.
