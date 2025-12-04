@@ -152,7 +152,7 @@ export default function OrderConfirmationEmail({
 
 // Styles
 const main = {
-  backgroundColor: '#682f2e',
+  backgroundColor: '#ffffff',
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
 }
