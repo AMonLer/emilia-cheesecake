@@ -6,7 +6,7 @@ import { CartProvider } from "@/contexts/CartContext"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
-export const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] })
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] })
 
 export const metadata: Metadata = {
   title: "Emilia - Tartas de Queso Artesanales | Envíos a Toda España",
