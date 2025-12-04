@@ -66,9 +66,9 @@ export default function OrderConfirmationEmail({
 
           {/* Content */}
           <Section style={content}>
-            <Text style={paragraph}>Liebe/r {customerName},</Text>
+            <Text style={paragraph}>Lieber {customerName.split(' ')[0]},</Text>
             <Text style={paragraph}>
-              Wir haben Ihre Bestellung erhalten und bereiten alles mit größter
+              Wir haben Ihre Bestellung erhalten und bereiten alles mit grösster
               Sorgfalt in unserer Backstube vor.
             </Text>
 

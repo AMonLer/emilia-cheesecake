@@ -9,6 +9,7 @@ import {
   Text,
   Hr,
   Link,
+  Font,
 } from '@react-email/components'
 
 interface WelcomeEmailProps {
@@ -20,17 +21,29 @@ export default function WelcomeEmail({
 }: WelcomeEmailProps) {
   return (
     <Html>
-      <Head />
-      <Preview>Willkommen bei Emilia - Dein süßer Anfang</Preview>
+      <Head>
+        <Font
+          fontFamily="Playfair Display"
+          fallbackFontFamily="serif"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={400}
+          fontStyle="normal"
+        />
+      </Head>
+      <Preview>Willkommen bei Emilia - Dein süsser Anfang</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
+            <Text style={logoText}>Emilia</Text>
             <Heading style={headerTitle}>
               Willkommen bei Emilia
             </Heading>
             <Text style={headerSubtitle}>
-              Ein süßer Anfang
+              Ein süsser Anfang
             </Text>
           </Section>
 
@@ -42,7 +55,7 @@ export default function WelcomeEmail({
 
             <Text style={paragraph}>
               Vielen Dank, dass du dich für unseren Newsletter angemeldet hast!
-              Wir freuen uns, dich in der Emilia-Familie willkommen zu heißen.
+              Wir freuen uns, dich in der Emilia-Familie willkommen zu heissen.
             </Text>
 
             {/* Discount Box */}
@@ -100,7 +113,7 @@ export default function WelcomeEmail({
             </Text>
 
             <Text style={signature}>
-              Herzliche Grüße,
+              Herzliche Grüsse,
               <br />
               <strong>Das Emilia-Team</strong>
             </Text>
@@ -138,70 +151,84 @@ export default function WelcomeEmail({
 
 // Styles
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#ffffff',
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
 }
 
 const container = {
   backgroundColor: '#ffffff',
-  margin: '0 auto',
-  padding: '20px 0',
-  marginBottom: '64px',
+  margin: '40px auto',
+  padding: '0',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  maxWidth: '600px',
 }
 
 const header = {
-  backgroundColor: '#651A1A',
+  backgroundColor: '#682f2e',
   padding: '40px 30px',
   textAlign: 'center' as const,
 }
 
-const headerTitle = {
-  color: '#ffffff',
-  fontSize: '32px',
-  fontWeight: 'bold',
+const logoText = {
+  fontFamily: '"Playfair Display", serif',
+  fontSize: '48px',
+  color: '#dec181',
   margin: '0 0 10px 0',
+}
+
+const headerTitle = {
+  color: '#dec181',
+  fontSize: '24px',
+  fontWeight: 'normal',
+  margin: '0 0 10px 0',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const headerSubtitle = {
   color: '#F5E6D3',
-  fontSize: '18px',
+  fontSize: '16px',
   fontStyle: 'italic',
   margin: '0',
+  opacity: 0.9,
 }
 
 const content = {
   padding: '40px 30px',
-  backgroundColor: '#FAF9F6',
+  backgroundColor: '#ffffff',
 }
 
 const greeting = {
   fontSize: '18px',
   color: '#333333',
   marginBottom: '20px',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const paragraph = {
   fontSize: '16px',
   lineHeight: '26px',
-  color: '#333333',
+  color: '#4a4a4a',
   marginBottom: '20px',
 }
 
 const discountBox = {
-  backgroundColor: '#ffffff',
-  border: '3px solid #651A1A',
-  borderRadius: '12px',
+  backgroundColor: '#f9f9f9',
+  border: '1px solid #dec181',
+  borderRadius: '8px',
   padding: '30px',
   margin: '30px 0',
   textAlign: 'center' as const,
 }
 
 const discountTitle = {
-  color: '#651A1A',
-  fontSize: '24px',
+  color: '#682f2e',
+  fontSize: '22px',
   fontWeight: 'bold',
-  margin: '0 0 20px 0',
+  margin: '0 0 15px 0',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const discountText = {
@@ -211,10 +238,12 @@ const discountText = {
 }
 
 const discountAmount = {
-  fontSize: '36px',
-  color: '#651A1A',
+  fontSize: '32px',
+  color: '#682f2e',
   display: 'block',
   fontWeight: 'bold',
+  fontFamily: '"Playfair Display", serif',
+  marginTop: '10px',
 }
 
 const discountCondition = {
@@ -226,24 +255,28 @@ const discountCondition = {
 
 const discountNote = {
   fontSize: '13px',
-  color: '#666666',
+  color: '#888888',
   lineHeight: '20px',
   marginTop: '15px',
 }
 
 const divider = {
-  borderColor: '#651A1A',
+  borderColor: '#dec181',
   borderWidth: '1px',
   margin: '20px 0',
+  opacity: 0.5,
 }
 
 const benefitsList = {
   margin: '20px 0',
+  backgroundColor: '#FAF9F6',
+  padding: '20px',
+  borderRadius: '8px',
 }
 
 const benefitItem = {
   fontSize: '15px',
-  color: '#333333',
+  color: '#4a4a4a',
   marginBottom: '10px',
   paddingLeft: '10px',
 }
@@ -254,10 +287,10 @@ const buttonContainer = {
 }
 
 const button = {
-  backgroundColor: '#651A1A',
+  backgroundColor: '#682f2e',
   color: '#ffffff',
   padding: '16px 40px',
-  borderRadius: '8px',
+  borderRadius: '4px',
   textDecoration: 'none',
   fontSize: '16px',
   fontWeight: 'bold',
@@ -271,23 +304,24 @@ const signature = {
   color: '#333333',
   marginTop: '40px',
   lineHeight: '26px',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const footer = {
   padding: '30px',
   textAlign: 'center' as const,
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#f5f5f5',
 }
 
 const footerText = {
   fontSize: '12px',
-  color: '#666666',
+  color: '#888888',
   lineHeight: '20px',
   marginBottom: '10px',
 }
 
 const footerDivider = {
-  borderColor: '#dddddd',
+  borderColor: '#e0e0e0',
   margin: '20px 0',
 }
 
@@ -297,6 +331,6 @@ const footerLinks = {
 }
 
 const footerLink = {
-  color: '#651A1A',
+  color: '#682f2e',
   textDecoration: 'underline',
 }
