@@ -4,11 +4,11 @@ import {
   Head,
   Heading,
   Html,
-  Img,
   Preview,
   Section,
   Text,
   Hr,
+  Font,
 } from '@react-email/components'
 
 interface OrderConfirmationEmailProps {
@@ -41,12 +41,24 @@ export default function OrderConfirmationEmail({
 }: OrderConfirmationEmailProps) {
   return (
     <Html>
-      <Head />
+      <Head>
+        <Font
+          fontFamily="Playfair Display"
+          fallbackFontFamily="serif"
+          webFont={{
+            url: 'https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff2',
+            format: 'woff2',
+          }}
+          fontWeight={400}
+          fontStyle="normal"
+        />
+      </Head>
       <Preview>Vielen Dank für Ihre Bestellung bei Emilia Cheesecake</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
+            <Text style={logoText}>Emilia</Text>
             <Heading style={headerTitle}>
               Vielen Dank für Ihre Bestellung!
             </Heading>
@@ -140,88 +152,106 @@ export default function OrderConfirmationEmail({
 
 // Styles
 const main = {
-  backgroundColor: '#f6f9fc',
+  backgroundColor: '#682f2e',
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
 }
 
 const container = {
   backgroundColor: '#ffffff',
-  margin: '0 auto',
-  padding: '20px 0',
-  marginBottom: '64px',
+  margin: '40px auto',
+  padding: '0',
+  borderRadius: '8px',
+  overflow: 'hidden',
+  boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+  maxWidth: '600px',
 }
 
 const header = {
-  backgroundColor: '#651A1A',
-  padding: '30px',
+  backgroundColor: '#682f2e',
+  padding: '40px 20px',
   textAlign: 'center' as const,
 }
 
+const logoText = {
+  fontFamily: '"Playfair Display", serif',
+  fontSize: '48px',
+  color: '#dec181',
+  margin: '0 0 20px 0',
+}
+
 const headerTitle = {
-  color: '#ffffff',
-  fontSize: '28px',
-  fontWeight: 'bold',
+  color: '#dec181',
+  fontSize: '24px',
+  fontWeight: 'normal',
   margin: '0',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const content = {
-  padding: '30px',
-  backgroundColor: '#F5E6D3',
+  padding: '40px',
+  backgroundColor: '#ffffff',
 }
 
 const paragraph = {
   fontSize: '16px',
   lineHeight: '26px',
-  color: '#333333',
+  color: '#4a4a4a',
+  marginBottom: '20px',
 }
 
 const orderDetailsBox = {
-  backgroundColor: '#ffffff',
-  padding: '20px',
-  borderRadius: '8px',
-  margin: '20px 0',
+  backgroundColor: '#f9f9f9',
+  padding: '30px',
+  borderRadius: '4px',
+  margin: '30px 0',
+  border: '1px solid #eaeaea',
 }
 
 const sectionTitle = {
-  color: '#651A1A',
-  fontSize: '22px',
+  color: '#682f2e',
+  fontSize: '20px',
   fontWeight: 'bold',
   marginTop: '0',
-  marginBottom: '15px',
+  marginBottom: '20px',
+  fontFamily: '"Playfair Display", serif',
 }
 
 const subsectionTitle = {
-  color: '#651A1A',
-  fontSize: '18px',
+  color: '#682f2e',
+  fontSize: '16px',
   fontWeight: 'bold',
-  marginTop: '20px',
+  marginTop: '25px',
   marginBottom: '10px',
+  textTransform: 'uppercase' as const,
+  letterSpacing: '0.5px',
 }
 
 const detailText = {
   fontSize: '15px',
   lineHeight: '24px',
-  color: '#333333',
+  color: '#4a4a4a',
   marginBottom: '10px',
 }
 
 const productRow = {
   marginBottom: '15px',
   paddingBottom: '15px',
-  borderBottom: '1px solid #eeeeee',
+  borderBottom: '1px solid #eaeaea',
 }
 
 const productName = {
-  fontSize: '15px',
+  fontSize: '16px',
   color: '#333333',
   marginBottom: '5px',
   marginTop: '0',
+  fontWeight: '500',
 }
 
 const productSize = {
   color: '#666666',
   fontSize: '14px',
+  fontStyle: 'italic',
 }
 
 const productDetails = {
@@ -231,29 +261,32 @@ const productDetails = {
 }
 
 const divider = {
-  borderColor: '#651A1A',
-  borderWidth: '2px',
+  borderColor: '#eaeaea',
+  borderWidth: '1px',
   margin: '20px 0',
 }
 
 const totalText = {
-  fontSize: '18px',
-  color: '#333333',
+  fontSize: '20px',
+  color: '#682f2e',
   marginTop: '10px',
   marginBottom: '20px',
+  fontFamily: '"Playfair Display", serif',
+  fontWeight: 'bold',
 }
 
 const link = {
-  color: '#651A1A',
+  color: '#682f2e',
   textDecoration: 'underline',
 }
 
 const footer = {
   textAlign: 'center' as const,
-  padding: '20px',
+  padding: '30px 20px',
+  backgroundColor: '#f5f5f5',
 }
 
 const footerText = {
-  color: '#666666',
+  color: '#888888',
   fontSize: '12px',
 }
