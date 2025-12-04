@@ -1,0 +1,8 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#FFF8DC"/>
+  <ellipse cx="400" cy="420" rx="220" ry="60" fill="#B8860B"/>
+  <ellipse cx="400" cy="380" rx="220" ry="50" fill="#DAA520"/>
+  <ellipse cx="400" cy="300" rx="220" ry="150" fill="#FFFACD"/>
+  <path d="M 180 280 Q 400 260 620 280" stroke="#FFD700" stroke-width="3" fill="none"/>
+  <text x="400" y="570" font-family="Arial" font-size="20" fill="#666" text-anchor="middle">Signature Golden Crust Cheesecake</text>
+</svg>

@@ -1,0 +1,8 @@
+<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#FFE4E1"/>
+  <path d="M 50 150 L 100 50 L 150 150 Z" fill="#FFFACD"/>
+  <path d="M 50 150 L 100 50 L 150 150 Z" fill="#FFB6C1" opacity="0.6"/>
+  <rect x="45" y="150" width="110" height="20" fill="#DEB887"/>
+  <circle cx="100" cy="80" r="10" fill="#FF69B4"/>
+  <text x="100" y="190" font-family="Arial" font-size="12" fill="#666" text-anchor="middle">Strawberry Cheesecake</text>
+</svg>

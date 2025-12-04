@@ -1,0 +1,10 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="600" fill="#FF8C00"/>
+  <circle cx="250" cy="250" r="80" fill="#FFFAF0"/>
+  <circle cx="250" cy="250" r="70" fill="#FF7F50"/>
+  <circle cx="550" cy="250" r="80" fill="#FFFAF0"/>
+  <circle cx="550" cy="250" r="70" fill="#FF7F50"/>
+  <circle cx="400" cy="400" r="80" fill="#FFFAF0"/>
+  <circle cx="400" cy="400" r="70" fill="#FF7F50"/>
+  <text x="400" y="570" font-family="Arial" font-size="20" fill="white" text-anchor="middle">Overhead Pumpkin Cheesecakes</text>
+</svg>
