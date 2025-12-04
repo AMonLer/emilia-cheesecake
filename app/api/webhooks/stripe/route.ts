@@ -125,7 +125,7 @@ ${productsText}
       }
 
       // Email al cliente con React Email
-      const customerEmailHtml = render(
+      const customerEmailHtml = await render(
         OrderConfirmationEmail({
           customerName: metadata.customerName || 'Kunde',
           orderId: paymentIntent.id,
@@ -147,7 +147,7 @@ ${productsText}
       })
 
       // Email a ti (el dueño) con React Email
-      const adminEmailHtml = render(
+      const adminEmailHtml = await render(
         AdminNotificationEmail({
           customerName: metadata.customerName || 'N/A',
           customerEmail: metadata.customerEmail || 'N/A',
