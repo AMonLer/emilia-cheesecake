@@ -48,7 +48,7 @@ export default function Navbar() {
             {/* Logo - Centered */}
             <Link href="/" className="flex-shrink-0 transform hover:scale-105 transition-transform duration-500">
               <Image
-                src="/Emilia (5).png"
+                src="/Emilia (6).png"
                 alt="Emilia"
                 width={180}
                 height={50}
