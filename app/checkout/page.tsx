@@ -103,6 +103,18 @@ export default function CheckoutPage() {
   const discount = totalPrice >= 120 ? totalPrice * 0.15 : 0
   const finalPrice = totalPrice - discount
 
+  const handleAddUpsellProduct = () => {
+    const upsellProduct = {
+      id: `clasica-upsell-${Date.now()}`,
+      name: "CLÁSICA",
+      price: 20.00,
+      size: "2-3",
+      image: "/original1.png",
+      quantity: 1
+    }
+    addToCart(upsellProduct)
+  }
+
   const handleContinueToDelivery = (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -469,6 +481,31 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-lg font-black border-t pt-3">
                 <span>Gesamt</span>
                 <span className={discount > 0 ? "text-green-600" : ""}>CHF {finalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+
+            {/* Limited Offer */}
+            <div className="mt-6 p-4 bg-pink-50 rounded-lg">
+              <h3 className="font-bold text-sm mb-2">Zeitlich begrenztes Angebot! Füge mehr hinzu und spare</h3>
+              <div className="flex gap-3 items-center">
+                <img
+                  src="/original1.png"
+                  alt="Angebot"
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+                <div className="flex-1">
+                  <p className="text-sm font-bold">CLÁSICA (2-3 Personen)</p>
+                  <p className="text-xs text-gray-600">Original Käsekuchen</p>
+                  <p className="text-sm">
+                    <span className="font-bold">20.00 CHF</span>
+                  </p>
+                </div>
+                <button
+                  onClick={handleAddUpsellProduct}
+                  className="px-4 py-2 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-900 transition-colors"
+                >
+                  Hinzufügen
+                </button>
               </div>
             </div>
           </div>
