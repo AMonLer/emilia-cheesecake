@@ -109,7 +109,7 @@ export default function CheckoutPage() {
       name: "CLÁSICA",
       price: 18.00, // 10% discount from 20 CHF
       size: "2-3",
-      image: "/original1.png",
+      image: "/original3.png",
       quantity: 1
     }
     addToCart(upsellProduct)
@@ -489,7 +489,7 @@ export default function CheckoutPage() {
               <h3 className="font-bold text-sm mb-2">Zeitlich begrenztes Angebot! Füge mehr hinzu und spare</h3>
               <div className="flex gap-3 items-center">
                 <img
-                  src="/original1.png"
+                  src="/original3.png"
                   alt="Angebot"
                   className="w-16 h-16 rounded-lg object-cover"
                 />
