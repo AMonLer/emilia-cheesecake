@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   title: "Emilia - Tartas de Queso Artesanales | Envíos a Toda España",
   description: "Las mejores tartas de queso artesanales. Envíos a domicilio en toda España.",
   generator: "v0.app",
+  icons: {
+    icon: "/Emilia (7).png",
+  },
 }
 
 export default function RootLayout({
