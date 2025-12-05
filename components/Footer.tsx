@@ -1,7 +1,18 @@
+"use client"
+
 import Link from "next/link"
+import { useState } from "react"
+import ContactModal from "./ContactModal"
 
 export default function Footer() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+
   return (
+    <>
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
     <footer className="bg-black text-white py-20">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* Logo y descripción */}
@@ -33,9 +44,12 @@ export default function Footer() {
             <h4 className="font-black mb-6 tracking-tight text-sm">HILFE</h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                <button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+                >
                   Kontakt
-                </a>
+                </button>
               </li>
               <li>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -93,5 +107,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }
