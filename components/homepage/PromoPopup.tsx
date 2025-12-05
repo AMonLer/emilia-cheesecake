@@ -61,8 +61,8 @@ export default function PromoPopup() {
     if (!showPromo) return null
 
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-500">
-            <div className="bg-[#FAF9F6] rounded-[2rem] max-w-md w-full p-10 relative shadow-2xl overflow-hidden animate-in zoom-in-95 duration-500 border border-white/50">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-md z-50 flex items-center justify-center p-4 animate-in fade-in duration-500 overflow-y-auto">
+            <div className="bg-[#FAF9F6] rounded-[2rem] max-w-md w-full p-10 relative shadow-2xl overflow-y-auto max-h-[95vh] my-auto animate-in zoom-in-95 duration-500 border border-white/50">
                 <button
                     onClick={handleClosePromo}
                     className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 z-10 cursor-pointer transition-colors duration-300"
@@ -77,7 +77,7 @@ export default function PromoPopup() {
                     </span>
 
                     <h2 className="text-4xl md:text-5xl font-serif text-[#1a1a1a] mb-6 leading-tight">
-                        Ein süßer <br />
+                        Ein süsser <br />
                         <span className="italic text-[#651A1A]">Anfang</span>
                     </h2>
 
