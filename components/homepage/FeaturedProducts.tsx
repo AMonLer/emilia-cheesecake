@@ -61,7 +61,7 @@ export default function FeaturedProducts() {
                             href="/product/cafe"
                             image1="/cafe1.png"
                             image2="/cafe2.png"
-                            name="DULCE"
+                            name="MANJAR"
                             description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
                             tag={{
                                 label: "New",

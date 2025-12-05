@@ -45,8 +45,8 @@ export default function BestellenPage() {
       description: "Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber."
     },
     {
-      id: "dulce",
-      name: "DULCE",
+      id: "manjar",
+      name: "MANJAR",
       slug: "cafe",
       image1: "/cafe1.png",
       image2: "/cafe2.png",

@@ -47,7 +47,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "DULCE",
+                name: "MANJAR",
                 price: 60.00,
                 image: "/cafe1.png"
             }
@@ -68,7 +68,7 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "DULCE",
+                name: "MANJAR",
                 price: 60.00,
                 image: "/cafe1.png"
             },
@@ -108,7 +108,7 @@ export const products: { [key: string]: any } = {
         ]
     },
     "cafe": {
-        name: "DULCE",
+        name: "MANJAR",
         prices: {
             "8-10": 60,
             "2-3": 20
