@@ -57,7 +57,7 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
             {/* Size Selector */}
             <div className="mb-8">
                 <h3 className="font-black text-sm text-black mb-4 tracking-wide uppercase">Größe wählen</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* 8-10 Personas */}
                     <button
                         onClick={() => setSelectedSize("8-10")}
@@ -66,8 +66,8 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                             : "bg-white border-gray-100 hover:border-black/30"
                             }`}
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="relative w-12 h-12 flex-shrink-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
                                     alt="Complete cheesecake"
@@ -75,9 +75,9 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     className="object-contain"
                                 />
                             </div>
-                            <div>
-                                <p className="font-black text-sm text-black">8–10 Personen</p>
-                                <p className="text-xs text-black/60">Ø 26 cm</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="font-black text-xs sm:text-sm text-black truncate">8–10 Personen</p>
+                                <p className="text-xs text-black/60">Ø 24 cm</p>
                             </div>
                         </div>
                         {selectedSize === "8-10" && (
@@ -95,8 +95,8 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                             : "bg-white border-gray-100 hover:border-black/30"
                             }`}
                     >
-                        <div className="flex items-center gap-3">
-                            <div className="relative w-12 h-12 flex-shrink-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
                                     alt="Small cheesecake box"
@@ -104,9 +104,9 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     className="object-contain"
                                 />
                             </div>
-                            <div>
-                                <p className="font-black text-sm text-black">2–3 Personen</p>
-                                <p className="text-xs text-black/60">Ø 16 cm</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="font-black text-xs sm:text-sm text-black truncate">2–3 Personen</p>
+                                <p className="text-xs text-black/60">Ø 14 cm</p>
                             </div>
                         </div>
                         {selectedSize === "2-3" && (
