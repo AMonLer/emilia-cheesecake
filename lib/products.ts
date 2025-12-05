@@ -47,7 +47,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "MOKKA",
+                name: "DULCE",
                 price: 60.00,
                 image: "/cafe1.png"
             }
@@ -68,7 +68,7 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "MOKKA",
+                name: "DULCE",
                 price: 60.00,
                 image: "/cafe1.png"
             },
@@ -108,15 +108,15 @@ export const products: { [key: string]: any } = {
         ]
     },
     "cafe": {
-        name: "MOKKA",
+        name: "DULCE",
         prices: {
             "8-10": 60,
             "2-3": 20
         },
-        description: "Sanfter und ausgewogener Kaffeegeschmack mit warmen Noten und zarter Creme. Eine Torte mit Charakter, aber freundlich und raffiniert.",
+        description: "Cremiges Dulce de Leche mit zartem Karamell und einer verführerischen Süße. Eine lateinamerikanische Köstlichkeit, die jeden Bissen zu einem unvergesslichen Erlebnis macht.",
         images: ["/cafe1.png", "/cafe2.png"],
         includes: [
-            "Espresso-Käsekuchen",
+            "Dulce de Leche Käsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
         frequentlyBought: [

@@ -45,12 +45,12 @@ export default function BestellenPage() {
       description: "Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber."
     },
     {
-      id: "mokka",
-      name: "MOKKA",
+      id: "dulce",
+      name: "DULCE",
       slug: "cafe",
       image1: "/cafe1.png",
       image2: "/cafe2.png",
-      description: "Köstlicher Käsekuchen mit Espresso-Kaffee, perfekt für Kaffeeliebhaber.",
+      description: "Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell.",
       tag: {
         label: "Neu",
         bgColor: "bg-[#8B7355]",

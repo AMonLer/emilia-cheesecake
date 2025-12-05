@@ -61,8 +61,8 @@ export default function FeaturedProducts() {
                             href="/product/cafe"
                             image1="/cafe1.png"
                             image2="/cafe2.png"
-                            name="MOKKA"
-                            description="Köstlicher Käsekuchen mit Espresso-Kaffee, perfekt für Kaffeeliebhaber..."
+                            name="DULCE"
+                            description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
                             tag={{
                                 label: "New",
                                 bgColor: "bg-[#8B7355]",
