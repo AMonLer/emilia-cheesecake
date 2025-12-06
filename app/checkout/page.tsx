@@ -83,6 +83,7 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string>("")
   const [showPayment, setShowPayment] = useState(false)
   const [showDeliveryStep, setShowDeliveryStep] = useState(false)
+  const [upsellAdded, setUpsellAdded] = useState(false)
 
   // Calculate minimum delivery date (36 hours from now)
   const getMinDeliveryDate = () => {
@@ -113,6 +114,7 @@ export default function CheckoutPage() {
       quantity: 1
     }
     addToCart(upsellProduct)
+    setUpsellAdded(true)
   }
 
   const handleContinueToDelivery = (e: React.FormEvent) => {
@@ -485,30 +487,32 @@ export default function CheckoutPage() {
             </div>
 
             {/* Limited Offer */}
-            <div className="mt-6 p-4 bg-pink-50 rounded-lg">
-              <h3 className="font-bold text-sm mb-2">Zeitlich begrenztes Angebot! Füge mehr hinzu und spare</h3>
-              <div className="flex gap-3 items-center">
-                <img
-                  src="/original3.png"
-                  alt="Angebot"
-                  className="w-16 h-16 rounded-lg object-cover"
-                />
-                <div className="flex-1">
-                  <p className="text-sm font-bold">CLÁSICA (2-3 Personen)</p>
-                  <p className="text-xs text-gray-600">(10% RABATT)</p>
-                  <p className="text-sm">
-                    <span className="font-bold">20.00 CHF</span>{" "}
-                    <span className="text-gray-500 line-through">27.00 CHF</span>
-                  </p>
+            {!upsellAdded && (
+              <div className="mt-6 p-4 bg-pink-50 rounded-lg">
+                <h3 className="font-bold text-sm mb-2">Zeitlich begrenztes Angebot! Füge mehr hinzu und spare</h3>
+                <div className="flex gap-3 items-center">
+                  <img
+                    src="/original3.png"
+                    alt="Angebot"
+                    className="w-16 h-16 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <p className="text-sm font-bold">CLÁSICA (2-3 Personen)</p>
+                    <p className="text-xs text-gray-600">(10% RABATT)</p>
+                    <p className="text-sm">
+                      <span className="font-bold">20.00 CHF</span>{" "}
+                      <span className="text-gray-500 line-through">27.00 CHF</span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleAddUpsellProduct}
+                    className="px-4 py-2 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-900 transition-colors"
+                  >
+                    Hinzufügen
+                  </button>
                 </div>
-                <button
-                  onClick={handleAddUpsellProduct}
-                  className="px-4 py-2 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-900 transition-colors"
-                >
-                  Hinzufügen
-                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
