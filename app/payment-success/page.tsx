@@ -6,8 +6,8 @@ import Image from "next/image"
 
 export default function PaymentSuccess() {
   useEffect(() => {
-    // Clear cart if needed
-    // localStorage.removeItem('cart')
+    // Clear cart after successful payment
+    localStorage.removeItem('emilia-cart')
   }, [])
 
   return (
@@ -50,7 +50,7 @@ export default function PaymentSuccess() {
             Zurück zur Startseite
           </Link>
           <p className="text-xs text-gray-400 font-light tracking-wider">
-            Fragen? <a href="mailto:hola@emilia.com" className="text-black hover:text-[#651A1A] transition-colors border-b border-gray-200 hover:border-[#651A1A] pb-0.5">Kontaktieren Sie uns</a>
+            Fragen? <a href="mailto:info@emilialab.com" className="text-black hover:text-[#651A1A] transition-colors border-b border-gray-200 hover:border-[#651A1A] pb-0.5">Kontaktieren Sie uns</a>
           </p>
         </div>
       </div>

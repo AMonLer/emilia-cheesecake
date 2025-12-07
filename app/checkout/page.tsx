@@ -37,11 +37,11 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
       })
 
       if (error) {
-        setErrorMessage(error.message || "Ocurrió un error al procesar el pago")
+        setErrorMessage(error.message || "Bei der Zahlungsabwicklung ist ein Fehler aufgetreten")
         setIsProcessing(false)
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Ocurrió un error inesperado")
+      setErrorMessage(err.message || "Ein unerwarteter Fehler ist aufgetreten")
       setIsProcessing(false)
     }
   }
@@ -170,11 +170,11 @@ export default function CheckoutPage() {
         setClientSecret(data.clientSecret)
         setShowPayment(true)
       } else {
-        alert('Error al iniciar el pago. Por favor intenta de nuevo.')
+        alert('Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.')
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('Error al iniciar el pago. Por favor intenta de nuevo.')
+      alert('Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.')
     }
   }
 
