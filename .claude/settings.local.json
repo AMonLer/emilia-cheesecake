@@ -35,7 +35,20 @@
       "Bash(git push:*)",
       "Bash(git reset:*)",
       "Bash(git config:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(curl:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add app/layout.tsx)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Add Google Ads tracking tag (AW-17759330762)\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" push)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add lib/products.ts app/checkout/page.tsx)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Update prices: large 60→70 CHF, small 20→27 CHF, upsell 20 CHF\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add app/checkout/page.tsx)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Hide upsell section after adding to cart (one-time only)\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add app/payment-success/page.tsx app/checkout/page.tsx)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Fix: clear cart after payment, correct email, translate error messages to German\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add .)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Add env check endpoint for debugging\")"
     ],
     "deny": [],
     "ask": []
