@@ -1,6 +1,45 @@
 import Image from "next/image"
+import useEmblaCarousel from "embla-carousel-react"
+import { useEffect, useState, useCallback } from "react"
+import { cn } from "@/lib/utils"
+import { ChevronRight } from "lucide-react"
+
+const occasions = [
+    {
+        title: "BIRTHDAYS",
+        image: "/birthday1.jpg",
+        alt: "Birthdays"
+    },
+    {
+        title: "THANK YOU",
+        image: "/Thankyou.png",
+        alt: "Thank You"
+    },
+    {
+        title: "CONGRATS",
+        image: "/Congrats.jpeg",
+        alt: "Congrats"
+    }
+]
 
 export default function OccasionsSection() {
+    const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: "center" })
+    const [selectedIndex, setSelectedIndex] = useState(0)
+    const [canScrollNext, setCanScrollNext] = useState(true)
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return
+        setSelectedIndex(emblaApi.selectedScrollSnap())
+        setCanScrollNext(emblaApi.canScrollNext())
+    }, [emblaApi])
+
+    useEffect(() => {
+        if (!emblaApi) return
+        onSelect()
+        emblaApi.on("select", onSelect)
+        emblaApi.on("reInit", onSelect)
+    }, [emblaApi, onSelect])
+
     return (
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
@@ -14,46 +53,69 @@ export default function OccasionsSection() {
                     </p>
                 </div>
 
-                {/* Grid de 3 imágenes */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {/* BIRTHDAYS */}
-                    <div className="text-center">
-                        <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
-                            <Image
-                                src="/birthday1.jpg"
-                                alt="Birthdays"
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                            />
+                {/* Mobile Carousel */}
+                <div className="md:hidden relative group">
+                    <div className="overflow-hidden" ref={emblaRef}>
+                        <div className="flex -ml-4">
+                            {occasions.map((item, index) => (
+                                <div key={index} className="flex-[0_0_85%] min-w-0 pl-4">
+                                    <div className="text-center transition-opacity duration-300" style={{ opacity: selectedIndex === index ? 1 : 0.5 }}>
+                                        <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
+                                            <Image
+                                                src={item.image}
+                                                alt={item.alt}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                        <h3 className="font-black text-xl tracking-tight">{item.title}</h3>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <h3 className="font-black text-xl tracking-tight">BIRTHDAYS</h3>
                     </div>
 
-                    {/* THANK YOU */}
-                    <div className="text-center">
-                        <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
-                            <Image
-                                src="/Thankyou.png"
-                                alt="Thank You"
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
-                            />
-                        </div>
-                        <h3 className="font-black text-xl tracking-tight">THANK YOU</h3>
-                    </div>
+                    {/* Right Arrow Indicator */}
+                    {canScrollNext && (
+                        <button
+                            onClick={() => emblaApi?.scrollNext()}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/80 backdrop-blur-sm p-2 rounded-full shadow-lg text-[#651A1A] animate-pulse"
+                            aria-label="Next slide"
+                        >
+                            <ChevronRight className="w-6 h-6" />
+                        </button>
+                    )}
 
-                    {/* CONGRATS */}
-                    <div className="text-center">
-                        <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
-                            <Image
-                                src="/Congrats.jpeg"
-                                alt="Congrats"
-                                fill
-                                className="object-cover hover:scale-105 transition-transform duration-500"
+                    {/* Dots */}
+                    <div className="flex justify-center gap-2 mt-6">
+                        {occasions.map((_, index) => (
+                            <button
+                                key={index}
+                                className={cn(
+                                    "w-2 h-2 rounded-full transition-all duration-300",
+                                    selectedIndex === index ? "bg-[#651A1A] w-6" : "bg-[#651A1A]/20"
+                                )}
+                                onClick={() => emblaApi?.scrollTo(index)}
                             />
-                        </div>
-                        <h3 className="font-black text-xl tracking-tight">CONGRATS</h3>
+                        ))}
                     </div>
+                </div>
+
+                {/* Desktop Grid */}
+                <div className="hidden md:grid grid-cols-3 gap-8">
+                    {occasions.map((item, index) => (
+                        <div key={index} className="text-center">
+                            <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
+                                <Image
+                                    src={item.image}
+                                    alt={item.alt}
+                                    fill
+                                    className="object-cover hover:scale-105 transition-transform duration-500"
+                                />
+                            </div>
+                            <h3 className="font-black text-xl tracking-tight">{item.title}</h3>
+                        </div>
+                    ))}
                 </div>
             </div>
         </section>

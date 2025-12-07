@@ -7,6 +7,7 @@ import Marquee from "@/components/homepage/Marquee"
 import FeaturedProducts from "@/components/homepage/FeaturedProducts"
 import QualitySection from "@/components/homepage/QualitySection"
 import OccasionsSection from "@/components/homepage/OccasionsSection"
+import ProductExperienceSection from "@/components/homepage/ProductExperienceSection"
 import WhyChooseSection from "@/components/homepage/WhyChooseSection"
 import Footer from "@/components/Footer"
 
@@ -20,6 +21,7 @@ export default function EmiliaPage() {
       <FeaturedProducts />
       <QualitySection />
       <OccasionsSection />
+      <ProductExperienceSection />
       <WhyChooseSection />
       <Footer />
     </div>

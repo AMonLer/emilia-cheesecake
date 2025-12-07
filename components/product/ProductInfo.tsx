@@ -3,7 +3,8 @@
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
-import { Check, Star } from "lucide-react"
+import { Check, Star, CheckCircle, CreditCard, Smartphone } from "lucide-react"
+import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
 
 interface ProductInfoProps {
     product: any
@@ -125,6 +126,38 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
             >
                 IN DEN WARENKORB LEGEN
             </button>
+
+            {/* Guarantee & Payment Info */}
+            <div className="mb-8 space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
+                {/* Guarantee */}
+                <div className="flex items-center gap-3">
+                    <div className="bg-[#651A1A]/10 p-2 rounded-full">
+                        <CheckCircle className="w-5 h-5 text-[#651A1A]" />
+                    </div>
+                    <span className="text-sm font-bold text-[#651A1A]">100% Zufriedenheitsgarantie</span>
+                </div>
+
+                {/* Separator */}
+                <div className="h-px bg-gray-200 w-full"></div>
+
+                {/* Payment */}
+                <div className="flex items-center gap-3">
+                    <div className="bg-[#651A1A]/10 p-2 rounded-full flex-shrink-0">
+                        <div className="flex gap-1">
+                            <CreditCard className="w-5 h-5 text-[#651A1A]" />
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-xs font-bold text-[#651A1A] uppercase tracking-wide mb-2">Sichere Bezahlung</span>
+                        <div className="flex items-center gap-2">
+                            <VisaIcon className="h-8 w-auto" />
+                            <MastercardIcon className="h-8 w-auto" />
+                            <TwintIcon className="h-8 w-auto" />
+                            <ApplePayIcon className="h-8 w-auto" />
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Features List */}
             <div className="space-y-3 border-t border-black/10 pt-6">
