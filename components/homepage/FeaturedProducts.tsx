@@ -13,7 +13,7 @@ export default function FeaturedProducts() {
                     </p>
                 </div>
 
-                <div className="overflow-x-auto pb-4 -mx-4 px-4">
+                <div className="overflow-x-auto pb-4 -mx-4 px-4 custom-scrollbar">
                     <div className="flex gap-4 min-w-min">
                         <ProductCard
                             className="w-80 flex-shrink-0"
