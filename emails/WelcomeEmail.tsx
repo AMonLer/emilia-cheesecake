@@ -67,12 +67,12 @@ export default function WelcomeEmail({
                 <strong style={discountAmount}>15% Rabatt</strong>
               </Text>
               <Text style={discountCondition}>
-                auf deine erste Bestellung ab 120 CHF
+                auf deine erste Bestellung ab 100 CHF
               </Text>
               <Hr style={divider} />
               <Text style={discountNote}>
                 Der Rabatt wird automatisch an der Kasse angewendet,
-                wenn dein Warenkorb 120 CHF oder mehr beträgt.
+                wenn dein Warenkorb 100 CHF oder mehr beträgt.
               </Text>
             </Section>
 

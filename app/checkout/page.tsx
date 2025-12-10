@@ -101,7 +101,7 @@ export default function CheckoutPage() {
   ]
 
   // Calculate discount
-  const discount = totalPrice >= 120 ? totalPrice * 0.15 : 0
+  const discount = totalPrice >= 100 ? totalPrice * 0.15 : 0
   const finalPrice = totalPrice - discount
 
   const handleAddUpsellProduct = () => {

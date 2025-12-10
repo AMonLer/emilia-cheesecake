@@ -221,7 +221,7 @@ export default function Navbar() {
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-6">
                 {/* Discount Info - Minimalist */}
                 <div className="space-y-3">
-                  {totalPrice >= 120 ? (
+                  {totalPrice >= 100 ? (
                     <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
                       <span className="text-xs font-bold tracking-widest uppercase">15% Rabatt aktiviert</span>
                       <span className="text-xs font-bold">-{(totalPrice * 0.15).toFixed(2)} CHF</span>
@@ -230,16 +230,16 @@ export default function Navbar() {
                     <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
                         <span>Bis 15% Rabatt</span>
-                        <span>Noch {(120 - totalPrice).toFixed(2)} CHF</span>
+                        <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
                       </div>
                       <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
                         <div
                           className="h-full bg-[#651A1A] transition-all duration-500 rounded-full"
-                          style={{ width: `${(totalPrice / 120) * 100}%` }}
+                          style={{ width: `${(totalPrice / 100) * 100}%` }}
                         />
                       </div>
                       <p className="text-[10px] text-gray-400 text-center font-light tracking-wide">
-                        Erreichen Sie 120 CHF für 15% Rabatt
+                        Erreichen Sie 100 CHF für 15% Rabatt
                       </p>
                     </div>
                   )}
@@ -249,7 +249,7 @@ export default function Navbar() {
                       <span>Zwischensumme</span>
                       <span>{totalPrice.toFixed(2)} CHF</span>
                     </div>
-                    {totalPrice >= 120 && (
+                    {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
                         <span>RABATT (15%)</span>
                         <span>-{(totalPrice * 0.15).toFixed(2)} CHF</span>
@@ -257,7 +257,7 @@ export default function Navbar() {
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <span>{(totalPrice * (totalPrice >= 120 ? 0.85 : 1)).toFixed(2)} CHF</span>
+                      <span>{(totalPrice * (totalPrice >= 100 ? 0.85 : 1)).toFixed(2)} CHF</span>
                     </div>
                   </div>
                 </div>

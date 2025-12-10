@@ -4,7 +4,7 @@ export default function Marquee() {
             <div className="flex whitespace-nowrap animate-marquee">
                 {[...Array(10)].map((_, i) => (
                     <span key={i} className="inline-block px-8 font-black text-sm tracking-wide">
-                        15% RABATT AB 120 CHF BESTELLWERT • GRATIS VERSAND
+                        15% RABATT AB 100 CHF BESTELLWERT • GRATIS VERSAND
                     </span>
                 ))}
             </div>
