@@ -103,7 +103,7 @@ export default function CheckoutPage() {
     "8106","8117","8118","8121","8122","8123","8125","8126","8127","8134",
     "8135","8142","8143","8152","8153","8302","8303","8304","8305","8306",
     "8600","8602","8603","8700","8702","8703","8800","8802","8803","8901",
-    "8902","8903","8904","8905","8906","8952"
+    "8902","8903","8904","8905","8906","8952","8953"
   ])
 
   const isPostalCodeValid = (code: string) => allowedPostalCodes.has(code.trim())
@@ -406,9 +406,6 @@ export default function CheckoutPage() {
                         calendarClassName="!font-sans"
                         required
                       />
-                      <p className="text-xs text-gray-500 mt-1">
-                        20. Dez - 6. Jan: Betriebsferien (keine Lieferung)
-                      </p>
                     </div>
 
                     {/* Time Slot Picker */}
