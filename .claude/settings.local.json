@@ -48,7 +48,14 @@
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add app/payment-success/page.tsx app/checkout/page.tsx)",
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Fix: clear cart after payment, correct email, translate error messages to German\")",
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add .)",
-      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Add env check endpoint for debugging\")"
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Add env check endpoint for debugging\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" status)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" diff --stat)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add components/icons/ components/homepage/ProductExperienceSection.tsx components/product/ProductInfo.tsx components/homepage/OccasionsSection.tsx app/page.tsx public/foto2.jpeg)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Improve payment icons (Visa, Mastercard, Apple, TWINT official) and center LIEBE ZUM DETAIL section\")",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add public/foto2.jpeg components/homepage/WhyChooseSection.tsx)",
+      "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Update foto2 and change HANDWERKLICHE icon to UtensilsCrossed\")",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

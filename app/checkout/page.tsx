@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronRight, X } from "lucide-react"
@@ -8,6 +8,12 @@ import { useCart } from "@/contexts/CartContext"
 import Navbar from "@/components/Navbar"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
+import DatePicker, { registerLocale } from "react-datepicker"
+import { de } from "date-fns/locale"
+import "react-datepicker/dist/react-datepicker.css"
+import { addHours, eachDayOfInterval } from "date-fns"
+
+registerLocale("de", de)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
@@ -78,19 +84,51 @@ export default function CheckoutPage() {
   const [postalCode, setPostalCode] = useState("")
   const [country, setCountry] = useState("Switzerland")
   const [kanton, setKanton] = useState("Zürich")
-  const [deliveryDate, setDeliveryDate] = useState("")
+  const [deliveryDate, setDeliveryDate] = useState<Date | null>(null)
   const [deliveryTime, setDeliveryTime] = useState("")
   const [clientSecret, setClientSecret] = useState<string>("")
   const [showPayment, setShowPayment] = useState(false)
   const [showDeliveryStep, setShowDeliveryStep] = useState(false)
   const [upsellAdded, setUpsellAdded] = useState(false)
+  const [postalCodeError, setPostalCodeError] = useState("")
+
+  // Allowed postal codes within 10km of Zürich center
+  const allowedPostalCodes = new Set([
+    "8000","8001","8002","8003","8004","8005","8006","8008","8010","8012",
+    "8021","8022","8024","8027","8031","8032","8034","8036","8037","8038",
+    "8040","8041","8042","8044","8045","8046","8047","8048","8049","8050",
+    "8051","8052","8053","8055","8057","8058","8060","8063","8064","8070",
+    "8071","8074","8075","8080","8081","8085","8086","8087","8088","8090",
+    "8091","8092","8093","8096","8098","8099","8102","8103","8104","8105",
+    "8106","8117","8118","8121","8122","8123","8125","8126","8127","8134",
+    "8135","8142","8143","8152","8153","8302","8303","8304","8305","8306",
+    "8600","8602","8603","8700","8702","8703","8800","8802","8803","8901",
+    "8902","8903","8904","8905","8906","8952"
+  ])
+
+  const isPostalCodeValid = (code: string) => allowedPostalCodes.has(code.trim())
 
   // Calculate minimum delivery date (36 hours from now)
-  const getMinDeliveryDate = () => {
-    const minDate = new Date()
-    minDate.setHours(minDate.getHours() + 36)
-    return minDate.toISOString().split('T')[0]
-  }
+  const minDeliveryDate = useMemo(() => addHours(new Date(), 36), [])
+
+  // Generate blocked dates (Dec 20 - Jan 6)
+  const blockedDates = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    const nextYear = currentYear + 1
+
+    // Dec 20 - Dec 31 of current year
+    const dec20 = new Date(currentYear, 11, 20)
+    const dec31 = new Date(currentYear, 11, 31)
+
+    // Jan 1 - Jan 6 of next year
+    const jan1 = new Date(nextYear, 0, 1)
+    const jan6 = new Date(nextYear, 0, 6)
+
+    const decemberDates = eachDayOfInterval({ start: dec20, end: dec31 })
+    const januaryDates = eachDayOfInterval({ start: jan1, end: jan6 })
+
+    return [...decemberDates, ...januaryDates]
+  }, [])
 
   // Generate time slots
   const timeSlots = [
@@ -125,6 +163,13 @@ export default function CheckoutPage() {
       return
     }
 
+    // Validate postal code is within delivery area
+    if (!isPostalCodeValid(postalCode)) {
+      setPostalCodeError("Leider liefern wir nur im Umkreis von 10km um Zürich Zentrum. Ihre Postleitzahl liegt ausserhalb unseres Liefergebiets.")
+      return
+    }
+
+    setPostalCodeError("")
     setShowDeliveryStep(true)
   }
 
@@ -152,7 +197,7 @@ export default function CheckoutPage() {
             city,
             postalCode,
             kanton,
-            deliveryDate,
+            deliveryDate: deliveryDate?.toLocaleDateString('de-CH'),
             deliveryTime,
             items: cartItems.map(item => ({
               name: item.name,
@@ -290,11 +335,22 @@ export default function CheckoutPage() {
                           type="text"
                           placeholder="Postleitzahl"
                           value={postalCode}
-                          onChange={(e) => setPostalCode(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                          onChange={(e) => {
+                            setPostalCode(e.target.value)
+                            setPostalCodeError("")
+                          }}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${
+                            postalCodeError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
+                          }`}
                           required
                         />
                       </div>
+
+                      {postalCodeError && (
+                        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
+                          {postalCodeError}
+                        </div>
+                      )}
 
                       <select
                         value={kanton}
@@ -338,14 +394,21 @@ export default function CheckoutPage() {
                     {/* Date Picker */}
                     <div>
                       <label className="block text-sm font-bold mb-2">Lieferdatum</label>
-                      <input
-                        type="date"
-                        value={deliveryDate}
-                        onChange={(e) => setDeliveryDate(e.target.value)}
-                        min={getMinDeliveryDate()}
+                      <DatePicker
+                        selected={deliveryDate}
+                        onChange={(date) => setDeliveryDate(date)}
+                        minDate={minDeliveryDate}
+                        excludeDates={blockedDates}
+                        locale="de"
+                        dateFormat="dd.MM.yyyy"
+                        placeholderText="Datum wählen"
                         className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                        calendarClassName="!font-sans"
                         required
                       />
+                      <p className="text-xs text-gray-500 mt-1">
+                        20. Dez - 6. Jan: Betriebsferien (keine Lieferung)
+                      </p>
                     </div>
 
                     {/* Time Slot Picker */}
