@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, X } from "lucide-react"
+import { ChevronRight, ChevronLeft, X } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import Navbar from "@/components/Navbar"
 import { loadStripe } from "@stripe/stripe-js"
@@ -94,16 +94,16 @@ export default function CheckoutPage() {
 
   // Allowed postal codes within 10km of Zürich center
   const allowedPostalCodes = new Set([
-    "8000","8001","8002","8003","8004","8005","8006","8008","8010","8012",
-    "8021","8022","8024","8027","8031","8032","8034","8036","8037","8038",
-    "8040","8041","8042","8044","8045","8046","8047","8048","8049","8050",
-    "8051","8052","8053","8055","8057","8058","8060","8063","8064","8070",
-    "8071","8074","8075","8080","8081","8085","8086","8087","8088","8090",
-    "8091","8092","8093","8096","8098","8099","8102","8103","8104","8105",
-    "8106","8117","8118","8121","8122","8123","8125","8126","8127","8134",
-    "8135","8142","8143","8152","8153","8302","8303","8304","8305","8306",
-    "8600","8602","8603","8700","8702","8703","8800","8802","8803","8901",
-    "8902","8903","8904","8905","8906","8952","8953"
+    "8000", "8001", "8002", "8003", "8004", "8005", "8006", "8008", "8010", "8012",
+    "8021", "8022", "8024", "8027", "8031", "8032", "8034", "8036", "8037", "8038",
+    "8040", "8041", "8042", "8044", "8045", "8046", "8047", "8048", "8049", "8050",
+    "8051", "8052", "8053", "8055", "8057", "8058", "8060", "8063", "8064", "8070",
+    "8071", "8074", "8075", "8080", "8081", "8085", "8086", "8087", "8088", "8090",
+    "8091", "8092", "8093", "8096", "8098", "8099", "8102", "8103", "8104", "8105",
+    "8106", "8117", "8118", "8121", "8122", "8123", "8125", "8126", "8127", "8134",
+    "8135", "8142", "8143", "8152", "8153", "8302", "8303", "8304", "8305", "8306",
+    "8600", "8602", "8603", "8700", "8702", "8703", "8800", "8802", "8803", "8901",
+    "8902", "8903", "8904", "8905", "8906", "8952", "8953"
   ])
 
   const isPostalCodeValid = (code: string) => allowedPostalCodes.has(code.trim())
@@ -339,9 +339,8 @@ export default function CheckoutPage() {
                             setPostalCode(e.target.value)
                             setPostalCodeError("")
                           }}
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${
-                            postalCodeError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
-                          }`}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${postalCodeError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
+                            }`}
                           required
                         />
                       </div>
@@ -393,19 +392,174 @@ export default function CheckoutPage() {
                   <div className="space-y-4 mb-8">
                     {/* Date Picker */}
                     <div>
-                      <label className="block text-sm font-bold mb-2">Lieferdatum</label>
-                      <DatePicker
-                        selected={deliveryDate}
-                        onChange={(date) => setDeliveryDate(date)}
-                        minDate={minDeliveryDate}
-                        excludeDates={blockedDates}
-                        locale="de"
-                        dateFormat="dd.MM.yyyy"
-                        placeholderText="Datum wählen"
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
-                        calendarClassName="!font-sans"
-                        required
-                      />
+                      <label className="block text-sm font-bold mb-4">Lieferdatum wählen</label>
+                      <style>{`
+                        .custom-datepicker {
+                          font-family: var(--font-playfair), serif;
+                          border: none;
+                          padding: 0;
+                          width: 100%;
+                          background-color: transparent;
+                        }
+                        .react-datepicker {
+                          width: 100%;
+                          border: none;
+                          background-color: transparent;
+                        }
+                        .react-datepicker__month-container {
+                          width: 100%;
+                          margin: 0 auto;
+                        }
+                        .react-datepicker__header {
+                          background-color: transparent;
+                          border-bottom: none;
+                          padding-top: 0;
+                          margin-bottom: 1rem;
+                          width: 100%;
+                        }
+                        .react-datepicker__day-names,
+                        .react-datepicker__week {
+                          display: flex;
+                          justify-content: space-between;
+                          padding: 0;
+                        }
+                        .react-datepicker__day-name {
+                          color: #651A1A;
+                          font-family: var(--font-geist-sans), sans-serif;
+                          font-weight: 600;
+                          width: 2.5rem;
+                          text-transform: uppercase;
+                          font-size: 0.7rem;
+                          letter-spacing: 0.1em;
+                          margin: 0;
+                          text-align: center;
+                        }
+                        .react-datepicker__day {
+                          width: 2.5rem;
+                          height: 2.5rem;
+                          line-height: 2.5rem;
+                          border-radius: 50%;
+                          margin: 0;
+                          font-family: var(--font-playfair), serif;
+                          font-size: 1rem;
+                          color: #1a1a1a;
+                          transition: all 0.2s;
+                          text-align: center;
+                        }
+                        .react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
+                          background-color: #E6D5C0;
+                          color: #651A1A;
+                        }
+                        .react-datepicker__day--selected,
+                        .react-datepicker__day--keyboard-selected {
+                          background-color: #651A1A !important;
+                          color: white !important;
+                        }
+                        .react-datepicker__day--disabled {
+                          color: #ccc;
+                          opacity: 0.3;
+                        }
+                        .react-datepicker__day--today {
+                          font-weight: bold;
+                          color: #651A1A;
+                          position: relative;
+                        }
+                        .react-datepicker__day--today::after {
+                          content: '';
+                          position: absolute;
+                          bottom: 4px;
+                          left: 50%;
+                          transform: translateX(-50%);
+                          width: 4px;
+                          height: 4px;
+                          background-color: #651A1A;
+                          border-radius: 50%;
+                        }
+                        .react-datepicker__day--selected::after {
+                          display: none;
+                        }
+                        .react-datepicker__month {
+                          margin: 0;
+                        }
+                      `}</style>
+
+                      <div className="bg-[#FFFCF8] border border-[#E6D5C0] rounded-2xl p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-center mb-6">
+                        {/* Left Side: Calendar */}
+                        <div className="flex-1 w-full max-w-[360px] lg:max-w-none">
+                          <DatePicker
+                            selected={deliveryDate}
+                            onChange={(date) => setDeliveryDate(date)}
+                            minDate={minDeliveryDate}
+                            excludeDates={blockedDates}
+                            locale="de"
+                            inline
+                            calendarClassName="custom-datepicker"
+                            renderCustomHeader={({
+                              date,
+                              decreaseMonth,
+                              increaseMonth,
+                              prevMonthButtonDisabled,
+                              nextMonthButtonDisabled,
+                            }) => (
+                              <div className="flex items-center justify-between px-2 mb-4">
+                                <button
+                                  onClick={decreaseMonth}
+                                  disabled={prevMonthButtonDisabled}
+                                  type="button"
+                                  className="p-2 hover:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent text-[#651A1A]"
+                                >
+                                  <ChevronLeft className="w-5 h-5" />
+                                </button>
+
+                                <h3 className="text-xl font-black text-[#1a1a1a] font-serif capitalize">
+                                  {date.toLocaleDateString("de-CH", {
+                                    month: "long",
+                                    year: "numeric",
+                                  })}
+                                </h3>
+
+                                <button
+                                  onClick={increaseMonth}
+                                  disabled={nextMonthButtonDisabled}
+                                  type="button"
+                                  className="p-2 hover:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent text-[#651A1A]"
+                                >
+                                  <ChevronRight className="w-5 h-5" />
+                                </button>
+                              </div>
+                            )}
+                          />
+                        </div>
+
+                        {/* Divider (Desktop) */}
+                        <div className="hidden lg:block w-px h-64 bg-[#E6D5C0] opacity-50"></div>
+
+                        {/* Right Side: Date Info */}
+                        <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start justify-center text-center lg:text-left">
+                          {deliveryDate ? (
+                            <>
+                              <p className="text-xs uppercase tracking-widest text-[#651A1A] font-bold mb-2">Lieferdatum</p>
+                              <p className="text-4xl lg:text-5xl font-black font-serif text-[#1a1a1a] mb-2">
+                                {deliveryDate.getDate()}
+                              </p>
+                              <p className="text-xl lg:text-2xl font-serif text-[#1a1a1a] mb-1 capitalize">
+                                {deliveryDate.toLocaleDateString('de-CH', { month: 'long' })}
+                              </p>
+                              <p className="text-lg text-gray-600 font-medium capitalize">
+                                {deliveryDate.toLocaleDateString('de-CH', { weekday: 'long' })}
+                              </p>
+                              <p className="text-sm text-gray-400 mt-2">
+                                {deliveryDate.getFullYear()}
+                              </p>
+                            </>
+                          ) : (
+                            <div className="text-gray-400 flex flex-col items-center lg:items-start">
+                              <p className="mb-2">Bitte wählen Sie ein Datum</p>
+                              <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Time Slot Picker */}
@@ -417,11 +571,10 @@ export default function CheckoutPage() {
                             key={slot}
                             type="button"
                             onClick={() => setDeliveryTime(slot)}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
-                              deliveryTime === slot
-                                ? "border-[#651A1A] bg-[#F5E6D3] shadow-md"
-                                : "border-gray-300 bg-white hover:border-gray-400"
-                            }`}
+                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${deliveryTime === slot
+                              ? "border-[#651A1A] bg-[#F5E6D3] shadow-md"
+                              : "border-gray-300 bg-white hover:border-gray-400"
+                              }`}
                           >
                             <div className="flex items-center justify-center gap-2">
                               <svg className="w-5 h-5 text-[#651A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -575,7 +728,7 @@ export default function CheckoutPage() {
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }
