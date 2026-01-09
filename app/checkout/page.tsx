@@ -212,6 +212,8 @@ export default function CheckoutPage() {
       const data = await response.json()
 
       if (data.clientSecret) {
+        // Store order value for Google Ads conversion tracking
+        localStorage.setItem('emilia-order-value', finalPrice.toString())
         setClientSecret(data.clientSecret)
         setShowPayment(true)
       } else {

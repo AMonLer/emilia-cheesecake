@@ -1,14 +1,41 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 
-export default function PaymentSuccess() {
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void
+  }
+}
+
+function PaymentSuccessContent() {
+  const searchParams = useSearchParams()
+
   useEffect(() => {
-    // Clear cart after successful payment
+    // Get payment_intent from Stripe redirect URL for transaction_id
+    const paymentIntent = searchParams.get('payment_intent')
+
+    // Get order value from localStorage
+    const orderValue = localStorage.getItem('emilia-order-value')
+    const value = orderValue ? parseFloat(orderValue) : 60.0
+
+    // Send Google Ads conversion event
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-17552723888/N08ICPDj1cwbELCf5bFB',
+        'value': value,
+        'currency': 'CHF',
+        'transaction_id': paymentIntent || ''
+      })
+    }
+
+    // Clear cart and order value after successful payment
     localStorage.removeItem('emilia-cart')
-  }, [])
+    localStorage.removeItem('emilia-order-value')
+  }, [searchParams])
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center px-4 py-12">
@@ -55,5 +82,17 @@ export default function PaymentSuccess() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center">
+        <div className="animate-pulse">Laden...</div>
+      </div>
+    }>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

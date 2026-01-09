@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ["latin"] })
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] })
 
 export const metadata: Metadata = {
-  title: "Emilia - Tartas de Queso Artesanales | Envíos a Toda España",
-  description: "Las mejores tartas de queso artesanales. Envíos a domicilio en toda España.",
+  title: "Emilia - Artisan Cheesecakes | Lieferung in Zürich",
+  description: "Die besten handgemachten Käsekuchen. Lieferung in Zürich und Umgebung.",
   generator: "v0.app",
   icons: {
     icon: "/Emilia (7).png",
@@ -38,6 +38,7 @@ export default function RootLayout({
             gtag('js', new Date());
             gtag('config', 'G-JL27DJQJKH');
             gtag('config', 'AW-17759330762');
+            gtag('config', 'AW-17552723888');
           `}
         </Script>
       </head>
