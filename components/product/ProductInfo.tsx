@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
 import { Check, Star, CheckCircle, CreditCard, Smartphone } from "lucide-react"
-import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
+import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 
 interface ProductInfoProps {
     product: any
@@ -152,7 +152,6 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                         <div className="flex items-center gap-2">
                             <VisaIcon className="h-8 w-auto" />
                             <MastercardIcon className="h-8 w-auto" />
-                            <TwintIcon className="h-8 w-auto" />
                             <ApplePayIcon className="h-8 w-auto" />
                         </div>
                     </div>
