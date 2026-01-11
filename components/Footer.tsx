@@ -82,7 +82,9 @@ export default function Footer() {
             <h4 className="font-black mb-6 tracking-tight text-sm">FOLGE UNS</h4>
             <div className="flex gap-4 justify-center md:justify-start">
               <a
-                href="#"
+                href="https://www.instagram.com/emilia.cheesecake/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all group"
                 aria-label="Instagram"
               >
