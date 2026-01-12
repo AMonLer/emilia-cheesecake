@@ -33,7 +33,7 @@ export default function ProductCard({ href, image1, image2, name, description, t
     }
 
     return (
-        <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer ${className}`}>
+        <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex flex-col ${className}`}>
             <div
                 className="relative h-80"
                 ref={imageContainerRef}
@@ -82,9 +82,9 @@ export default function ProductCard({ href, image1, image2, name, description, t
                     />
                 </div>
             </div>
-            <div className="p-6 text-center">
+            <div className="p-6 text-center flex flex-col flex-1">
                 <h3 className="font-black text-lg mb-2 tracking-tight">{name}</h3>
-                <p className="text-sm leading-relaxed text-gray-700">{description}</p>
+                <p className="text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
 
                 {/* Mobile Order Button */}
                 <div className="md:hidden mt-6">
