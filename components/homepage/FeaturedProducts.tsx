@@ -21,6 +21,7 @@ export default function FeaturedProducts() {
                             image1="/pistacho1.png"
                             image2="/pistacho2.png"
                             name="VERDALIA"
+                            price={19}
                             description="Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack..."
                             tag={{
                                 label: "Bestseller",
@@ -35,6 +36,7 @@ export default function FeaturedProducts() {
                             image1="/original1.png"
                             image2="/original2.png"
                             name="CLÁSICA"
+                            price={15}
                             description="Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack..."
                         />
 
@@ -44,6 +46,7 @@ export default function FeaturedProducts() {
                             image1="/lotus1.png"
                             image2="/lotus2.png"
                             name="EMILIA Nº3"
+                            price={18}
                             description="Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack..."
                         />
 
@@ -53,6 +56,7 @@ export default function FeaturedProducts() {
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
                             name="FONDANT"
+                            price={17}
                             description="Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber..."
                         />
 
@@ -62,6 +66,7 @@ export default function FeaturedProducts() {
                             image1="/cafe1.png"
                             image2="/cafe2.png"
                             name="MANJAR"
+                            price={17}
                             description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
                             tag={{
                                 label: "New",
