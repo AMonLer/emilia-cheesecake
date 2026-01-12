@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Enviar email de contacto a info@emilialab.com
-    await resend.emails.send({
+    const { data, error: resendError } = await resend.emails.send({
       from: process.env.EMAIL_FROM || 'info@emilialab.com',
       to: process.env.EMAIL_TO || 'info@emilialab.com',
       replyTo: email,
@@ -74,7 +74,16 @@ export async function POST(req: NextRequest) {
       `,
     })
 
+    if (resendError) {
+      console.error('❌ Resend error:', resendError)
+      return NextResponse.json(
+        { error: `Resend error: ${resendError.message}` },
+        { status: 500 }
+      )
+    }
+
     console.log(`✅ Contact form submitted by: ${name} (${email})`)
+    console.log('📧 Resend response:', data)
 
     return NextResponse.json({
       success: true,

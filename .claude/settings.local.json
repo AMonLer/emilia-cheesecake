@@ -55,7 +55,8 @@
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Improve payment icons (Visa, Mastercard, Apple, TWINT official) and center LIEBE ZUM DETAIL section\")",
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add public/foto2.jpeg components/homepage/WhyChooseSection.tsx)",
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Update foto2 and change HANDWERKLICHE icon to UtensilsCrossed\")",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(timeout /t 5 /nobreak)"
     ],
     "deny": [],
     "ask": []

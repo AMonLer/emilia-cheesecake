@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Documentación Web - Emilia Cheesecake</title>
+    <style>
+        body { font-family: Calibri, Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1 { color: #651A1A; border-bottom: 3px solid #651A1A; padding-bottom: 10px; }
+        h2 { color: #651A1A; margin-top: 30px; }
+        h3 { color: #333; margin-top: 20px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #651A1A; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        code { background-color: #f4f4f4; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; }
+        .folder { color: #651A1A; font-weight: bold; }
+        .file { color: #333; }
+        ul { margin: 10px 0; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+<h1>EMILIA CHEESECAKE - Documentación Técnica</h1>
+<p><strong>Fecha:</strong> Diciembre 2024<br>
+<strong>URL Producción:</strong> https://emilialab.com<br>
+<strong>Repositorio:</strong> emilia-cheesecake</p>
+
+<h2>1. RESUMEN DEL PROYECTO</h2>
+<p>Emilia Cheesecake es una tienda online de cheesecakes artesanales con sede en Zürich, Suiza. La web está desarrollada con Next.js 14 y permite a los clientes ver productos, realizar pedidos y pagar online.</p>
+
+<h3>Características principales:</h3>
+<ul>
+    <li>Catálogo de 5 sabores de cheesecake</li>
+    <li>Carrito de compras con persistencia</li>
+    <li>Checkout con Stripe (pagos con tarjeta, Apple Pay, TWINT)</li>
+    <li>Emails transaccionales con Resend</li>
+    <li>Notificaciones por Telegram</li>
+    <li>Newsletter con suscripción</li>
+    <li>Formulario de contacto</li>
+    <li>Diseño responsive y optimizado</li>
+</ul>
+
+<h2>2. TECNOLOGÍAS UTILIZADAS</h2>
+
+<table>
+    <tr><th>Categoría</th><th>Tecnología</th><th>Versión</th></tr>
+    <tr><td>Framework</td><td>Next.js</td><td>14.2.x</td></tr>
+    <tr><td>Lenguaje</td><td>TypeScript</td><td>5.x</td></tr>
+    <tr><td>UI Library</td><td>React</td><td>18.2.x</td></tr>
+    <tr><td>Estilos</td><td>Tailwind CSS</td><td>3.4.x</td></tr>
+    <tr><td>Componentes UI</td><td>Radix UI</td><td>Varios</td></tr>
+    <tr><td>Iconos</td><td>Lucide React</td><td>0.454.x</td></tr>
+    <tr><td>Pagos</td><td>Stripe</td><td>20.x</td></tr>
+    <tr><td>Emails</td><td>Resend + React Email</td><td>6.5.x</td></tr>
+    <tr><td>Formularios</td><td>React Hook Form + Zod</td><td>7.60.x</td></tr>
+    <tr><td>Fechas</td><td>date-fns</td><td>4.1.x</td></tr>
+    <tr><td>Carrusel</td><td>Embla Carousel</td><td>8.5.x</td></tr>
+    <tr><td>Analytics</td><td>Vercel Analytics</td><td>1.3.x</td></tr>
+</table>
+
+<h2>3. ESTRUCTURA DE CARPETAS</h2>
+
+<pre>
+emilia-cheesecake/
+├── <span class="folder">app/</span>                    # Páginas y rutas (App Router)
+│   ├── <span class="folder">api/</span>                # API Routes
+│   │   ├── check-env/          # Verificar variables de entorno
+│   │   ├── contact/            # Formulario de contacto
+│   │   ├── create-payment-intent/  # Crear intento de pago Stripe
+│   │   ├── newsletter/         # Suscripción newsletter
+│   │   ├── test-stripe/        # Test conexión Stripe
+│   │   └── webhooks/           # Webhooks (Stripe)
+│   ├── <span class="folder">bestellen/</span>          # Página de pedidos
+│   ├── <span class="folder">checkout/</span>           # Página de checkout/pago
+│   ├── <span class="folder">payment-success/</span>    # Página de pago exitoso
+│   ├── <span class="folder">preview-email/</span>      # Vista previa de emails
+│   ├── <span class="folder">product/</span>            # Páginas de productos
+│   ├── <span class="folder">uber-uns/</span>           # Página "Sobre nosotros"
+│   ├── globals.css             # Estilos globales
+│   ├── layout.tsx              # Layout principal
+│   └── page.tsx                # Página de inicio
+│
+├── <span class="folder">components/</span>             # Componentes React
+│   ├── <span class="folder">about/</span>              # Componentes página "Sobre nosotros"
+│   ├── <span class="folder">homepage/</span>           # Componentes página inicio
+│   ├── <span class="folder">icons/</span>              # Iconos personalizados (pagos)
+│   ├── <span class="folder">order/</span>              # Componentes de pedidos
+│   ├── <span class="folder">product/</span>            # Componentes de productos
+│   ├── <span class="folder">ui/</span>                 # Componentes UI base (shadcn)
+│   ├── ContactModal.tsx        # Modal de contacto
+│   ├── CTASection.tsx          # Sección CTA
+│   ├── Features.tsx            # Sección características
+│   ├── Footer.tsx              # Pie de página
+│   ├── Hero.tsx                # Sección hero
+│   ├── Navbar.tsx              # Barra de navegación
+│   ├── ProductCard.tsx         # Tarjeta de producto
+│   ├── ProductGrid.tsx         # Grid de productos
+│   └── Testimonials.tsx        # Testimonios
+│
+├── <span class="folder">contexts/</span>               # Context API (estado global)
+│
+├── <span class="folder">emails/</span>                 # Plantillas de email (React Email)
+│   ├── AdminNotification.tsx   # Notificación a admin (nuevo pedido)
+│   ├── OrderConfirmation.tsx   # Confirmación de pedido al cliente
+│   └── WelcomeEmail.tsx        # Email de bienvenida newsletter
+│
+├── <span class="folder">lib/</span>                    # Utilidades y datos
+│   ├── products.ts             # Catálogo de productos
+│   └── utils.ts                # Funciones utilitarias
+│
+├── <span class="folder">public/</span>                 # Assets estáticos (imágenes)
+│
+├── <span class="folder">scripts/</span>                # Scripts auxiliares
+│
+├── .env.local                  # Variables de entorno (NO en git)
+├── next.config.js              # Configuración Next.js
+├── package.json                # Dependencias
+├── tailwind.config.js          # Configuración Tailwind
+└── tsconfig.json               # Configuración TypeScript
+</pre>
+
+<h2>4. PÁGINAS DE LA WEB</h2>
+
+<table>
+    <tr><th>Ruta</th><th>Descripción</th><th>Archivo</th></tr>
+    <tr><td>/</td><td>Página de inicio</td><td>app/page.tsx</td></tr>
+    <tr><td>/product/[slug]</td><td>Detalle de producto</td><td>app/product/[slug]/page.tsx</td></tr>
+    <tr><td>/bestellen</td><td>Página de pedidos</td><td>app/bestellen/page.tsx</td></tr>
+    <tr><td>/checkout</td><td>Checkout y pago</td><td>app/checkout/page.tsx</td></tr>
+    <tr><td>/payment-success</td><td>Confirmación de pago</td><td>app/payment-success/page.tsx</td></tr>
+    <tr><td>/uber-uns</td><td>Sobre nosotros</td><td>app/uber-uns/page.tsx</td></tr>
+</table>
+
+<h2>5. API ENDPOINTS</h2>
+
+<table>
+    <tr><th>Endpoint</th><th>Método</th><th>Descripción</th></tr>
+    <tr><td>/api/contact</td><td>POST</td><td>Enviar formulario de contacto</td></tr>
+    <tr><td>/api/newsletter</td><td>POST</td><td>Suscribirse al newsletter</td></tr>
+    <tr><td>/api/create-payment-intent</td><td>POST</td><td>Crear intento de pago en Stripe</td></tr>
+    <tr><td>/api/webhooks/stripe</td><td>POST</td><td>Webhook de Stripe (confirmar pagos)</td></tr>
+    <tr><td>/api/check-env</td><td>GET</td><td>Verificar configuración</td></tr>
+    <tr><td>/api/test-stripe</td><td>GET</td><td>Test conexión Stripe</td></tr>
+</table>
+
+<h2>6. CATÁLOGO DE PRODUCTOS</h2>
+
+<table>
+    <tr><th>Slug</th><th>Nombre</th><th>Precio Grande (8-10p)</th><th>Precio Pequeño (2-3p)</th></tr>
+    <tr><td>pistacho</td><td>VERDALIA</td><td>57 CHF</td><td>21 CHF</td></tr>
+    <tr><td>lotus</td><td>EMILIA Nº3</td><td>57 CHF</td><td>21 CHF</td></tr>
+    <tr><td>chocolate</td><td>OSCURA</td><td>57 CHF</td><td>21 CHF</td></tr>
+    <tr><td>original</td><td>CLÁSICA</td><td>57 CHF</td><td>21 CHF</td></tr>
+    <tr><td>cafe</td><td>MANJAR</td><td>57 CHF</td><td>21 CHF</td></tr>
+</table>
+
+<h2>7. ASSETS (IMÁGENES)</h2>
+
+<h3>Logos:</h3>
+<ul>
+    <li><code>/public/logo.png</code> - Logo principal</li>
+    <li><code>/public/Emilia (7).png</code> - Logo alternativo</li>
+</ul>
+
+<h3>Imágenes de productos:</h3>
+<table>
+    <tr><th>Producto</th><th>Imágenes</th></tr>
+    <tr><td>Pistacho (VERDALIA)</td><td>pistacho1.png, pistacho2.png, pistacho3.png</td></tr>
+    <tr><td>Lotus (EMILIA Nº3)</td><td>lotus1.png, lotus2.png, lotus3.png</td></tr>
+    <tr><td>Chocolate (OSCURA)</td><td>chocolate1.png, chocolate2.png, chocolate3.png</td></tr>
+    <tr><td>Original (CLÁSICA)</td><td>original1.png, original2.png, original3.png</td></tr>
+    <tr><td>Café (MANJAR)</td><td>cafe1.png, cafe2.png, cafe3.png</td></tr>
+</table>
+
+<h3>Otras imágenes:</h3>
+<ul>
+    <li><code>Portada1.jpg</code> - Hero principal</li>
+    <li><code>foto2.jpeg</code> - Sección destacada</li>
+    <li><code>uberuns.png</code> - Página sobre nosotros</li>
+    <li><code>mobil1.jpeg, mobil 2.jpeg</code> - Imágenes móvil</li>
+    <li><code>Thankyou.png, thanks.jpeg</code> - Página de agradecimiento</li>
+    <li><code>Congrats.jpeg</code> - Felicitaciones</li>
+</ul>
+
+<h2>8. VARIABLES DE ENTORNO</h2>
+
+<table>
+    <tr><th>Variable</th><th>Descripción</th><th>Ejemplo</th></tr>
+    <tr><td>NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY</td><td>Clave pública de Stripe</td><td>pk_test_xxx o pk_live_xxx</td></tr>
+    <tr><td>STRIPE_SECRET_KEY</td><td>Clave secreta de Stripe</td><td>sk_test_xxx o sk_live_xxx</td></tr>
+    <tr><td>RESEND_API_KEY</td><td>API Key de Resend</td><td>re_xxx</td></tr>
+    <tr><td>EMAIL_FROM</td><td>Email remitente</td><td>info@emilialab.com</td></tr>
+    <tr><td>EMAIL_TO</td><td>Email destinatario (admin)</td><td>info@emilialab.com</td></tr>
+    <tr><td>TELEGRAM_BOT_TOKEN</td><td>Token del bot de Telegram</td><td>123456:ABC-xxx</td></tr>
+    <tr><td>TELEGRAM_CHAT_ID</td><td>ID del chat de Telegram</td><td>123456789</td></tr>
+</table>
+
+<h2>9. FLUJO DE COMPRA</h2>
+
+<ol>
+    <li><strong>Usuario navega</strong> → Página de inicio o productos</li>
+    <li><strong>Selecciona producto</strong> → Elige tamaño y cantidad</li>
+    <li><strong>Añade al carrito</strong> → Se guarda en localStorage</li>
+    <li><strong>Va al checkout</strong> → Introduce datos de entrega</li>
+    <li><strong>Selecciona fecha</strong> → Calendario con fechas disponibles</li>
+    <li><strong>Paga con Stripe</strong> → Tarjeta, Apple Pay o TWINT</li>
+    <li><strong>Webhook confirma</strong> → Stripe notifica el pago</li>
+    <li><strong>Se envían emails</strong> → Confirmación al cliente + notificación admin</li>
+    <li><strong>Notificación Telegram</strong> → Admin recibe alerta</li>
+    <li><strong>Página de éxito</strong> → Cliente ve confirmación</li>
+</ol>
+
+<h2>10. INTEGRACIONES EXTERNAS</h2>
+
+<h3>Stripe (Pagos)</h3>
+<ul>
+    <li>Dashboard: <a href="https://dashboard.stripe.com">dashboard.stripe.com</a></li>
+    <li>Webhook endpoint: <code>/api/webhooks/stripe</code></li>
+    <li>Métodos: Card, Apple Pay, Google Pay, TWINT</li>
+</ul>
+
+<h3>Resend (Emails)</h3>
+<ul>
+    <li>Dashboard: <a href="https://resend.com">resend.com</a></li>
+    <li>Dominio verificado: emilialab.com</li>
+    <li>Plantillas en: <code>/emails/</code></li>
+</ul>
+
+<h3>Telegram (Notificaciones)</h3>
+<ul>
+    <li>Bot para notificaciones de pedidos</li>
+    <li>Configurado con TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID</li>
+</ul>
+
+<h3>Vercel (Hosting)</h3>
+<ul>
+    <li>Despliegue automático desde Git</li>
+    <li>Variables de entorno en dashboard de Vercel</li>
+</ul>
+
+<h2>11. COMANDOS ÚTILES</h2>
+
+<table>
+    <tr><th>Comando</th><th>Descripción</th></tr>
+    <tr><td><code>npm run dev</code></td><td>Iniciar servidor de desarrollo (localhost:3000)</td></tr>
+    <tr><td><code>npm run build</code></td><td>Compilar para producción</td></tr>
+    <tr><td><code>npm run start</code></td><td>Iniciar servidor de producción</td></tr>
+    <tr><td><code>npm run lint</code></td><td>Ejecutar linter</td></tr>
+</table>
+
+<h2>12. CONFIGURACIÓN DNS (Namecheap)</h2>
+
+<h3>Registros MX (Email):</h3>
+<table>
+    <tr><th>Type</th><th>Host</th><th>Value</th><th>Priority</th></tr>
+    <tr><td>MX</td><td>@</td><td>mx1.privateemail.com</td><td>10</td></tr>
+    <tr><td>MX</td><td>@</td><td>mx2.privateemail.com</td><td>10</td></tr>
+</table>
+
+<h3>Registros para Resend (envío de emails):</h3>
+<p>Verificar en dashboard de Resend los registros SPF, DKIM y DMARC necesarios.</p>
+
+<hr>
+<p style="text-align: center; color: #666; margin-top: 40px;">
+    <em>Documentación generada el 23 de Diciembre de 2024</em><br>
+    <strong>Emilia Cheesecake</strong> - emilialab.com
+</p>
+
+</body>
+</html>
