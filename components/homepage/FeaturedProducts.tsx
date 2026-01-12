@@ -52,7 +52,7 @@ export default function FeaturedProducts() {
                             href="/product/chocolate"
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
-                            name="OSCURA"
+                            name="FONDANT"
                             description="Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber..."
                         />
 

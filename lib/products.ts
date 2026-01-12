@@ -20,7 +20,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "OSCURA",
+                name: "FONDANT",
                 price: 44.00,
                 image: "/chocolate1.png"
             }
@@ -54,7 +54,7 @@ export const products: { [key: string]: any } = {
         ]
     },
     "chocolate": {
-        name: "OSCURA",
+        name: "FONDANT",
         prices: {
             "8-10": 44,
             "2-3": 17
@@ -122,7 +122,7 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "OSCURA",
+                name: "FONDANT",
                 price: 44.00,
                 image: "/chocolate1.png"
             },

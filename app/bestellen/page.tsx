@@ -37,8 +37,8 @@ export default function BestellenPage() {
       description: "Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack."
     },
     {
-      id: "oscura",
-      name: "OSCURA",
+      id: "fondant",
+      name: "FONDANT",
       slug: "chocolate",
       image1: "/chocolate1.png",
       image2: "/chocolate2.png",
