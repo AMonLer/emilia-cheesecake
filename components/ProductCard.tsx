@@ -10,7 +10,8 @@ interface ProductCardProps {
     image2: string
     name: string
     description: string
-    price?: number
+    priceSmall?: number
+    priceLarge?: number
     tag?: {
         label: string
         bgColor: string
@@ -19,7 +20,7 @@ interface ProductCardProps {
     className?: string
 }
 
-export default function ProductCard({ href, image1, image2, name, description, price, tag, className = "" }: ProductCardProps) {
+export default function ProductCard({ href, image1, image2, name, description, priceSmall, priceLarge, tag, className = "" }: ProductCardProps) {
     const [showSecondImage, setShowSecondImage] = useState(false)
     const imageContainerRef = useRef<HTMLDivElement>(null)
 
@@ -85,11 +86,13 @@ export default function ProductCard({ href, image1, image2, name, description, p
             </div>
             <div className="p-6 text-center flex flex-col flex-1">
                 <h3 className="font-black text-lg tracking-tight">{name}</h3>
-                {price && (
-                    <p className="text-sm text-[#651A1A] font-medium mt-1 mb-2">
-                        <span className="text-gray-500 font-normal">ab </span>
-                        <span className="text-base font-bold">{price} CHF</span>
-                    </p>
+                {priceSmall && priceLarge && (
+                    <div className="flex items-center justify-center gap-2 mt-1 mb-2">
+                        <span className="text-[#651A1A] font-bold">{priceSmall}</span>
+                        <span className="text-gray-300">—</span>
+                        <span className="text-[#651A1A] font-bold">{priceLarge}</span>
+                        <span className="text-xs text-gray-500 font-medium">CHF</span>
+                    </div>
                 )}
                 <p className="text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
 
