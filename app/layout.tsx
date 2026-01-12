@@ -6,8 +6,8 @@ import { CartProvider } from "@/contexts/CartContext"
 import Script from "next/script"
 import "./globals.css"
 
-const inter = Inter({ subsets: ["latin"] })
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"] })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-playfair" })
 
 export const metadata: Metadata = {
   title: "Emilia - Artisan Cheesecakes | Lieferung in Zürich",
@@ -52,7 +52,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.className} antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <CartProvider>
           {children}
           <Analytics />

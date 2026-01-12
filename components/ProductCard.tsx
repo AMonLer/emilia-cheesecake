@@ -87,11 +87,11 @@ export default function ProductCard({ href, image1, image2, name, description, p
             <div className="p-6 text-center flex flex-col flex-1">
                 <h3 className="font-black text-lg tracking-tight">{name}</h3>
                 {priceSmall && priceLarge && (
-                    <div className="flex items-center justify-center gap-2 mt-1 mb-2">
-                        <span className="text-[#651A1A] font-bold">{priceSmall}</span>
-                        <span className="text-gray-300">—</span>
-                        <span className="text-[#651A1A] font-bold">{priceLarge}</span>
-                        <span className="text-xs text-gray-500 font-medium">CHF</span>
+                    <div className="flex items-baseline justify-center gap-1 mt-1 mb-2">
+                        <span className="text-[#651A1A] font-serif font-medium text-xl">{priceSmall}</span>
+                        <span className="text-[#651A1A] font-serif text-lg font-light opacity-60">/</span>
+                        <span className="text-[#651A1A] font-serif font-medium text-xl">{priceLarge}</span>
+                        <span className="text-xs text-gray-500 font-medium ml-1">CHF</span>
                     </div>
                 )}
                 <p className="text-sm leading-relaxed text-gray-700 flex-1">{description}</p>

@@ -26,6 +26,10 @@ module.exports = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        fontFamily: {
+          sans: ["var(--font-inter)", "sans-serif"],
+          serif: ["var(--font-playfair)", "serif"],
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",

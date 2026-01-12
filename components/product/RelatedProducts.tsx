@@ -27,7 +27,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                         </div>
                         <div className="text-center">
                             <h4 className="font-black text-[#651A1A] tracking-tight mb-1">{item.name}</h4>
-                            <p className="text-sm text-[#651A1A]/60 font-medium mb-4">{item.price} CHF</p>
+                            <p className="text-base text-[#651A1A] font-serif font-medium mb-4">{item.price} CHF</p>
                             <button className="w-full border-2 border-[#651A1A] text-[#651A1A] py-3 rounded-xl font-black text-xs tracking-widest uppercase hover:bg-[#651A1A] hover:text-white transition-colors flex items-center justify-center gap-2">
                                 <Plus className="w-4 h-4" />
                                 <span>DAZU</span>
