@@ -67,7 +67,7 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                             : "bg-white border-gray-100 hover:border-black/30"
                             }`}
                     >
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                             <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
@@ -76,9 +76,19 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     className="object-contain"
                                 />
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="font-black text-xs sm:text-sm text-black truncate">8–10 Personen</p>
-                                <p className="text-xs text-black/60">Ø 24 cm</p>
+                            <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+                                <div>
+                                    <p className="font-black text-xs sm:text-sm text-black truncate">8–10 Personen</p>
+                                    <p className="text-xs text-black/60">Ø 24 cm</p>
+                                </div>
+                                <div className="text-right flex flex-col items-end">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-[#651A1A] font-serif font-medium text-lg sm:text-xl leading-none">
+                                            {product.prices["8-10"]}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide transform translate-y-[-1px]">CHF</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {selectedSize === "8-10" && (
@@ -96,7 +106,7 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                             : "bg-white border-gray-100 hover:border-black/30"
                             }`}
                     >
-                        <div className="flex items-center gap-2 sm:gap-3">
+                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                             <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
@@ -105,9 +115,19 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     className="object-contain"
                                 />
                             </div>
-                            <div className="min-w-0 flex-1">
-                                <p className="font-black text-xs sm:text-sm text-black truncate">2–3 Personen</p>
-                                <p className="text-xs text-black/60">Ø 14 cm</p>
+                            <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
+                                <div>
+                                    <p className="font-black text-xs sm:text-sm text-black truncate">2–3 Personen</p>
+                                    <p className="text-xs text-black/60">Ø 14 cm</p>
+                                </div>
+                                <div className="text-right flex flex-col items-end">
+                                    <div className="flex items-baseline gap-1">
+                                        <span className="text-[#651A1A] font-serif font-medium text-lg sm:text-xl leading-none">
+                                            {product.prices["2-3"]}
+                                        </span>
+                                        <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide transform translate-y-[-1px]">CHF</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {selectedSize === "2-3" && (
