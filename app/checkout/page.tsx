@@ -138,9 +138,10 @@ export default function CheckoutPage() {
     "18:00 - 21:00"
   ]
 
-  // Calculate discount
+  // Calculate discount and shipping
+  const shippingCost = 6
   const discount = totalPrice >= 100 ? totalPrice * 0.15 : 0
-  const finalPrice = totalPrice - discount
+  const finalPrice = totalPrice - discount + shippingCost
 
   const handleAddUpsellProduct = () => {
     const upsellProduct = {
@@ -693,7 +694,7 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between text-sm">
                 <span>Versand</span>
-                <span className="text-gray-600">Wird im nächsten Schritt berechnet</span>
+                <span>{shippingCost.toFixed(2)} CHF</span>
               </div>
               <div className="flex justify-between text-lg font-black border-t pt-3">
                 <span>Gesamt</span>

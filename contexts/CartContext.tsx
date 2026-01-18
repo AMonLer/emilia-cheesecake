@@ -62,7 +62,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }
 
   const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id))
+    const newItems = cartItems.filter(item => item.id !== id)
+    // Si solo quedan productos de upsell, vaciar el carrito para evitar exploits
+    const hasNonUpsellItems = newItems.some(item => !item.id.includes('upsell'))
+    setCartItems(hasNonUpsellItems ? newItems : [])
   }
 
   const totalPrice = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
