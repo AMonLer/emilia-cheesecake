@@ -249,6 +249,10 @@ export default function Navbar() {
                       <span>Zwischensumme</span>
                       <span>{totalPrice.toFixed(2)} CHF</span>
                     </div>
+                    <div className="flex items-center justify-between text-sm font-light text-gray-600">
+                      <span>Versand</span>
+                      <span>6.00 CHF</span>
+                    </div>
                     {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
                         <span>RABATT (15%)</span>
@@ -257,7 +261,7 @@ export default function Navbar() {
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <span>{(totalPrice * (totalPrice >= 100 ? 0.85 : 1)).toFixed(2)} CHF</span>
+                      <span>{(totalPrice * (totalPrice >= 100 ? 0.85 : 1) + 6).toFixed(2)} CHF</span>
                     </div>
                   </div>
                 </div>
