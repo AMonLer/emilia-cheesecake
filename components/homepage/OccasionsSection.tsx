@@ -1,4 +1,5 @@
 import Image from "next/image"
+import Link from "next/link"
 import useEmblaCarousel from "embla-carousel-react"
 import { useEffect, useState, useCallback } from "react"
 import { cn } from "@/lib/utils"
@@ -59,7 +60,7 @@ export default function OccasionsSection() {
                         <div className="flex -ml-4">
                             {occasions.map((item, index) => (
                                 <div key={index} className="flex-[0_0_85%] min-w-0 pl-4">
-                                    <div className="text-center transition-opacity duration-300" style={{ opacity: selectedIndex === index ? 1 : 0.5 }}>
+                                    <Link href="/bestellen" className="text-center transition-opacity duration-300 block" style={{ opacity: selectedIndex === index ? 1 : 0.5 }}>
                                         <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
                                             <Image
                                                 src={item.image}
@@ -69,7 +70,7 @@ export default function OccasionsSection() {
                                             />
                                         </div>
                                         <h3 className="font-black text-xl tracking-tight">{item.title}</h3>
-                                    </div>
+                                    </Link>
                                 </div>
                             ))}
                         </div>
@@ -104,17 +105,17 @@ export default function OccasionsSection() {
                 {/* Desktop Grid */}
                 <div className="hidden md:grid grid-cols-3 gap-8">
                     {occasions.map((item, index) => (
-                        <div key={index} className="text-center">
+                        <Link href="/bestellen" key={index} className="text-center group cursor-pointer">
                             <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-4 relative">
                                 <Image
                                     src={item.image}
                                     alt={item.alt}
                                     fill
-                                    className="object-cover hover:scale-105 transition-transform duration-500"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                                 />
                             </div>
-                            <h3 className="font-black text-xl tracking-tight">{item.title}</h3>
-                        </div>
+                            <h3 className="font-black text-xl tracking-tight group-hover:text-[#651A1A] transition-colors">{item.title}</h3>
+                        </Link>
                     ))}
                 </div>
             </div>

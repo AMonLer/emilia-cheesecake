@@ -15,8 +15,8 @@ export default function WhyChooseSection() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
                     {/* HANDWERKLICHE HERSTELLUNG */}
-                    <div className="bg-white/50 p-10 rounded-3xl hover:bg-white transition-colors duration-500 group text-center">
-                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full group-hover:bg-[#651A1A]/10 transition-all duration-500 p-5 group-hover:scale-110">
+                    <div className="bg-white/50 p-10 rounded-3xl text-center">
+                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full p-5">
                             <UtensilsCrossed className="w-full h-full text-[#651A1A]" strokeWidth={1.5} />
                         </div>
                         <h3 className="font-black text-xl mb-4 tracking-tight text-[#651A1A]">
@@ -28,8 +28,8 @@ export default function WhyChooseSection() {
                     </div>
 
                     {/* KLEINSERIENPRODUKTION */}
-                    <div className="bg-white/50 p-10 rounded-3xl hover:bg-white transition-colors duration-500 group text-center md:-mt-8">
-                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full group-hover:bg-[#651A1A]/10 transition-all duration-500 p-5 group-hover:scale-110">
+                    <div className="bg-white/50 p-10 rounded-3xl text-center md:-mt-8">
+                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full p-5">
                             <CakeSlice className="w-full h-full text-[#651A1A]" strokeWidth={1.5} />
                         </div>
                         <h3 className="font-black text-xl mb-4 tracking-tight text-[#651A1A]">
@@ -41,8 +41,8 @@ export default function WhyChooseSection() {
                     </div>
 
                     {/* TRADITIONELLE REZEPTE */}
-                    <div className="bg-white/50 p-10 rounded-3xl hover:bg-white transition-colors duration-500 group text-center">
-                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full group-hover:bg-[#651A1A]/10 transition-all duration-500 p-5 group-hover:scale-110">
+                    <div className="bg-white/50 p-10 rounded-3xl text-center">
+                        <div className="w-24 h-24 mx-auto mb-8 flex items-center justify-center bg-[#651A1A]/5 rounded-full p-5">
                             <BookOpenText className="w-full h-full text-[#651A1A]" strokeWidth={1.5} />
                         </div>
                         <h3 className="font-black text-xl mb-4 tracking-tight text-[#651A1A]">

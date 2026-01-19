@@ -56,7 +56,9 @@
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" add public/foto2.jpeg components/homepage/WhyChooseSection.tsx)",
       "Bash(git -C \"C:\\Users\\adria\\Documents\\Projects\\emilia-cheesecake\" commit -m \"Update foto2 and change HANDWERKLICHE icon to UtensilsCrossed\")",
       "Bash(node:*)",
-      "Bash(timeout /t 5 /nobreak)"
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(git restore:*)",
+      "WebFetch(domain:www.spruengli.ch)"
     ],
     "deny": [],
     "ask": []

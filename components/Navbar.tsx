@@ -180,7 +180,14 @@ export default function Navbar() {
                       <div className="flex-1 flex flex-col justify-between py-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-medium text-base text-black tracking-wide uppercase">{item.name}</h3>
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-medium text-base text-black tracking-wide uppercase">{item.name}</h3>
+                              {item.price === 13.5 && (
+                                <span className="bg-[#651A1A] text-[#F5E6D3] text-[9px] px-1.5 py-0.5 rounded-sm tracking-widest font-bold">
+                                  ANGEBOT
+                                </span>
+                              )}
+                            </div>
                             <p className="text-xs text-gray-500 mt-1 font-light">{item.size} Personen</p>
                           </div>
                           <button
