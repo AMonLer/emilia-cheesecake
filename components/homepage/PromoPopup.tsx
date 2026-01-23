@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
@@ -26,7 +26,7 @@ export default function PromoPopup() {
 
     const handleSubscribe = async () => {
         if (!email || !email.includes('@')) {
-            setMessage("Bitte gib eine gÃ¼ltige E-Mail-Adresse ein")
+            setMessage("Bitte gib eine gültige E-Mail-Adresse ein")
             return
         }
 
@@ -43,7 +43,7 @@ export default function PromoPopup() {
             })
 
             if (response.ok) {
-                setMessage("Vielen Dank! PrÃ¼fe deine E-Mails.")
+                setMessage("Vielen Dank! Prüfe deine E-Mails.")
                 setTimeout(() => {
                     handleClosePromo()
                 }, 2000)
@@ -66,7 +66,7 @@ export default function PromoPopup() {
                 <button
                     onClick={handleClosePromo}
                     className="absolute top-5 right-5 text-gray-400 hover:text-gray-900 z-10 cursor-pointer transition-colors duration-300"
-                    aria-label="SchlieÃŸen"
+                    aria-label="Schließen"
                 >
                     <X className="w-5 h-5" />
                 </button>
@@ -77,13 +77,13 @@ export default function PromoPopup() {
                     </span>
 
                     <h2 className="text-4xl md:text-5xl font-serif text-[#1a1a1a] mb-6 leading-tight">
-                        Ein sÃ¼sser <br />
+                        Ein süsser <br />
                         <span className="italic text-[#651A1A]">Anfang</span>
                     </h2>
 
                     <div className="py-6 border-y border-[#651A1A]/10 my-6">
                         <p className="text-lg text-[#1a1a1a] font-light tracking-wide">
-                            Erhalte <span className="font-medium text-[#651A1A]">10% Rabatt</span> auf deine erste Bestellung
+                            Erhalte <span className="font-medium text-[#651A1A]">15% Rabatt</span> auf deine erste Bestellung
                         </p>
                         <p className="text-xs text-gray-400 mt-2 font-light tracking-wider uppercase">
                             Ab 100 CHF Bestellwert
@@ -91,7 +91,7 @@ export default function PromoPopup() {
                     </div>
 
                     <p className="text-sm text-gray-500 font-light leading-relaxed max-w-xs mx-auto">
-                        Melde dich fÃ¼r unseren Newsletter an und entdecke die Kunst des baskischen KÃ¤sekuchens.
+                        Melde dich für unseren Newsletter an und entdecke die Kunst des baskischen Käsekuchens.
                     </p>
                 </div>
 
@@ -111,7 +111,7 @@ export default function PromoPopup() {
                             disabled={isSubmitting}
                             className="w-full bg-[#1a1a1a] text-white hover:bg-[#651A1A] font-medium py-6 text-sm rounded-lg tracking-widest uppercase transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {isSubmitting ? 'Wird gesendet...' : 'Anmelden & GenieÃŸen'}
+                            {isSubmitting ? 'Wird gesendet...' : 'Anmelden & Genießen'}
                         </Button>
                         {message && (
                             <p className={`text-sm text-center font-medium ${
@@ -122,11 +122,10 @@ export default function PromoPopup() {
                         )}
                     </div>
                     <p className="text-[10px] text-center text-gray-400 font-light">
-                        Abmeldung jederzeit mÃ¶glich.
+                        Abmeldung jederzeit möglich.
                     </p>
                 </div>
             </div>
         </div>
     )
 }
-

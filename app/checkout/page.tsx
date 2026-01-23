@@ -145,7 +145,7 @@ export default function CheckoutPage() {
   const shippingCost = 6
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
   const hasCodeDiscount = normalizedDiscountCode === "emilia_daniela"
-  const codeDiscountRate = totalPrice >= 100 ? 0.15 : 0.10
+  const codeDiscountRate = totalPrice >= 100 ? 0.20 : 0.10
   const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
   const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0
   const discount = hasCodeDiscount ? codeDiscount : automaticDiscount
@@ -727,7 +727,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-green-700 font-bold">
                     {hasCodeDiscount
-                      ? (totalPrice >= 100 ? "15% Rabatt (EMILIA_DANIELA)" : "10% Rabatt (EMILIA_DANIELA)")
+                      ? (totalPrice >= 100 ? "20% Rabatt (EMILIA_DANIELA)" : "10% Rabatt (EMILIA_DANIELA)")
                       : "10% Rabatt"}
                   </span>
                   <span className="text-green-600 font-bold">-{discount.toFixed(2)} CHF</span>
