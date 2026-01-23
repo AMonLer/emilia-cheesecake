@@ -9,9 +9,27 @@ export async function POST(req: NextRequest) {
   try {
     const { amount, orderData } = await req.json()
 
+    const rawDiscountCode = String(orderData?.discountCode || '').trim().toLowerCase()
+    const subtotal = Number(orderData?.subtotal || 0)
+    const shippingCost = Number(orderData?.shippingCost || 0)
+
+    let finalAmount = Number(amount || 0)
+    let discountPercent = 0
+
+    if (subtotal > 0) {
+      if (rawDiscountCode === 'emilia_daniela') {
+        discountPercent = subtotal >= 100 ? 20 : 10
+      } else if (subtotal >= 100) {
+        discountPercent = 10
+      }
+
+      const discountValue = subtotal * (discountPercent / 100)
+      finalAmount = subtotal - discountValue + shippingCost
+    }
+
     // Crear Payment Intent con metadata del pedido
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Stripe usa centavos
+      amount: Math.round(finalAmount * 100), // Stripe usa centavos
       currency: 'chf',
       payment_method_types: ['card', 'twint'], // card includes Apple Pay & Google Pay
       metadata: {
@@ -23,6 +41,8 @@ export async function POST(req: NextRequest) {
         kanton: orderData?.kanton || '',
         deliveryDate: orderData?.deliveryDate || '',
         deliveryTime: orderData?.deliveryTime || '',
+        discountCode: orderData?.discountCode || '',
+        discountPercent: discountPercent ? String(discountPercent) : '',
         items: JSON.stringify(orderData?.items || []),
       },
     })

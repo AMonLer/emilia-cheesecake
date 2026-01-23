@@ -91,6 +91,9 @@ export default function CheckoutPage() {
   const [showDeliveryStep, setShowDeliveryStep] = useState(false)
   const [upsellAdded, setUpsellAdded] = useState(false)
   const [postalCodeError, setPostalCodeError] = useState("")
+  const [discountCodeInput, setDiscountCodeInput] = useState("")
+  const [appliedDiscountCode, setAppliedDiscountCode] = useState("")
+  const [discountCodeError, setDiscountCodeError] = useState("")
 
   // Allowed postal codes within 10km of Zürich center
   const allowedPostalCodes = new Set([
@@ -140,7 +143,12 @@ export default function CheckoutPage() {
 
   // Calculate discount and shipping
   const shippingCost = 6
-  const discount = totalPrice >= 100 ? totalPrice * 0.15 : 0
+  const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
+  const hasCodeDiscount = normalizedDiscountCode === "emilia_daniela"
+  const codeDiscountRate = totalPrice >= 100 ? 0.20 : 0.10
+  const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
+  const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0
+  const discount = hasCodeDiscount ? codeDiscount : automaticDiscount
   const finalPrice = totalPrice - discount + shippingCost
 
   const handleAddUpsellProduct = () => {
@@ -200,6 +208,9 @@ export default function CheckoutPage() {
             kanton,
             deliveryDate: deliveryDate?.toLocaleDateString('de-CH'),
             deliveryTime,
+            discountCode: appliedDiscountCode,
+            subtotal: totalPrice,
+            shippingCost,
             items: cartItems.map(item => ({
               name: item.name,
               quantity: item.quantity,
@@ -672,12 +683,38 @@ export default function CheckoutPage() {
                 <input
                   type="text"
                   placeholder="Rabattcode oder Geschenkkarte"
+                  value={discountCodeInput}
+                  onChange={(e) => {
+                    setDiscountCodeInput(e.target.value)
+                    setDiscountCodeError("")
+                  }}
                   className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black"
                 />
-                <button className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const normalized = discountCodeInput.trim().toLowerCase()
+                    if (!normalized) {
+                      setAppliedDiscountCode("")
+                      setDiscountCodeError("")
+                      return
+                    }
+                    if (normalized === "emilia_daniela") {
+                      setAppliedDiscountCode(discountCodeInput.trim())
+                      setDiscountCodeError("")
+                    } else {
+                      setAppliedDiscountCode("")
+                      setDiscountCodeError("Rabattcode ungültig")
+                    }
+                  }}
+                  className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors"
+                >
                   Anwenden
                 </button>
               </div>
+              {discountCodeError && (
+                <p className="text-sm text-red-600 mt-2">{discountCodeError}</p>
+              )}
             </div>
 
             {/* Totals */}
@@ -688,7 +725,11 @@ export default function CheckoutPage() {
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-700 font-bold">15% Rabatt</span>
+                  <span className="text-green-700 font-bold">
+                    {hasCodeDiscount
+                      ? (totalPrice >= 100 ? "20% Rabatt (EMILIA_DANIELA)" : "10% Rabatt (EMILIA_DANIELA)")
+                      : "10% Rabatt"}
+                  </span>
                   <span className="text-green-600 font-bold">-{discount.toFixed(2)} CHF</span>
                 </div>
               )}
