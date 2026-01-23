@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import Image from 'next/image'
 import Link from 'next/link'
@@ -40,7 +40,7 @@ export default function Navbar() {
                 href="/uber-uns"
                 className="group relative text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
               >
-                {language === 'DE' ? 'Über Uns' : 'About Us'}
+                {language === 'DE' ? 'Ãœber Uns' : 'About Us'}
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />
               </Link>
             </div>
@@ -153,7 +153,7 @@ export default function Navbar() {
                 <div className="flex flex-col items-center justify-center h-[50vh] text-center">
                   <ShoppingBag className="w-12 h-12 text-gray-200 mb-4" strokeWidth={1} />
                   <h3 className="text-lg font-medium text-black mb-2 tracking-wide">Ihr Warenkorb ist leer</h3>
-                  <p className="text-sm text-gray-500 mb-8 font-light">Entdecken Sie unsere handgemachten Käsekuchen.</p>
+                  <p className="text-sm text-gray-500 mb-8 font-light">Entdecken Sie unsere handgemachten KÃ¤sekuchen.</p>
                   <Link href="/">
                     <button
                       onClick={() => setIsCartOpen(false)}
@@ -204,7 +204,7 @@ export default function Navbar() {
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
                             >
-                              −
+                              âˆ’
                             </button>
                             <span className="text-xs font-medium w-8 text-center text-black">{item.quantity}</span>
                             <button
@@ -230,13 +230,13 @@ export default function Navbar() {
                 <div className="space-y-3">
                   {totalPrice >= 100 ? (
                     <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
-                      <span className="text-xs font-bold tracking-widest uppercase">15% Rabatt aktiviert</span>
-                      <span className="text-xs font-bold">-{(totalPrice * 0.15).toFixed(2)} CHF</span>
+                      <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
+                      <span className="text-xs font-bold">-{(totalPrice * 0.10).toFixed(2)} CHF</span>
                     </div>
                   ) : (
                     <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
-                        <span>Bis 15% Rabatt</span>
+                        <span>Bis 10% Rabatt</span>
                         <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
                       </div>
                       <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
@@ -246,7 +246,7 @@ export default function Navbar() {
                         />
                       </div>
                       <p className="text-[10px] text-gray-400 text-center font-light tracking-wide">
-                        Erreichen Sie 100 CHF für 15% Rabatt
+                        Erreichen Sie 100 CHF fÃ¼r 10% Rabatt
                       </p>
                     </div>
                   )}
@@ -262,13 +262,13 @@ export default function Navbar() {
                     </div>
                     {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
-                        <span>RABATT (15%)</span>
-                        <span>-{(totalPrice * 0.15).toFixed(2)} CHF</span>
+                        <span>RABATT (10%)</span>
+                        <span>-{(totalPrice * 0.10).toFixed(2)} CHF</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <span>{(totalPrice * (totalPrice >= 100 ? 0.85 : 1) + 6).toFixed(2)} CHF</span>
+                      <span>{(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6).toFixed(2)} CHF</span>
                     </div>
                   </div>
                 </div>
@@ -287,3 +287,4 @@ export default function Navbar() {
     </>
   )
 }
+
