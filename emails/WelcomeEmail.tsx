@@ -64,7 +64,7 @@ export default function WelcomeEmail({
                 🎉 Dein exklusiver Willkommensrabatt
               </Heading>
               <Text style={discountText}>
-                <strong style={discountAmount}>15% Rabatt</strong>
+                <strong style={discountAmount}>10% Rabatt</strong>
               </Text>
               <Text style={discountCondition}>
                 auf deine erste Bestellung ab 100 CHF

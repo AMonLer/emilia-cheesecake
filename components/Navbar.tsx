@@ -230,13 +230,13 @@ export default function Navbar() {
                 <div className="space-y-3">
                   {totalPrice >= 100 ? (
                     <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
-                      <span className="text-xs font-bold tracking-widest uppercase">15% Rabatt aktiviert</span>
-                      <span className="text-xs font-bold">-{(totalPrice * 0.15).toFixed(2)} CHF</span>
+                      <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
+                      <span className="text-xs font-bold">-{(totalPrice * 0.10).toFixed(2)} CHF</span>
                     </div>
                   ) : (
                     <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
                       <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
-                        <span>Bis 15% Rabatt</span>
+                        <span>Bis 10% Rabatt</span>
                         <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
                       </div>
                       <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
@@ -246,7 +246,7 @@ export default function Navbar() {
                         />
                       </div>
                       <p className="text-[10px] text-gray-400 text-center font-light tracking-wide">
-                        Erreichen Sie 100 CHF für 15% Rabatt
+                        Erreichen Sie 100 CHF für 10% Rabatt
                       </p>
                     </div>
                   )}
@@ -262,13 +262,13 @@ export default function Navbar() {
                     </div>
                     {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
-                        <span>RABATT (15%)</span>
-                        <span>-{(totalPrice * 0.15).toFixed(2)} CHF</span>
+                        <span>RABATT (10%)</span>
+                        <span>-{(totalPrice * 0.10).toFixed(2)} CHF</span>
                       </div>
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <span>{(totalPrice * (totalPrice >= 100 ? 0.85 : 1) + 6).toFixed(2)} CHF</span>
+                      <span>{(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6).toFixed(2)} CHF</span>
                     </div>
                   </div>
                 </div>

@@ -83,7 +83,7 @@ export default function PromoPopup() {
 
                     <div className="py-6 border-y border-[#651A1A]/10 my-6">
                         <p className="text-lg text-[#1a1a1a] font-light tracking-wide">
-                            Erhalte <span className="font-medium text-[#651A1A]">15% Rabatt</span> auf deine erste Bestellung
+                            Erhalte <span className="font-medium text-[#651A1A]">10% Rabatt</span> auf deine erste Bestellung
                         </p>
                         <p className="text-xs text-gray-400 mt-2 font-light tracking-wider uppercase">
                             Ab 100 CHF Bestellwert
