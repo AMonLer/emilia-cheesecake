@@ -21,8 +21,8 @@ export default function FeaturedProducts() {
                             image1="/pistacho1.png"
                             image2="/pistacho2.png"
                             name="VERDALIA"
-                            priceSmall={19}
-                            priceLarge={51}
+                            priceSmall={21.90}
+                            priceLarge={55.90}
                             description="Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack..."
                             tag={{
                                 label: "Bestseller",
@@ -37,8 +37,8 @@ export default function FeaturedProducts() {
                             image1="/original1.png"
                             image2="/original2.png"
                             name="CLÁSICA"
-                            priceSmall={15}
-                            priceLarge={39}
+                            priceSmall={17.90}
+                            priceLarge={46.90}
                             description="Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack..."
                         />
 
@@ -48,8 +48,8 @@ export default function FeaturedProducts() {
                             image1="/lotus1.png"
                             image2="/lotus2.png"
                             name="EMILIA Nº3"
-                            priceSmall={18}
-                            priceLarge={47}
+                            priceSmall={21.90}
+                            priceLarge={55.90}
                             description="Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack..."
                         />
 
@@ -59,8 +59,8 @@ export default function FeaturedProducts() {
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
                             name="FONDANT"
-                            priceSmall={17}
-                            priceLarge={44}
+                            priceSmall={20.90}
+                            priceLarge={52.90}
                             description="Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber..."
                         />
 
@@ -70,8 +70,8 @@ export default function FeaturedProducts() {
                             image1="/cafe1.png"
                             image2="/cafe2.png"
                             name="MANJAR"
-                            priceSmall={17}
-                            priceLarge={44}
+                            priceSmall={20.90}
+                            priceLarge={52.90}
                             description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
                             tag={{
                                 label: "New",
