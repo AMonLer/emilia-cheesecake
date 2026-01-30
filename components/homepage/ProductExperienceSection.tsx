@@ -25,30 +25,31 @@ export default function ProductExperienceSection() {
                     <div className="space-y-8 order-2 text-center">
                         <div className="space-y-4">
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-[#651A1A]">
-                                LIEBE ZUM
+                                CREMIG &
                                 <br />
-                                DETAIL
+                                HAUSGEMACHT
                             </h2>
-                            <div className="w-24 h-1 bg-[#dec181] mx-auto rounded-full"></div>
+                            <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full -mt-2 opacity-30 transform -rotate-1"></div>
                         </div>
 
                         <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium max-w-lg mx-auto">
-                            Gute Zutaten, Sorgfalt bei jedem Schritt.
+                            Täglich frisch gebacken mit besten Zutaten. Ein ehrlicher Genuss ohne Kompromisse.
                         </p>
 
                         <div className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto">
                             <div className="flex flex-col items-center space-y-2">
                                 <Star className="w-8 h-8 text-[#651A1A]" strokeWidth={1.5} />
-                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Exzellente Qualität</span>
+                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Beste Zutaten</span>
                             </div>
                             <div className="flex flex-col items-center space-y-2">
                                 <ChefHat className="w-8 h-8 text-[#651A1A]" strokeWidth={1.5} />
-                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Handwerkliche Perfektion</span>
+                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Frisch auf Bestellung</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+        </section >
     )
 }
