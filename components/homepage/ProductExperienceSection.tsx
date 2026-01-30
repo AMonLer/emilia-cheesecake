@@ -25,7 +25,7 @@ export default function ProductExperienceSection() {
                     <div className="space-y-8 order-2 text-center">
                         <div className="space-y-4">
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-[#651A1A]">
-                                SAN SEBASTIÁN
+                                SAN SEBASTIAN
                                 <br />
                                 CHEESECAKE AUS ZÜRICH
                             </h2>
