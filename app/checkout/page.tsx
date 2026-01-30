@@ -142,7 +142,7 @@ export default function CheckoutPage() {
   ]
 
   // Calculate discount and shipping
-  const shippingCost = 6
+  const shippingCost = 6.90
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
   const hasCodeDiscount = normalizedDiscountCode === "emilia_daniela"
   const codeDiscountRate = totalPrice >= 100 ? 0.20 : 0.10
@@ -155,7 +155,7 @@ export default function CheckoutPage() {
     const upsellProduct = {
       id: `clasica-upsell-${Date.now()}`,
       name: "CLÁSICA",
-      price: 13.50, // Discounted upsell price (10% off)
+      price: 16.11, // Discounted upsell price (10% off 17.90)
       size: "2-3",
       image: "/original3.png",
       quantity: 1
@@ -757,8 +757,8 @@ export default function CheckoutPage() {
                     <p className="text-sm font-bold">CLÁSICA (2-3 Personen)</p>
                     <p className="text-xs text-gray-600">(10% RABATT)</p>
                     <p className="text-sm">
-                      <span className="font-bold">13.50 CHF</span>{" "}
-                      <span className="text-gray-500 line-through">15.00 CHF</span>
+                      <span className="font-bold">16.11 CHF</span>{" "}
+                      <span className="text-gray-500 line-through">17.90 CHF</span>
                     </p>
                   </div>
                   <button

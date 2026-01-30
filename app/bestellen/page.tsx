@@ -13,8 +13,8 @@ export default function BestellenPage() {
       slug: "pistacho",
       image1: "/pistacho1.png",
       image2: "/pistacho2.png",
-      priceSmall: 19,
-      priceLarge: 51,
+      priceSmall: 21.90,
+      priceLarge: 55.90,
       description: "Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack.",
       tag: {
         label: "Bestseller",
@@ -28,8 +28,8 @@ export default function BestellenPage() {
       slug: "original",
       image1: "/original1.png",
       image2: "/original2.png",
-      priceSmall: 15,
-      priceLarge: 39,
+      priceSmall: 17.90,
+      priceLarge: 46.90,
       description: "Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack."
     },
     {
@@ -38,8 +38,8 @@ export default function BestellenPage() {
       slug: "lotus",
       image1: "/lotus1.png",
       image2: "/lotus2.png",
-      priceSmall: 18,
-      priceLarge: 47,
+      priceSmall: 21.90,
+      priceLarge: 55.90,
       description: "Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack."
     },
     {
@@ -48,8 +48,8 @@ export default function BestellenPage() {
       slug: "chocolate",
       image1: "/chocolate1.png",
       image2: "/chocolate2.png",
-      priceSmall: 17,
-      priceLarge: 44,
+      priceSmall: 20.90,
+      priceLarge: 52.90,
       description: "Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber."
     },
     {
@@ -58,8 +58,8 @@ export default function BestellenPage() {
       slug: "cafe",
       image1: "/cafe1.png",
       image2: "/cafe2.png",
-      priceSmall: 17,
-      priceLarge: 44,
+      priceSmall: 20.90,
+      priceLarge: 52.90,
       description: "Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell.",
       tag: {
         label: "Neu",
