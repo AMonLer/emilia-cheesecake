@@ -21,7 +21,7 @@ export default function PriceDisplay({
     return (
         <span className={cn("inline-flex items-baseline font-serif", className)}>
             <span className="font-medium">{integerPart}</span>
-            <span className="text-[0.6em] font-medium -translate-y-[0.3em] ml-[1px]">{decimalPart}</span>
+            <span className="text-[0.6em] font-medium -translate-y-[0.3em] ml-[1px]">.{decimalPart}</span>
             {showCurrency && (
                 <span className={cn("ml-1 text-[0.4em] uppercase tracking-wide opacity-80 self-center font-sans translate-y-[0.1em]", currencyClassName)}>
                     {currency}
