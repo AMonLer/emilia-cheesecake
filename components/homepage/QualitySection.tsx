@@ -9,7 +9,7 @@ export default function QualitySection() {
                     {/* Lado izquierdo - Texto */}
                     <div className="space-y-6 text-center lg:text-left order-2 lg:order-1">
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight text-[#651A1A]">
-                            BASKISCHER KÄSEKUCHEN,
+                            DEIN CHEESECAKE,
                             <br className="hidden lg:block" />
                             WIE ER SEIN SOLL
                         </h2>
