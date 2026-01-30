@@ -215,7 +215,7 @@ export default function Navbar() {
                               +
                             </button>
                           </div>
-                          <PriceDisplay amount={item.price * item.quantity} className="text-base font-bold text-black tracking-wide" />
+                          <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
                         </div>
                       </div>
                     </div>
@@ -257,11 +257,11 @@ export default function Navbar() {
                   <div className="space-y-2 pt-2">
                     <div className="flex items-center justify-between text-sm font-light text-gray-600">
                       <span>Zwischensumme</span>
-                      <PriceDisplay amount={totalPrice} className="text-sm" />
+                      <PriceDisplay amount={totalPrice} className="text-base font-bold text-black" />
                     </div>
                     <div className="flex items-center justify-between text-sm font-light text-gray-600">
                       <span>Versand</span>
-                      <PriceDisplay amount={6.00} className="text-sm" />
+                      <PriceDisplay amount={6.00} className="text-base font-bold text-black" />
                     </div>
                     {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
