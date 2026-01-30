@@ -9,12 +9,12 @@ export default function QualitySection() {
                     {/* Lado izquierdo - Texto */}
                     <div className="space-y-6 text-center lg:text-left order-2 lg:order-1">
                         <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight text-[#651A1A]">
-                            DER KÄSEKUCHEN,
+                            BASKISCHER KÄSEKUCHEN,
                             <br className="hidden lg:block" />
-                            DEN DU VERDIENST
+                            WIE ER SEIN SOLL
                         </h2>
                         <p className="text-base md:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 text-[#651A1A]/80">
-                            Der authentische baskische Käsekuchen, handgefertigt mit erstklassigen Zutaten. Täglich backen wir in kleinen Mengen für garantierte Frische und den Geschmack, der die Welt begeistert.
+                            Gute Zutaten, kleine Mengen, jeden Tag frisch gebacken.
                         </p>
                         <div className="pt-4">
                             <Link href="/bestellen">

@@ -33,7 +33,7 @@ export default function ProductExperienceSection() {
                         </div>
 
                         <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium max-w-lg mx-auto">
-                            Wir wählen nur das Beste aus und achten auf jedes Detail, um Ihnen ein unvergessliches Erlebnis zu bieten.
+                            Gute Zutaten, Sorgfalt bei jedem Schritt.
                         </p>
 
                         <div className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto">

@@ -6,10 +6,10 @@ export default function FeaturedProducts() {
             <div className="container mx-auto px-4">
                 <div className="text-center mb-8 max-w-3xl mx-auto">
                     <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
-                        VON UNSERER KONDITOREI ZU DEINER HAUSTÜR
+                        UNSERE KÄSEKUCHEN
                     </h2>
                     <p className="text-base leading-relaxed">
-                        Authentische baskische Käsekuchen in fünf einzigartigen Variationen. Jede Torte wird frisch auf Bestellung gebacken – wähle deinen Favoriten oder entdecke sie alle.
+                        Fünf Sorten, alle frisch auf Bestellung gebacken.
                     </p>
                 </div>
 

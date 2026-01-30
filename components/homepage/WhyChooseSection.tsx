@@ -20,10 +20,10 @@ export default function WhyChooseSection() {
                             <UtensilsCrossed className="w-full h-full text-[#651A1A]" strokeWidth={1.5} />
                         </div>
                         <h3 className="font-black text-xl mb-4 tracking-tight text-[#651A1A]">
-                            HANDWERKLICHE HERSTELLUNG
+                            HANDGEMACHT
                         </h3>
                         <p className="text-base leading-relaxed text-[#651A1A]/80">
-                            Jede Torte wird von Hand mit erstklassigen Zutaten und viel Liebe gefertigt, wie zu Hause.
+                            Jede Torte machen wir von Hand.
                         </p>
                     </div>
 
@@ -33,10 +33,10 @@ export default function WhyChooseSection() {
                             <CakeSlice className="w-full h-full text-[#651A1A]" strokeWidth={1.5} />
                         </div>
                         <h3 className="font-black text-xl mb-4 tracking-tight text-[#651A1A]">
-                            KLEINSERIENPRODUKTION
+                            KLEINE MENGEN
                         </h3>
                         <p className="text-base leading-relaxed text-[#651A1A]/80">
-                            Als kleine Konditorei achten wir auf jedes Detail und backen in begrenzten Chargen, um Frische zu garantieren.
+                            Wir backen täglich in kleinen Mengen.
                         </p>
                     </div>
 
@@ -49,7 +49,7 @@ export default function WhyChooseSection() {
                             TRADITIONELLE REZEPTE
                         </h3>
                         <p className="text-base leading-relaxed text-[#651A1A]/80">
-                            Wir folgen authentischen spanischen Rezepten, mit Leidenschaft weitergegeben und mit der Zeit perfektioniert.
+                            Spanische Rezepte, über die Zeit verfeinert.
                         </p>
                     </div>
                 </div>

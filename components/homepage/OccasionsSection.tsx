@@ -47,10 +47,10 @@ export default function OccasionsSection() {
                 {/* Título y descripción centrados */}
                 <div className="text-center mb-12 max-w-3xl mx-auto">
                     <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">
-                        GESCHENKE FÜR JEDEN ANLASS!
+                        FÜR JEDEN ANLASS
                     </h2>
                     <p className="text-base leading-relaxed">
-                        Ob du den Geburtstag eines Freundes oder Familienmitglieds feierst, eine Zusammenkunft veranstaltest oder einfach ein Geschenk verschicken möchtest – wir haben die besten Desserts für jeden Anlass.
+                        Geburtstag, Dankeschön oder einfach so.
                     </p>
                 </div>
 
