@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ChevronRight, ChevronLeft, X } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import Navbar from "@/components/Navbar"
+import PriceDisplay from "@/components/PriceDisplay"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import DatePicker, { registerLocale } from "react-datepicker"
@@ -672,7 +673,9 @@ export default function CheckoutPage() {
                     <p className="text-xs text-gray-600">{item.size} Personen</p>
                     <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
                   </div>
-                  <div className="font-bold">{(item.price * item.quantity).toFixed(2)} CHF</div>
+                  <div className="font-bold">
+                    <PriceDisplay amount={item.price * item.quantity} className="text-sm" />
+                  </div>
                 </div>
               ))}
             </div>
@@ -721,7 +724,9 @@ export default function CheckoutPage() {
             <div className="space-y-3 border-t pt-6">
               <div className="flex justify-between text-sm">
                 <span>Zwischensumme</span>
-                <span className={discount > 0 ? "text-gray-500 line-through" : "font-bold"}>{totalPrice.toFixed(2)} CHF</span>
+                <span className={discount > 0 ? "text-gray-500 line-through" : "font-bold"}>
+                  <PriceDisplay amount={totalPrice} className="text-sm" />
+                </span>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-sm">
@@ -730,16 +735,20 @@ export default function CheckoutPage() {
                       ? (totalPrice >= 100 ? "20% Rabatt (EMILIA_DANIELA)" : "10% Rabatt (EMILIA_DANIELA)")
                       : "10% Rabatt"}
                   </span>
-                  <span className="text-green-600 font-bold">-{discount.toFixed(2)} CHF</span>
+                  <span className="text-green-600 font-bold flex items-center">
+                    -<PriceDisplay amount={discount} showCurrency={false} /> CHF
+                  </span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
                 <span>Versand</span>
-                <span>{shippingCost.toFixed(2)} CHF</span>
+                <PriceDisplay amount={shippingCost} className="text-sm" />
               </div>
               <div className="flex justify-between text-lg font-black border-t pt-3">
                 <span>Gesamt</span>
-                <span className={discount > 0 ? "text-green-600" : ""}>CHF {finalPrice.toFixed(2)}</span>
+                <span className={discount > 0 ? "text-green-600" : ""}>
+                  <PriceDisplay amount={finalPrice} className="text-lg" />
+                </span>
               </div>
             </div>
 
@@ -757,8 +766,8 @@ export default function CheckoutPage() {
                     <p className="text-sm font-bold">CLÁSICA (2-3 Personen)</p>
                     <p className="text-xs text-gray-600">(10% RABATT)</p>
                     <p className="text-sm">
-                      <span className="font-bold">16.11 CHF</span>{" "}
-                      <span className="text-gray-500 line-through">17.90 CHF</span>
+                      <span className="font-bold"><PriceDisplay amount={16.11} showCurrency={false} className="text-sm" /> CHF</span>{" "}
+                      <span className="text-gray-500 line-through"><PriceDisplay amount={17.90} showCurrency={false} className="text-sm" /> CHF</span>
                     </p>
                   </div>
                   <button

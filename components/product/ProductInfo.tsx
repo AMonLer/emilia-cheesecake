@@ -5,6 +5,7 @@ import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
 import { Check, Star, CheckCircle, CreditCard, Smartphone } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
+import PriceDisplay from "@/components/PriceDisplay"
 
 interface ProductInfoProps {
     product: any
@@ -82,11 +83,12 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     <p className="text-xs text-black/60">Ø 24 cm</p>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-[#651A1A] font-serif font-medium text-lg sm:text-xl leading-none">
-                                            {product.prices["8-10"]}
-                                        </span>
-                                        <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide transform translate-y-[-1px]">CHF</span>
+                                    <div className="flex items-baseline gap-1 text-[#651A1A]">
+                                        <PriceDisplay
+                                            amount={product.prices["8-10"]}
+                                            className="text-lg sm:text-xl"
+                                            currencyClassName="transform translate-y-[-1px]"
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -121,11 +123,12 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                                     <p className="text-xs text-black/60">Ø 14 cm</p>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
-                                    <div className="flex items-baseline gap-1">
-                                        <span className="text-[#651A1A] font-serif font-medium text-lg sm:text-xl leading-none">
-                                            {product.prices["2-3"]}
-                                        </span>
-                                        <span className="text-[10px] text-gray-500 font-medium uppercase tracking-wide transform translate-y-[-1px]">CHF</span>
+                                    <div className="flex items-baseline gap-1 text-[#651A1A]">
+                                        <PriceDisplay
+                                            amount={product.prices["2-3"]}
+                                            className="text-lg sm:text-xl"
+                                            currencyClassName="transform translate-y-[-1px]"
+                                        />
                                     </div>
                                 </div>
                             </div>

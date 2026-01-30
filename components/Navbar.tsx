@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
+import PriceDisplay from '@/components/PriceDisplay'
 
 export default function Navbar() {
   const router = useRouter()
@@ -214,7 +215,7 @@ export default function Navbar() {
                               +
                             </button>
                           </div>
-                          <span className="font-medium text-sm text-black tracking-wide">{(item.price * item.quantity).toFixed(2)} CHF</span>
+                          <PriceDisplay amount={item.price * item.quantity} className="text-sm font-medium text-black tracking-wide" />
                         </div>
                       </div>
                     </div>
@@ -231,7 +232,9 @@ export default function Navbar() {
                   {totalPrice >= 100 ? (
                     <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
                       <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
-                      <span className="text-xs font-bold">-{(totalPrice * 0.10).toFixed(2)} CHF</span>
+                      <span className="text-xs font-bold font-serif flex items-center">
+                        -<PriceDisplay amount={totalPrice * 0.10} showCurrency={false} className="text-xs" /> CHF
+                      </span>
                     </div>
                   ) : (
                     <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
@@ -254,21 +257,23 @@ export default function Navbar() {
                   <div className="space-y-2 pt-2">
                     <div className="flex items-center justify-between text-sm font-light text-gray-600">
                       <span>Zwischensumme</span>
-                      <span>{totalPrice.toFixed(2)} CHF</span>
+                      <PriceDisplay amount={totalPrice} className="text-sm" />
                     </div>
                     <div className="flex items-center justify-between text-sm font-light text-gray-600">
                       <span>Versand</span>
-                      <span>6.00 CHF</span>
+                      <PriceDisplay amount={6.00} className="text-sm" />
                     </div>
                     {totalPrice >= 100 && (
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
                         <span>RABATT (10%)</span>
-                        <span>-{(totalPrice * 0.10).toFixed(2)} CHF</span>
+                        <span className="flex items-center">
+                          -<PriceDisplay amount={totalPrice * 0.10} showCurrency={false} /> CHF
+                        </span>
                       </div>
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <span>{(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6).toFixed(2)} CHF</span>
+                      <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-lg" />
                     </div>
                   </div>
                 </div>
