@@ -215,7 +215,7 @@ export default function Navbar() {
                               +
                             </button>
                           </div>
-                          <PriceDisplay amount={item.price * item.quantity} className="text-sm font-medium text-black tracking-wide" />
+                          <PriceDisplay amount={item.price * item.quantity} className="text-base font-bold text-black tracking-wide" />
                         </div>
                       </div>
                     </div>
@@ -273,7 +273,7 @@ export default function Navbar() {
                     )}
                     <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                       <span>Gesamt</span>
-                      <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-lg" />
+                      <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-2xl font-black" />
                     </div>
                   </div>
                 </div>
