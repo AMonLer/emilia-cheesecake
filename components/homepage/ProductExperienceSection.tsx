@@ -25,15 +25,15 @@ export default function ProductExperienceSection() {
                     <div className="space-y-8 order-2 text-center">
                         <div className="space-y-4">
                             <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-[#651A1A]">
-                                CREMIG &
+                                SAN SEBASTIÁN
                                 <br />
-                                HAUSGEMACHT
+                                CHEESECAKE AUS ZÜRICH
                             </h2>
                             <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full -mt-2 opacity-30 transform -rotate-1"></div>
                         </div>
 
                         <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium max-w-lg mx-auto">
-                            Täglich frisch gebacken mit besten Zutaten. Ein ehrlicher Genuss ohne Kompromisse.
+                            Der erste San Sebastián Cheesecake in Zürich — handgemacht mit den besten Zutaten, frisch auf Bestellung.
                         </p>
 
                         <div className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto">
