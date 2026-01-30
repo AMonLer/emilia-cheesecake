@@ -14,7 +14,7 @@ export default function QualitySection() {
                             WIE ER SEIN SOLL
                         </h2>
                         <p className="text-base md:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 text-[#651A1A]/80">
-                            Gute Zutaten, kleine Mengen, jeden Tag frisch gebacken.
+                            Überrasche deine Freunde, Familie oder Kollegen mit unseren frisch gebackenen Käsekuchen. Ab 100 CHF bekommst du 10% Rabatt und Gratisversand!
                         </p>
                         <div className="pt-4">
                             <Link href="/bestellen">
