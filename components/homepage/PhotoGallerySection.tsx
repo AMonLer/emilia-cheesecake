@@ -1,16 +1,16 @@
 import Image from "next/image"
+import { Instagram } from "lucide-react"
 
 const galleryItems = [
-    { src: "/original1.png", title: "Original Cheesecake" },
-    { src: "/pistacho1.png", title: "Pistachio Cheesecake" },
-    { src: "/lotus1.png", title: "Lotus Cheesecake" },
-    { src: "/chocolate1.png", title: "Chocolate Cheesecake" },
-    { src: "/cafe1.png", title: "Kaffee Cheesecake" },
-    { src: "/original2.png", title: "Original Cheesecake" },
-    { src: "/pistacho2.png", title: "Pistachio Cheesecake" },
-    { src: "/lotus2.png", title: "Lotus Cheesecake" },
-    { src: "/chocolate2.png", title: "Chocolate Cheesecake" },
-    { src: "/cafe2.png", title: "Kaffee Cheesecake" },
+    { src: "/IG1.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG2.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG3.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG4.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG5.jpg", title: "Pistachio Cheesecake" },
+    { src: "/IG6.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG7.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG8.jpg", title: "Emilia Cheesecake" },
+    { src: "/IG9.jpg", title: "Emilia Cheesecake" },
 ]
 
 export default function PhotoGallerySection() {
@@ -55,22 +55,24 @@ export default function PhotoGallerySection() {
                                 />
                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                             </div>
-                            <h3 className="text-center font-bold text-lg md:text-xl tracking-tight text-[#1a1a1a] opacity-60 group-hover:opacity-100 transition-opacity duration-300">
-                                {item.title}
-                            </h3>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <div className="text-center mt-12">
+            <div className="text-center mt-16">
                 <a
                     href="https://www.instagram.com/emilia.cheesecake/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 border-b-2 border-black pb-1 text-sm font-bold tracking-widest uppercase hover:text-[#651A1A] hover:border-[#651A1A] transition-colors"
+                    className="inline-flex flex-col items-center gap-4 group"
                 >
-                    Folge uns auf Instagram
+                    <div className="p-4 rounded-full border-2 border-[#651A1A]/10 group-hover:border-[#651A1A] transition-colors duration-300">
+                        <Instagram className="w-12 h-12 text-[#651A1A]" strokeWidth={1.5} />
+                    </div>
+                    <span className="text-sm font-bold tracking-widest uppercase text-black group-hover:text-[#651A1A] transition-colors">
+                        Folge uns auf Instagram
+                    </span>
                 </a>
             </div>
         </section>
