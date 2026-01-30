@@ -21,16 +21,10 @@ export default function PhotoGallerySection() {
             <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-3xl opacity-40 pointer-events-none animate-pulse" />
             <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#651A1A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 pointer-events-none" />
 
-            <div className="container mx-auto px-4 mb-16 text-center relative">
-                <span className="inline-block text-xs font-bold tracking-[0.35em] uppercase text-[#651A1A]/70 mb-4 px-4 py-2 border border-[#651A1A]/10 rounded-full bg-white/40 backdrop-blur-sm">
-                    Galerie
-                </span>
-                <h2 className="text-4xl md:text-6xl font-black tracking-tight text-[#651A1A] mb-2 font-serif">
+            <div className="container mx-auto px-4 mb-12 text-center relative">
+                <h2 className="text-4xl md:text-5xl font-black tracking-tight text-[#651A1A] mb-2 uppercase">
                     Unsere Kreationen
                 </h2>
-                <p className="text-[#651A1A]/60 mt-4 max-w-lg mx-auto font-light leading-relaxed">
-                    Ein Einblick in unsere Backstube und die Vielfalt unserer handgemachten Cheesecakes.
-                </p>
             </div>
 
             {/* Scrolling Banner */}
@@ -61,14 +55,19 @@ export default function PhotoGallerySection() {
                                     fill
                                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 bg-[#651A1A]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 contrast-125" />
+                                {/* Overlay with Instagram Icon */}
+                                <div className="absolute inset-0 bg-[#651A1A]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
+                                    <div className="bg-white p-4 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                                        <Instagram className="w-6 h-6 text-[#651A1A]" />
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ))}
                 </div>
             </div>
 
-            <div className="text-center mt-16 relative z-10">
+            <div className="text-center mt-8 relative z-10">
                 <a
                     href="https://www.instagram.com/emilia.cheesecake/"
                     target="_blank"
