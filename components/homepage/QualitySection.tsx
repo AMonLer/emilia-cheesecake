@@ -28,7 +28,7 @@ export default function QualitySection() {
                     {/* Lado derecho - Imagen */}
                     <div className="relative h-[400px] lg:h-[600px] w-full order-1 lg:order-2">
                         <Image
-                            src="/Y.jpeg"
+                            src="/Z.jpeg"
                             alt="Fall Party Desserts"
                             fill
                             className="object-cover rounded-3xl shadow-2xl"
