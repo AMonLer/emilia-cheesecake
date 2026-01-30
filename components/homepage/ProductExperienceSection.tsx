@@ -49,7 +49,6 @@ export default function ProductExperienceSection() {
                     </div>
                 </div>
             </div>
-        </div>
         </section >
     )
 }
