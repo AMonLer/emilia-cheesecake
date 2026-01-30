@@ -15,7 +15,7 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "CLÁSICA",
-                price: 46.90,
+                price: 49.90,
                 image: "/original1.png"
             },
             {
@@ -75,7 +75,7 @@ export const products: { [key: string]: any } = {
             {
                 id: 2,
                 name: "CLÁSICA",
-                price: 46.90,
+                price: 49.90,
                 image: "/original1.png"
             }
         ]
@@ -83,7 +83,7 @@ export const products: { [key: string]: any } = {
     "original": {
         name: "CLÁSICA",
         prices: {
-            "8-10": 46.90,
+            "8-10": 49.90,
             "2-3": 17.90
         },
         description: "Das Rezept, mit dem alles begann. Cremig, seidig und im baskischen Stil gebacken. Pure Emilia-Essenz: einfach, perfekt, unvergesslich.",

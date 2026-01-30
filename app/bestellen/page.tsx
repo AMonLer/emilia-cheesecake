@@ -29,7 +29,7 @@ export default function BestellenPage() {
       image1: "/original1.png",
       image2: "/original2.png",
       priceSmall: 17.90,
-      priceLarge: 46.90,
+      priceLarge: 49.90,
       description: "Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack."
     },
     {

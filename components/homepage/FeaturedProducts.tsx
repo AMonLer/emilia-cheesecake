@@ -38,7 +38,7 @@ export default function FeaturedProducts() {
                             image2="/original2.png"
                             name="CLÁSICA"
                             priceSmall={17.90}
-                            priceLarge={46.90}
+                            priceLarge={49.90}
                             description="Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack..."
                         />
 
