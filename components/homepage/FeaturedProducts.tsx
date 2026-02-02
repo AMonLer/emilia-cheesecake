@@ -24,11 +24,6 @@ export default function FeaturedProducts() {
                             priceSmall={21.90}
                             priceLarge={55.90}
                             description="Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack..."
-                            tag={{
-                                label: "Bestseller",
-                                bgColor: "bg-[#D4AF85]",
-                                textColor: "text-[#3A2A1A]"
-                            }}
                         />
 
                         <ProductCard
@@ -47,7 +42,7 @@ export default function FeaturedProducts() {
                             href="/product/lotus"
                             image1="/lotus1.png"
                             image2="/lotus2.png"
-                            name="EMILIA Nº3"
+                            name="EMILIA N.3"
                             priceSmall={21.90}
                             priceLarge={55.90}
                             description="Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack..."
@@ -58,7 +53,7 @@ export default function FeaturedProducts() {
                             href="/product/chocolate"
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
-                            name="FONDANT"
+                            name="SCHOGGI"
                             priceSmall={20.90}
                             priceLarge={52.90}
                             description="Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber..."
@@ -73,11 +68,6 @@ export default function FeaturedProducts() {
                             priceSmall={20.90}
                             priceLarge={52.90}
                             description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
-                            tag={{
-                                label: "New",
-                                bgColor: "bg-[#8B7355]",
-                                textColor: "text-[#F5EEE4]"
-                            }}
                         />
                     </div>
                 </div>

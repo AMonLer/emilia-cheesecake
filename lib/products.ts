@@ -20,14 +20,14 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "FONDANT",
+                name: "SCHOGGI",
                 price: 52.90,
                 image: "/chocolate1.png"
             }
         ]
     },
     "lotus": {
-        name: "EMILIA Nº3",
+        name: "EMILIA N.3",
         prices: {
             "8-10": 55.90,
             "2-3": 21.90
@@ -54,7 +54,7 @@ export const products: { [key: string]: any } = {
         ]
     },
     "chocolate": {
-        name: "FONDANT",
+        name: "SCHOGGI",
         prices: {
             "8-10": 52.90,
             "2-3": 20.90
@@ -101,7 +101,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "EMILIA Nº3",
+                name: "EMILIA N.3",
                 price: 55.90,
                 image: "/lotus1.png"
             }
@@ -122,7 +122,7 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "FONDANT",
+                name: "SCHOGGI",
                 price: 52.90,
                 image: "/chocolate1.png"
             },

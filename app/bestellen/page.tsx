@@ -15,12 +15,7 @@ export default function BestellenPage() {
       image2: "/pistacho2.png",
       priceSmall: 21.90,
       priceLarge: 55.90,
-      description: "Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack.",
-      tag: {
-        label: "Bestseller",
-        bgColor: "bg-[#D4AF85]",
-        textColor: "text-[#3A2A1A]"
-      }
+      description: "Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack."
     },
     {
       id: "clasica",
@@ -34,7 +29,7 @@ export default function BestellenPage() {
     },
     {
       id: "emilia3",
-      name: "EMILIA Nº3",
+      name: "EMILIA N.3",
       slug: "lotus",
       image1: "/lotus1.png",
       image2: "/lotus2.png",
@@ -43,8 +38,8 @@ export default function BestellenPage() {
       description: "Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack."
     },
     {
-      id: "fondant",
-      name: "FONDANT",
+      id: "schoggi",
+      name: "SCHOGGI",
       slug: "chocolate",
       image1: "/chocolate1.png",
       image2: "/chocolate2.png",
@@ -60,12 +55,7 @@ export default function BestellenPage() {
       image2: "/cafe2.png",
       priceSmall: 20.90,
       priceLarge: 52.90,
-      description: "Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell.",
-      tag: {
-        label: "Neu",
-        bgColor: "bg-[#8B7355]",
-        textColor: "text-[#F5EEE4]"
-      }
+      description: "Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell."
     }
   ]
 

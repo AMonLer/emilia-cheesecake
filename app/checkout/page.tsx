@@ -143,7 +143,7 @@ export default function CheckoutPage() {
   ]
 
   // Calculate discount and shipping
-  const shippingCost = 6.90
+  const shippingCost = totalPrice >= 100 ? 0 : 6.90
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
   const hasCodeDiscount = normalizedDiscountCode === "emilia_daniela"
   const codeDiscountRate = totalPrice >= 100 ? 0.20 : 0.10
@@ -742,7 +742,11 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between text-sm">
                 <span>Versand</span>
-                <PriceDisplay amount={shippingCost} className="text-sm" />
+                {shippingCost === 0 ? (
+                  <span className="text-green-600 font-bold">Gratis</span>
+                ) : (
+                  <PriceDisplay amount={shippingCost} className="text-sm" />
+                )}
               </div>
               <div className="flex justify-between text-lg font-black border-t pt-3">
                 <span>Gesamt</span>
