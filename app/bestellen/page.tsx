@@ -79,7 +79,6 @@ export default function BestellenPage() {
                 priceSmall={product.priceSmall}
                 priceLarge={product.priceLarge}
                 description={product.description}
-                tag={product.tag}
                 className="w-full"
               />
             ))}
