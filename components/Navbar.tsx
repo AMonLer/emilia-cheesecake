@@ -235,8 +235,8 @@ export default function Navbar() {
                       <span className="text-xs font-bold font-serif flex items-center">
                         -<PriceDisplay
                           amount={totalPrice * 0.10}
-                          className="text-xs"
-                          currencyClassName="text-[0.6em] opacity-100"
+                          className="text-base font-black"
+                          currencyClassName="text-[0.5em] opacity-100"
                         />
                       </span>
                     </div>
@@ -273,6 +273,7 @@ export default function Navbar() {
                         <span className="flex items-center">
                           -<PriceDisplay
                             amount={totalPrice * 0.10}
+                            className="text-lg"
                             currencyClassName="text-[0.6em] opacity-100"
                           />
                         </span>
