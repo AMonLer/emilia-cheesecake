@@ -145,7 +145,7 @@ export default function CheckoutPage() {
   // Calculate discount and shipping
   const shippingCost = totalPrice >= 100 ? 0 : 6.90
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
-  const hasCodeDiscount = normalizedDiscountCode === "emilia_daniela"
+  const hasCodeDiscount = normalizedDiscountCode === "holaswitzerland"
   const codeDiscountRate = totalPrice >= 100 ? 0.20 : 0.10
   const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
   const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0

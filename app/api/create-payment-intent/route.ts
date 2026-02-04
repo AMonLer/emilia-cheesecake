@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     let discountPercent = 0
 
     if (subtotal > 0) {
-      if (rawDiscountCode === 'emilia_daniela') {
+      if (rawDiscountCode === 'holaswitzerland') {
         discountPercent = subtotal >= 100 ? 20 : 10
       } else if (subtotal >= 100) {
         discountPercent = 10
