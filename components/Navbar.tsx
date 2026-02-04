@@ -233,7 +233,11 @@ export default function Navbar() {
                     <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
                       <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
                       <span className="text-xs font-bold font-serif flex items-center">
-                        -<PriceDisplay amount={totalPrice * 0.10} showCurrency={false} className="text-xs" /> CHF
+                        -<PriceDisplay
+                          amount={totalPrice * 0.10}
+                          className="text-xs"
+                          currencyClassName="text-[0.6em] opacity-100"
+                        />
                       </span>
                     </div>
                   ) : (
@@ -267,7 +271,10 @@ export default function Navbar() {
                       <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
                         <span>RABATT (10%)</span>
                         <span className="flex items-center">
-                          -<PriceDisplay amount={totalPrice * 0.10} showCurrency={false} /> CHF
+                          -<PriceDisplay
+                            amount={totalPrice * 0.10}
+                            currencyClassName="text-[0.6em] opacity-100"
+                          />
                         </span>
                       </div>
                     )}
