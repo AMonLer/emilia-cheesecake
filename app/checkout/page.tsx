@@ -674,7 +674,7 @@ export default function CheckoutPage() {
                     <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
                   </div>
                   <div className="font-bold">
-                    <PriceDisplay amount={item.price * item.quantity} className="text-sm" />
+                    <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
                   </div>
                 </div>
               ))}
@@ -725,7 +725,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-sm">
                 <span>Zwischensumme</span>
                 <span className={discount > 0 ? "text-gray-500 line-through" : "font-bold"}>
-                  <PriceDisplay amount={totalPrice} className="text-sm" />
+                  <PriceDisplay amount={totalPrice} className="text-base font-bold" currencyClassName="text-[0.6em] opacity-80" />
                 </span>
               </div>
               {discount > 0 && (
@@ -736,7 +736,7 @@ export default function CheckoutPage() {
                       : "10% Rabatt"}
                   </span>
                   <span className="text-green-600 font-bold flex items-center">
-                    -<PriceDisplay amount={discount} showCurrency={false} /> CHF
+                    -<PriceDisplay amount={discount} className="text-base font-bold" currencyClassName="text-[0.5em] opacity-80" />
                   </span>
                 </div>
               )}
@@ -751,7 +751,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-lg font-black border-t pt-3">
                 <span>Gesamt</span>
                 <span className={discount > 0 ? "text-green-600" : ""}>
-                  <PriceDisplay amount={finalPrice} className="text-lg" />
+                  <PriceDisplay amount={finalPrice} className="text-xl font-black" currencyClassName="text-[0.5em] opacity-100" />
                 </span>
               </div>
             </div>
