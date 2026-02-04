@@ -702,7 +702,7 @@ export default function CheckoutPage() {
                       setDiscountCodeError("")
                       return
                     }
-                    if (normalized === "emilia_daniela") {
+                    if (normalized === "holaswitzerland") {
                       setAppliedDiscountCode(discountCodeInput.trim())
                       setDiscountCodeError("")
                     } else {
