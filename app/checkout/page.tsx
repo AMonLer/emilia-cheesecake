@@ -732,7 +732,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-green-700 font-bold">
                     {hasCodeDiscount
-                      ? (totalPrice >= 100 ? "20% Rabatt (EMILIA_DANIELA)" : "10% Rabatt (EMILIA_DANIELA)")
+                      ? (totalPrice >= 100 ? "20% Rabatt (HolaSwitzerland)" : "10% Rabatt (HolaSwitzerland)")
                       : "10% Rabatt"}
                   </span>
                   <span className="text-green-600 font-bold flex items-center">
