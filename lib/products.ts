@@ -21,7 +21,7 @@ export const products: { [key: string]: any } = {
             {
                 id: 2,
                 name: "SCHOGGI",
-                price: 52.90,
+                price: 51.90,
                 image: "/chocolate1.png"
             }
         ]
@@ -29,8 +29,8 @@ export const products: { [key: string]: any } = {
     "lotus": {
         name: "EMILIA N.3",
         prices: {
-            "8-10": 55.90,
-            "2-3": 21.90
+            "8-10": 53.90,
+            "2-3": 19.90
         },
         description: "Die süßeste aus der Kollektion. Karamell, sanfte Gewürze und eine umhüllende Creme, die jeden Bissen in puren Komfort verwandelt.",
         images: ["/lotus1.png", "/lotus2.png"],
@@ -56,8 +56,8 @@ export const products: { [key: string]: any } = {
     "chocolate": {
         name: "SCHOGGI",
         prices: {
-            "8-10": 52.90,
-            "2-3": 20.90
+            "8-10": 51.90,
+            "2-3": 18.90
         },
         description: "Cremige Schweizer Schokolade mit einem tiefen Geschmack, der umhüllt, ohne zu überwältigen. Eine perfekte Balance zwischen Intensität und Sanftheit.",
         images: ["/chocolate1.png", "/chocolate2.png"],
@@ -102,7 +102,7 @@ export const products: { [key: string]: any } = {
             {
                 id: 2,
                 name: "EMILIA N.3",
-                price: 55.90,
+                price: 53.90,
                 image: "/lotus1.png"
             }
         ]
@@ -123,7 +123,7 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "SCHOGGI",
-                price: 52.90,
+                price: 51.90,
                 image: "/chocolate1.png"
             },
             {
