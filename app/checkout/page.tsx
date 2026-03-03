@@ -131,13 +131,7 @@ export default function CheckoutPage() {
     const decemberDates = eachDayOfInterval({ start: dec20, end: dec31 })
     const januaryDates = eachDayOfInterval({ start: jan1, end: jan6 })
 
-    // Temporarily blocked dates (travel)
-    const travelDates = [
-      new Date(2026, 1, 28), // Feb 28, 2026
-      new Date(2026, 2, 1),  // Mar 1, 2026
-    ]
-
-    return [...decemberDates, ...januaryDates, ...travelDates]
+    return [...decemberDates, ...januaryDates]
   }, [])
 
   // Generate time slots
