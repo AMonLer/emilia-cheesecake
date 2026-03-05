@@ -10,10 +10,10 @@ export default function ProductExperienceSection() {
                     <div className="relative order-1">
                         <div className="relative h-[400px] lg:h-[600px] w-full">
                             <Image
-                                src="/Gemini_Generated_Image_ez2xavez2xavez2x.png"
+                                src="/nuevo.png"
                                 alt="Liebe zum Detail"
                                 fill
-                                className="object-contain object-top rounded-3xl"
+                                className="object-cover object-bottom rounded-3xl shadow-2xl"
                             />
                         </div>
                         {/* Decorative elements matching QualitySection style */}
