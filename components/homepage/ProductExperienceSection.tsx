@@ -13,7 +13,7 @@ export default function ProductExperienceSection() {
                                 src="/Gemini_Generated_Image_ez2xavez2xavez2x.png"
                                 alt="Liebe zum Detail"
                                 fill
-                                className="object-cover rounded-3xl shadow-2xl"
+                                className="object-contain object-top rounded-3xl"
                             />
                         </div>
                         {/* Decorative elements matching QualitySection style */}
