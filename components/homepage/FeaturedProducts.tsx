@@ -43,8 +43,8 @@ export default function FeaturedProducts() {
                             image1="/lotus1.png"
                             image2="/lotus2.png"
                             name="EMILIA N.3"
-                            priceSmall={21.90}
-                            priceLarge={55.90}
+                            priceSmall={19.90}
+                            priceLarge={53.90}
                             description="Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack..."
                         />
 
@@ -54,8 +54,8 @@ export default function FeaturedProducts() {
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
                             name="SCHOGGI"
-                            priceSmall={20.90}
-                            priceLarge={52.90}
+                            priceSmall={18.90}
+                            priceLarge={51.90}
                             description="Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber..."
                         />
 
