@@ -13,7 +13,7 @@ export default function ProductExperienceSection() {
                                 src="/nuevo.png"
                                 alt="Liebe zum Detail"
                                 fill
-                                className="object-cover object-bottom rounded-3xl shadow-2xl"
+                                className="object-cover rounded-3xl shadow-2xl" style={{ objectPosition: '50% 60%' }}
                             />
                         </div>
                         {/* Decorative elements matching QualitySection style */}
