@@ -78,6 +78,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, totalPrice, removeItem, addToCart } = useCart()
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [address, setAddress] = useState("")
@@ -168,7 +169,7 @@ export default function CheckoutPage() {
   const handleContinueToDelivery = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!email || !firstName || !lastName || !address || !city || !postalCode) {
+    if (!email || !phone || !firstName || !lastName || !address || !city || !postalCode) {
       alert("Bitte füllen Sie alle erforderlichen Felder aus")
       return
     }
@@ -201,6 +202,7 @@ export default function CheckoutPage() {
           amount: finalPrice,
           orderData: {
             email,
+            phone,
             firstName,
             lastName,
             address,
@@ -286,6 +288,14 @@ export default function CheckoutPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                  required
+                />
+                <input
+                  type="tel"
+                  placeholder="Handynummer (z.B. +41 79 123 45 67)"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
                   required
                 />
                 <label className="flex items-center gap-2 mt-3">

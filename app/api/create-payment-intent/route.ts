@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ['card'], // card includes Apple Pay & Google Pay
       metadata: {
         customerEmail: orderData?.email || '',
+        customerPhone: orderData?.phone || '',
         customerName: `${orderData?.firstName || ''} ${orderData?.lastName || ''}`,
         address: orderData?.address || '',
         city: orderData?.city || '',

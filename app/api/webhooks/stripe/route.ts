@@ -96,6 +96,7 @@ export async function POST(req: NextRequest) {
 👤 <b>Cliente:</b>
 ${metadata.customerName || 'N/A'}
 ${metadata.customerEmail || 'N/A'}
+📱 ${metadata.customerPhone || 'N/A'}
 
 📍 <b>Dirección de Entrega:</b>
 ${metadata.address || ''}
@@ -151,7 +152,7 @@ ${productsText}
         AdminNotificationEmail({
           customerName: metadata.customerName || 'N/A',
           customerEmail: metadata.customerEmail || 'N/A',
-          phone: metadata.phone,
+          phone: metadata.customerPhone || '',
           orderId: paymentIntent.id,
           amount,
           paymentMethod: paymentIntent.payment_method_types.join(', '),
