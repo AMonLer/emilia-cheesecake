@@ -10,10 +10,10 @@ export default function ProductExperienceSection() {
                     <div className="relative order-1">
                         <div className="relative h-[400px] lg:h-[600px] w-full">
                             <Image
-                                src="/345.png"
+                                src="/3434.png"
                                 alt="Liebe zum Detail"
                                 fill
-                                className="object-cover rounded-3xl shadow-2xl" style={{ objectPosition: '50% 70%' }}
+                                className="object-contain rounded-3xl shadow-2xl"
                             />
                         </div>
                         {/* Decorative elements matching QualitySection style */}
