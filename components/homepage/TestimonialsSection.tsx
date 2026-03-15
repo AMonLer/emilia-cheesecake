@@ -66,12 +66,7 @@ export default function TestimonialsSection() {
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-[#651A1A] mb-4">
                         WAS UNSERE KUNDEN SAGEN
                     </h2>
-                    <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full opacity-30 transform -rotate-1 mb-6"></div>
-                    <div className="flex items-center justify-center gap-2 text-[#651A1A]/70 font-medium">
-                        <span className="text-xl font-bold text-[#651A1A]">4.9/5</span>
-                        <StarRating rating={5} />
-                        <span>basierend auf 100+ Bewertungen</span>
-                    </div>
+                    <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full opacity-30 transform -rotate-1"></div>
                 </div>
 
                 {/* Mobile Carousel */}
