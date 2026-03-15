@@ -21,16 +21,6 @@ const testimonials = [
         text: "Endlich ein San Sebastian Cheesecake in Zürich! Schmeckt wie in einem Sternerestaurant. Wir bestellen jetzt regelmässig.",
         rating: 5,
     },
-    {
-        name: "Marco B.",
-        text: "Die Qualität ist hervorragend. Man merkt, dass alles mit Liebe und besten Zutaten gemacht wird. Mein neuer Lieblingskuchen!",
-        rating: 5,
-    },
-    {
-        name: "Anna W.",
-        text: "Ich bin Cheesecake-Fan und dieser ist mit Abstand der beste in der Schweiz. Die Textur ist einfach himmlisch.",
-        rating: 5,
-    },
 ]
 
 function StarRating({ rating }: { rating: number }) {
@@ -123,32 +113,7 @@ export default function TestimonialsSection() {
 
                 {/* Desktop Grid */}
                 <div className="hidden md:grid grid-cols-3 gap-6 max-w-5xl mx-auto">
-                    {testimonials.slice(0, 3).map((testimonial, index) => (
-                        <div
-                            key={index}
-                            className="bg-white rounded-2xl p-8 shadow-sm border border-[#F5E6D3] hover:shadow-md transition-shadow duration-300"
-                        >
-                            <StarRating rating={testimonial.rating} />
-                            <p className="text-[#651A1A]/80 leading-relaxed mt-4 mb-6 text-base">
-                                &ldquo;{testimonial.text}&rdquo;
-                            </p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#F5E6D3] rounded-full flex items-center justify-center">
-                                    <span className="text-[#651A1A] font-black text-sm">
-                                        {testimonial.name.charAt(0)}
-                                    </span>
-                                </div>
-                                <span className="font-bold text-[#651A1A] text-sm tracking-wide">
-                                    {testimonial.name}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Bottom row desktop - 2 cards centered */}
-                <div className="hidden md:grid grid-cols-2 gap-6 max-w-3xl mx-auto mt-6">
-                    {testimonials.slice(3).map((testimonial, index) => (
+                    {testimonials.map((testimonial, index) => (
                         <div
                             key={index}
                             className="bg-white rounded-2xl p-8 shadow-sm border border-[#F5E6D3] hover:shadow-md transition-shadow duration-300"
