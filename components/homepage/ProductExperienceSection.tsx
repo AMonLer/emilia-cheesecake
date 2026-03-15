@@ -13,7 +13,7 @@ export default function ProductExperienceSection() {
                                 src="/3434.png"
                                 alt="Liebe zum Detail"
                                 fill
-                                className="object-contain rounded-3xl shadow-2xl"
+                                className="object-cover rounded-3xl shadow-2xl"
                             />
                         </div>
                         {/* Decorative elements matching QualitySection style */}
