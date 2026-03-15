@@ -7,20 +7,14 @@ import { cn } from "@/lib/utils"
 
 const testimonials = [
     {
-        name: "Maria S.",
-        text: "Der beste Cheesecake, den ich je gegessen habe! Cremig, nicht zu süss und einfach perfekt. Meine Gäste waren begeistert.",
+        name: "Constanza",
+        text: "I ordered the classic cheesecake because I wanted to treat our team meeting to something sweet and special. The service was impeccable, and the cheesecake... simply delicious. For a moment, I felt like I was in the Basque Country. It's the perfect surprise to send to friends you love, something made with heart, beautifully presented and full of flavor.",
         rating: 5,
         verified: true,
     },
     {
-        name: "Thomas K.",
-        text: "Habe den Cheesecake zum Geburtstag meiner Frau bestellt. Die Lieferung war pünktlich und der Kuchen war unglaublich frisch. Absolut empfehlenswert!",
-        rating: 5,
-        verified: true,
-    },
-    {
-        name: "Julia R.",
-        text: "Endlich ein San Sebastian Cheesecake in Zürich! Schmeckt wie in einem Sternerestaurant. Wir bestellen jetzt regelmässig.",
+        name: "Nicole",
+        text: "Was very delicious. Would order again and can recommend.",
         rating: 5,
         verified: true,
     },
@@ -124,7 +118,7 @@ export default function TestimonialsSection() {
                 </div>
 
                 {/* Desktop Grid */}
-                <div className="hidden md:grid grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div className="hidden md:grid grid-cols-2 gap-8 max-w-4xl mx-auto">
                     {testimonials.map((testimonial, index) => (
                         <div
                             key={index}
