@@ -169,7 +169,7 @@ export default function CheckoutPage() {
   const handleContinueToDelivery = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!email || !phone || !firstName || !lastName || !address || !city || !postalCode) {
+    if (!email || !firstName || !lastName || !address || !city || !postalCode) {
       alert("Bitte füllen Sie alle erforderlichen Felder aus")
       return
     }
@@ -296,7 +296,6 @@ export default function CheckoutPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
-                  required
                 />
                 <label className="flex items-center gap-2 mt-3">
                   <input type="checkbox" className="w-4 h-4" />
