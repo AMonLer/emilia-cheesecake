@@ -7,17 +7,14 @@ import { cn } from "@/lib/utils"
 
 const testimonials = [
     {
-        name: "Laura M.",
         text: "Der beste Cheesecake, den ich je gegessen habe! Cremig, nicht zu süss und einfach perfekt. Meine Gäste waren begeistert.",
         rating: 5,
     },
     {
-        name: "Thomas K.",
         text: "Habe den Cheesecake zum Geburtstag meiner Frau bestellt. Die Lieferung war pünktlich und der Kuchen war unglaublich frisch. Absolut empfehlenswert!",
         rating: 5,
     },
     {
-        name: "Sofia R.",
         text: "Endlich ein San Sebastian Cheesecake in Zürich! Schmeckt wie in einem Sternerestaurant. Wir bestellen jetzt regelmässig.",
         rating: 5,
     },
@@ -77,19 +74,9 @@ export default function TestimonialsSection() {
                                         style={{ opacity: selectedIndex === index ? 1 : 0.5 }}
                                     >
                                         <StarRating rating={testimonial.rating} />
-                                        <p className="text-[#651A1A]/80 leading-relaxed mt-4 mb-6 text-base">
+                                        <p className="text-[#651A1A]/80 leading-relaxed mt-4 text-base">
                                             &ldquo;{testimonial.text}&rdquo;
                                         </p>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-[#F5E6D3] rounded-full flex items-center justify-center">
-                                                <span className="text-[#651A1A] font-black text-sm">
-                                                    {testimonial.name.charAt(0)}
-                                                </span>
-                                            </div>
-                                            <span className="font-bold text-[#651A1A] text-sm tracking-wide">
-                                                {testimonial.name}
-                                            </span>
-                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -119,19 +106,9 @@ export default function TestimonialsSection() {
                             className="bg-white rounded-2xl p-8 shadow-sm border border-[#F5E6D3] hover:shadow-md transition-shadow duration-300"
                         >
                             <StarRating rating={testimonial.rating} />
-                            <p className="text-[#651A1A]/80 leading-relaxed mt-4 mb-6 text-base">
+                            <p className="text-[#651A1A]/80 leading-relaxed mt-4 text-base">
                                 &ldquo;{testimonial.text}&rdquo;
                             </p>
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-[#F5E6D3] rounded-full flex items-center justify-center">
-                                    <span className="text-[#651A1A] font-black text-sm">
-                                        {testimonial.name.charAt(0)}
-                                    </span>
-                                </div>
-                                <span className="font-bold text-[#651A1A] text-sm tracking-wide">
-                                    {testimonial.name}
-                                </span>
-                            </div>
                         </div>
                     ))}
                 </div>
