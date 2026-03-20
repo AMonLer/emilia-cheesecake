@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { Star, ChefHat } from "lucide-react"
 
 export default function ProductExperienceSection() {
     return (
@@ -36,16 +35,6 @@ export default function ProductExperienceSection() {
                             Der erste San Sebastian Cheesecake in Zürich — handgemacht mit den besten Zutaten, frisch auf Bestellung.
                         </p>
 
-                        <div className="grid grid-cols-2 gap-6 pt-4 max-w-md mx-auto">
-                            <div className="flex flex-col items-center space-y-2">
-                                <Star className="w-8 h-8 text-[#651A1A]" strokeWidth={1.5} />
-                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Beste Zutaten</span>
-                            </div>
-                            <div className="flex flex-col items-center space-y-2">
-                                <ChefHat className="w-8 h-8 text-[#651A1A]" strokeWidth={1.5} />
-                                <span className="text-sm font-bold tracking-wider text-[#651A1A] uppercase">Frisch auf Bestellung</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
