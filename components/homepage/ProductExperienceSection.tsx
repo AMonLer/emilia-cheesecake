@@ -10,7 +10,7 @@ export default function ProductExperienceSection() {
                     <div className="relative order-1">
                         <div className="relative h-[400px] lg:h-[600px] w-full">
                             <Image
-                                src="/3434.png"
+                                src="/4.jpg"
                                 alt="Liebe zum Detail"
                                 fill
                                 className="object-cover rounded-3xl shadow-2xl"
