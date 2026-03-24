@@ -55,6 +55,12 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* All numbers use Roboto font */
+  .price, [data-price], .font-roboto {
+    font-family: var(--font-roboto), sans-serif;
   }
 
   /* Adding marquee animation for scrolling text banner */

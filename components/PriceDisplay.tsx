@@ -19,7 +19,7 @@ export default function PriceDisplay({
     const [integerPart, decimalPart] = formatted.split('.')
 
     return (
-        <span className={cn("inline-flex items-baseline font-serif font-medium", className)}>
+        <span className={cn("inline-flex items-baseline font-medium", className)} style={{ fontFamily: 'var(--font-roboto), sans-serif' }}>
             <span>{integerPart}</span>
             <span className="text-[0.6em] -translate-y-[0.3em] ml-[1px]">.{decimalPart}</span>
             {showCurrency && (

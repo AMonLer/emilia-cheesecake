@@ -16,6 +16,11 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        serif: ["var(--font-playfair)", "serif"],
+        roboto: ["var(--font-roboto)", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -25,10 +30,6 @@ module.exports = {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-        },
-        fontFamily: {
-          sans: ["var(--font-inter)", "sans-serif"],
-          serif: ["var(--font-playfair)", "serif"],
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
