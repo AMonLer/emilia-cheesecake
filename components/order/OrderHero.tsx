@@ -20,7 +20,7 @@ export default function OrderHero() {
                     <br />
                     CHEESECAKES
                 </h1>
-                <p className="text-lg md:text-2xl text-[#651A1A]/80 leading-relaxed max-w-2xl mx-auto font-light animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+                <p className="hidden md:block text-lg md:text-2xl text-[#651A1A]/80 leading-relaxed max-w-2xl mx-auto font-light animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
                     Jede Kreation ist ein Kunstwerk – handgefertigt mit Liebe und den feinsten Zutaten.
                 </p>
             </div>

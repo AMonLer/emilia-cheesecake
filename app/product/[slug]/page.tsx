@@ -10,10 +10,18 @@ import RelatedProducts from "@/components/product/RelatedProducts"
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior })
-    // Fallback: some browsers restore scroll after first paint
-    const timer = setTimeout(() => window.scrollTo(0, 0), 50)
-    return () => clearTimeout(timer)
+    // Disable browser scroll restoration so it doesn't override our scroll
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
+    // Fallback for browsers that restore scroll after paint
+    const raf = requestAnimationFrame(() => window.scrollTo(0, 0))
+    const timer = setTimeout(() => window.scrollTo(0, 0), 100)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(timer)
+    }
   }, [params.slug])
   const product = products[params.slug]
 
