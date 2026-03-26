@@ -2,7 +2,7 @@ import Image from "next/image"
 
 export default function OrderHero() {
     return (
-        <section className="relative bg-[#F5E6D3] py-20 md:py-32 px-4 overflow-hidden">
+        <section className="relative bg-[#F5E6D3] py-12 md:py-32 px-4 overflow-hidden">
             {/* Decorative Elements */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div className="absolute top-[-10%] left-[-5%] w-[300px] h-[300px] rounded-full bg-[#651A1A]/5 blur-3xl"></div>
@@ -15,7 +15,7 @@ export default function OrderHero() {
                         Unser Sortiment
                     </span>
                 </div>
-                <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#651A1A] mb-8 leading-[0.9] tracking-tight animate-in fade-in zoom-in-95 duration-700 delay-100">
+                <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-[#651A1A] mb-4 md:mb-8 leading-[0.9] tracking-tight animate-in fade-in zoom-in-95 duration-700 delay-100">
                     UNSERE
                     <br />
                     CHEESECAKES
