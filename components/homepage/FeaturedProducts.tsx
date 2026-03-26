@@ -14,9 +14,9 @@ export default function FeaturedProducts() {
                 </div>
 
                 <div className="overflow-x-auto pb-4 -mx-4 px-4 custom-scrollbar">
-                    <div className="flex gap-4 min-w-min">
+                    <div className="flex gap-2 md:gap-4 min-w-min">
                         <ProductCard
-                            className="w-80 flex-shrink-0"
+                            className="w-44 md:w-80 flex-shrink-0"
                             href="/product/pistacho"
                             image1="/pistacho1.png"
                             image2="/pistacho2.png"
@@ -27,7 +27,7 @@ export default function FeaturedProducts() {
                         />
 
                         <ProductCard
-                            className="w-80 flex-shrink-0"
+                            className="w-44 md:w-80 flex-shrink-0"
                             href="/product/original"
                             image1="/original1.png"
                             image2="/original2.png"
@@ -38,7 +38,7 @@ export default function FeaturedProducts() {
                         />
 
                         <ProductCard
-                            className="w-80 flex-shrink-0"
+                            className="w-44 md:w-80 flex-shrink-0"
                             href="/product/lotus"
                             image1="/lotus1.png"
                             image2="/lotus2.png"
@@ -49,7 +49,7 @@ export default function FeaturedProducts() {
                         />
 
                         <ProductCard
-                            className="w-80 flex-shrink-0"
+                            className="w-44 md:w-80 flex-shrink-0"
                             href="/product/chocolate"
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
@@ -60,7 +60,7 @@ export default function FeaturedProducts() {
                         />
 
                         <ProductCard
-                            className="w-80 flex-shrink-0"
+                            className="w-44 md:w-80 flex-shrink-0"
                             href="/product/cafe"
                             image1="/cafe1.png"
                             image2="/cafe2.png"

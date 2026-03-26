@@ -38,7 +38,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     return (
         <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex flex-col ${className}`}>
             <div
-                className="relative h-80"
+                className="relative h-48 md:h-80"
                 ref={imageContainerRef}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
@@ -85,19 +85,19 @@ export default function ProductCard({ href, image1, image2, name, description, p
                     />
                 </div>
             </div>
-            <div className="p-6 text-center flex flex-col flex-1">
-                <h3 className="font-black text-lg tracking-tight">{name}</h3>
+            <div className="p-3 md:p-6 text-center flex flex-col flex-1">
+                <h3 className="font-black text-sm md:text-lg tracking-tight">{name}</h3>
                 {priceSmall && (
-                    <div className="flex items-baseline justify-center gap-1 mt-1 mb-2 text-[#651A1A]">
-                        <span className="text-sm font-medium opacity-60">ab</span>
-                        <PriceDisplay amount={priceSmall} className="text-xl" />
+                    <div className="flex items-baseline justify-center gap-1 mt-0.5 md:mt-1 mb-1 md:mb-2 text-[#651A1A]">
+                        <span className="text-xs md:text-sm font-medium opacity-60">ab</span>
+                        <PriceDisplay amount={priceSmall} className="text-base md:text-xl" />
                     </div>
                 )}
-                <p className="text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
+                <p className="hidden md:block text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
 
                 {/* Mobile Order Button */}
-                <div className="md:hidden mt-6">
-                    <span className="block w-full bg-black text-white py-3 text-xs font-bold tracking-[0.2em] uppercase rounded-lg shadow-sm">
+                <div className="md:hidden mt-2">
+                    <span className="block w-full bg-black text-white py-2 text-[10px] font-bold tracking-[0.2em] uppercase rounded-lg shadow-sm">
                         Bestellen
                     </span>
                 </div>
