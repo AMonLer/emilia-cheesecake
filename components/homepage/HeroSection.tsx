@@ -32,7 +32,6 @@ export default function HeroSection() {
                 JETZT SICHERN
               </button>
             </Link>
-            <p className="text-white/70 text-xs mt-3 tracking-wide">Gratis Lieferung ab 100 CHF</p>
           </div>
         </div>
       </div>
@@ -53,7 +52,6 @@ export default function HeroSection() {
                 JETZT SICHERN
               </button>
             </Link>
-            <p className="text-[#651A1A]/50 text-xs mt-3 tracking-wide">Gratis Lieferung ab 100 CHF</p>
           </div>
         </div>
 
