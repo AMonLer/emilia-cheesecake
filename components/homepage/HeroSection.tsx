@@ -28,8 +28,8 @@ export default function HeroSection() {
               TO YOUR HOME
             </h1>
             <Link href="/bestellen">
-              <button className="bg-[#651A1A] text-white font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#4A1313] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                JETZT SICHERN
+              <button className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                ORDER & DELIVERY
               </button>
             </Link>
           </div>
@@ -48,8 +48,8 @@ export default function HeroSection() {
               TO YOUR HOME
             </h1>
             <Link href="/bestellen">
-              <button className="bg-[#651A1A] text-white font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#4A1313] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                JETZT SICHERN
+              <button className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                ORDER & DELIVERY
               </button>
             </Link>
           </div>
