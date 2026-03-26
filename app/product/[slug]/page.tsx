@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { products } from "@/lib/products"
@@ -8,6 +9,9 @@ import ProductInfo from "@/components/product/ProductInfo"
 import RelatedProducts from "@/components/product/RelatedProducts"
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [params.slug])
   const product = products[params.slug]
 
   if (!product) {
