@@ -110,6 +110,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             fill
                             className={`object-cover absolute inset-0 transition-opacity duration-200 ${showSecondImage ? 'opacity-100' : 'opacity-0'}`}
                         />
+                        <span className="absolute bottom-2 left-2 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full z-10">+ info</span>
                     </div>
                 </div>
                 <div className="p-3 md:p-6 text-center flex flex-col flex-1">
