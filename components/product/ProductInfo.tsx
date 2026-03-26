@@ -10,7 +10,7 @@ import PriceDisplay from "@/components/PriceDisplay"
 interface ProductInfoProps {
     product: any
     slug: string
-    compact?: boolean
+    compact?: boolean | "top" | "bottom"
 }
 
 export default function ProductInfo({ product, slug, compact = false }: ProductInfoProps) {
@@ -36,91 +36,90 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         addToCartContext(newItem)
     }
 
-    if (compact) {
+    if (compact === "top") {
         return (
-            <div className="flex flex-col">
-                {/* Title */}
+            <div className="flex flex-col justify-center h-full">
                 <h1 className="text-xl font-black tracking-tight leading-tight text-black mb-2">
                     {product.name}
                 </h1>
-
-                {/* Description */}
-                <p className="text-xs text-black/70 mb-4 leading-relaxed line-clamp-3">
+                <p className="text-xs text-black/70 leading-relaxed">
                     {product.description}
                 </p>
+            </div>
+        )
+    }
 
-                {/* Size Selector - compact */}
-                <div className="mb-4">
-                    <h3 className="font-black text-[10px] text-black mb-2 tracking-wide uppercase">Größe wählen</h3>
-                    <div className="space-y-2">
-                        <button
-                            onClick={() => setSelectedSize("8-10")}
-                            className={`relative w-full rounded-lg p-2 transition-all duration-200 border-2 text-left ${selectedSize === "8-10"
-                                ? "bg-[#F5E6D3] border-black"
-                                : "bg-white border-gray-100"
-                                }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className="relative w-8 h-8 flex-shrink-0">
-                                    <Image
-                                        src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
-                                        alt="Complete cheesecake"
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-black text-[10px] text-black">8–10 Pers.</p>
-                                    <p className="text-[9px] text-black/60">Ø 24 cm</p>
-                                </div>
-                                <div className="text-[#651A1A]">
+    if (compact === "bottom") {
+        return (
+            <div>
+                <h3 className="font-black text-xs text-black mb-3 tracking-wide uppercase">Größe wählen</h3>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                    <button
+                        onClick={() => setSelectedSize("8-10")}
+                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "8-10"
+                            ? "bg-[#F5E6D3] border-black"
+                            : "bg-white border-gray-100"
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <div className="relative w-10 h-10 flex-shrink-0">
+                                <Image
+                                    src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
+                                    alt="Complete cheesecake"
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-black text-xs text-black">8–10 Pers.</p>
+                                <p className="text-[10px] text-black/60">Ø 24 cm</p>
+                                <div className="text-[#651A1A] mt-0.5">
                                     <PriceDisplay amount={product.prices["8-10"]} className="text-sm" />
                                 </div>
                             </div>
-                            {selectedSize === "8-10" && (
-                                <div className="absolute top-1 right-1 bg-black rounded-full p-0.5">
-                                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                                </div>
-                            )}
-                        </button>
+                        </div>
+                        {selectedSize === "8-10" && (
+                            <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
+                                <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                            </div>
+                        )}
+                    </button>
 
-                        <button
-                            onClick={() => setSelectedSize("2-3")}
-                            className={`relative w-full rounded-lg p-2 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
-                                ? "bg-[#F5E6D3] border-black"
-                                : "bg-white border-gray-100"
-                                }`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className="relative w-8 h-8 flex-shrink-0">
-                                    <Image
-                                        src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
-                                        alt="Small cheesecake box"
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <p className="font-black text-[10px] text-black">2–3 Pers.</p>
-                                    <p className="text-[9px] text-black/60">Ø 14 cm</p>
-                                </div>
-                                <div className="text-[#651A1A]">
+                    <button
+                        onClick={() => setSelectedSize("2-3")}
+                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
+                            ? "bg-[#F5E6D3] border-black"
+                            : "bg-white border-gray-100"
+                            }`}
+                    >
+                        <div className="flex items-center gap-2">
+                            <div className="relative w-10 h-10 flex-shrink-0">
+                                <Image
+                                    src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
+                                    alt="Small cheesecake box"
+                                    fill
+                                    className="object-contain"
+                                />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <p className="font-black text-xs text-black">2–3 Pers.</p>
+                                <p className="text-[10px] text-black/60">Ø 14 cm</p>
+                                <div className="text-[#651A1A] mt-0.5">
                                     <PriceDisplay amount={product.prices["2-3"]} className="text-sm" />
                                 </div>
                             </div>
-                            {selectedSize === "2-3" && (
-                                <div className="absolute top-1 right-1 bg-black rounded-full p-0.5">
-                                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
-                                </div>
-                            )}
-                        </button>
-                    </div>
+                        </div>
+                        {selectedSize === "2-3" && (
+                            <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
+                                <Check className="w-3 h-3 text-white" strokeWidth={3} />
+                            </div>
+                        )}
+                    </button>
                 </div>
 
-                {/* Add to Cart Button */}
                 <button
                     onClick={addToCart}
-                    className="w-full bg-black text-white py-3 rounded-xl font-black text-xs tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20"
+                    className="w-full bg-black text-white py-3.5 rounded-xl font-black text-sm tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20"
                 >
                     IN DEN WARENKORB
                 </button>
