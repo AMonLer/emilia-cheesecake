@@ -10,7 +10,10 @@ import RelatedProducts from "@/components/product/RelatedProducts"
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
   useEffect(() => {
-    window.scrollTo(0, 0)
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior })
+    // Fallback: some browsers restore scroll after first paint
+    const timer = setTimeout(() => window.scrollTo(0, 0), 50)
+    return () => clearTimeout(timer)
   }, [params.slug])
   const product = products[params.slug]
 
