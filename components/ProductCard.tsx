@@ -95,8 +95,9 @@ export default function ProductCard({ href, image1, image2, name, description, p
                 )}
                 <p className="hidden md:block text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
 
-                {/* Mobile Order Button */}
-                <div className="md:hidden mt-2">
+                {/* Mobile */}
+                <div className="md:hidden mt-2 space-y-1.5">
+                    <span className="block text-[10px] text-gray-400 tracking-wide">+ info</span>
                     <span className="block w-full bg-black text-white py-2 text-[10px] font-bold tracking-[0.2em] uppercase rounded-lg shadow-sm">
                         Bestellen
                     </span>
