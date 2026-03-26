@@ -9,7 +9,7 @@ export default function BestellenPage() {
   const products = [
     {
       id: "verdalia",
-      name: "VERDALIA",
+      name: "PISTACHIO",
       slug: "pistacho",
       image1: "/pistacho1.png",
       image2: "/pistacho2.png",
@@ -19,7 +19,7 @@ export default function BestellenPage() {
     },
     {
       id: "clasica",
-      name: "CLÁSICA",
+      name: "CLASSIC",
       slug: "original",
       image1: "/original1.png",
       image2: "/original2.png",
@@ -29,7 +29,7 @@ export default function BestellenPage() {
     },
     {
       id: "emilia3",
-      name: "EMILIA N.3",
+      name: "LOTUS",
       slug: "lotus",
       image1: "/lotus1.png",
       image2: "/lotus2.png",
@@ -49,7 +49,7 @@ export default function BestellenPage() {
     },
     {
       id: "manjar",
-      name: "MANJAR",
+      name: "DULCE DE LECHE",
       slug: "cafe",
       image1: "/cafe1.png",
       image2: "/cafe2.png",

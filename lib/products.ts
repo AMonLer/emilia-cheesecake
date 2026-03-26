@@ -1,6 +1,6 @@
 export const products: { [key: string]: any } = {
     "pistacho": {
-        name: "VERDALIA",
+        name: "PISTACHIO",
         prices: {
             "8-10": 55.90,  // CHF for 8-10 people
             "2-3": 21.90    // CHF for 2-3 people
@@ -14,7 +14,7 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "CLÁSICA",
+                name: "CLASSIC",
                 price: 49.90,
                 image: "/original1.png"
             },
@@ -27,7 +27,7 @@ export const products: { [key: string]: any } = {
         ]
     },
     "lotus": {
-        name: "EMILIA N.3",
+        name: "LOTUS",
         prices: {
             "8-10": 53.90,
             "2-3": 19.90
@@ -41,13 +41,13 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "VERDALIA",
+                name: "PISTACHIO",
                 price: 55.90,
                 image: "/pistacho1.png"
             },
             {
                 id: 2,
-                name: "MANJAR",
+                name: "DULCE DE LECHE",
                 price: 52.90,
                 image: "/cafe1.png"
             }
@@ -68,20 +68,20 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "MANJAR",
+                name: "DULCE DE LECHE",
                 price: 52.90,
                 image: "/cafe1.png"
             },
             {
                 id: 2,
-                name: "CLÁSICA",
+                name: "CLASSIC",
                 price: 49.90,
                 image: "/original1.png"
             }
         ]
     },
     "original": {
-        name: "CLÁSICA",
+        name: "CLASSIC",
         prices: {
             "8-10": 49.90,
             "2-3": 17.90
@@ -95,20 +95,20 @@ export const products: { [key: string]: any } = {
         frequentlyBought: [
             {
                 id: 1,
-                name: "VERDALIA",
+                name: "PISTACHIO",
                 price: 55.90,
                 image: "/pistacho1.png"
             },
             {
                 id: 2,
-                name: "EMILIA N.3",
+                name: "LOTUS",
                 price: 53.90,
                 image: "/lotus1.png"
             }
         ]
     },
     "cafe": {
-        name: "MANJAR",
+        name: "DULCE DE LECHE",
         prices: {
             "8-10": 52.90,
             "2-3": 20.90
@@ -128,7 +128,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 2,
-                name: "VERDALIA",
+                name: "PISTACHIO",
                 price: 55.90,
                 image: "/pistacho1.png"
             }

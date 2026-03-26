@@ -20,7 +20,7 @@ export default function FeaturedProducts() {
                             href="/product/pistacho"
                             image1="/pistacho1.png"
                             image2="/pistacho2.png"
-                            name="VERDALIA"
+                            name="PISTACHIO"
                             priceSmall={21.90}
                             priceLarge={55.90}
                             description="Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack..."
@@ -31,7 +31,7 @@ export default function FeaturedProducts() {
                             href="/product/original"
                             image1="/original1.png"
                             image2="/original2.png"
-                            name="CLÁSICA"
+                            name="CLASSIC"
                             priceSmall={17.90}
                             priceLarge={49.90}
                             description="Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack..."
@@ -42,7 +42,7 @@ export default function FeaturedProducts() {
                             href="/product/lotus"
                             image1="/lotus1.png"
                             image2="/lotus2.png"
-                            name="EMILIA N.3"
+                            name="LOTUS"
                             priceSmall={19.90}
                             priceLarge={53.90}
                             description="Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack..."
@@ -64,7 +64,7 @@ export default function FeaturedProducts() {
                             href="/product/cafe"
                             image1="/cafe1.png"
                             image2="/cafe2.png"
-                            name="MANJAR"
+                            name="DULCE DE LECHE"
                             priceSmall={20.90}
                             priceLarge={52.90}
                             description="Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell..."
