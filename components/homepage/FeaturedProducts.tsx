@@ -18,6 +18,7 @@ export default function FeaturedProducts() {
                     <ProductCard
                         className="w-full"
                         href="/product/pistacho"
+                        slug="pistacho"
                         image1="/pistacho1.png"
                         image2="/pistacho2.png"
                         name="PISTACHIO"
@@ -28,6 +29,7 @@ export default function FeaturedProducts() {
                     <ProductCard
                         className="w-full"
                         href="/product/original"
+                        slug="original"
                         image1="/original1.png"
                         image2="/original2.png"
                         name="CLASSIC"
@@ -38,6 +40,7 @@ export default function FeaturedProducts() {
                     <ProductCard
                         className="w-full"
                         href="/product/lotus"
+                        slug="lotus"
                         image1="/lotus1.png"
                         image2="/lotus2.png"
                         name="LOTUS"
@@ -48,6 +51,7 @@ export default function FeaturedProducts() {
                     <ProductCard
                         className="w-full"
                         href="/product/chocolate"
+                        slug="chocolate"
                         image1="/chocolate1.png"
                         image2="/chocolate2.png"
                         name="SCHOGGI"
@@ -58,6 +62,7 @@ export default function FeaturedProducts() {
                     <ProductCard
                         className="w-full col-span-2 max-w-[50%] mx-auto"
                         href="/product/cafe"
+                        slug="cafe"
                         image1="/cafe1.png"
                         image2="/cafe2.png"
                         name="DULCE DE LECHE"

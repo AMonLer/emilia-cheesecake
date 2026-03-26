@@ -73,6 +73,7 @@ export default function BestellenPage() {
               <ProductCard
                 key={product.id}
                 href={`/product/${product.slug}`}
+                slug={product.slug}
                 image1={product.image1}
                 image2={product.image2}
                 name={product.name}
