@@ -3,24 +3,22 @@
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import Image from "next/image"
-import { Check, Star, CheckCircle, CreditCard, Smartphone } from "lucide-react"
+import { Check, CheckCircle, CreditCard } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
 
 interface ProductInfoProps {
     product: any
     slug: string
+    compact?: boolean
 }
 
-export default function ProductInfo({ product, slug }: ProductInfoProps) {
+export default function ProductInfo({ product, slug, compact = false }: ProductInfoProps) {
     const [selectedSize, setSelectedSize] = useState<string>("8-10")
     const { addToCart: addToCartContext } = useCart()
 
     const addToCart = () => {
-        if (!selectedSize) {
-            alert("Bitte wählen Sie eine Größe")
-            return
-        }
+        if (!selectedSize) return
 
         const imageForSize = selectedSize === "2-3"
             ? `/${slug}3.png`
@@ -38,6 +36,98 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
         addToCartContext(newItem)
     }
 
+    if (compact) {
+        return (
+            <div className="flex flex-col">
+                {/* Title */}
+                <h1 className="text-xl font-black tracking-tight leading-tight text-black mb-2">
+                    {product.name}
+                </h1>
+
+                {/* Description */}
+                <p className="text-xs text-black/70 mb-4 leading-relaxed line-clamp-3">
+                    {product.description}
+                </p>
+
+                {/* Size Selector - compact */}
+                <div className="mb-4">
+                    <h3 className="font-black text-[10px] text-black mb-2 tracking-wide uppercase">Größe wählen</h3>
+                    <div className="space-y-2">
+                        <button
+                            onClick={() => setSelectedSize("8-10")}
+                            className={`relative w-full rounded-lg p-2 transition-all duration-200 border-2 text-left ${selectedSize === "8-10"
+                                ? "bg-[#F5E6D3] border-black"
+                                : "bg-white border-gray-100"
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="relative w-8 h-8 flex-shrink-0">
+                                    <Image
+                                        src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
+                                        alt="Complete cheesecake"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-black text-[10px] text-black">8–10 Pers.</p>
+                                    <p className="text-[9px] text-black/60">Ø 24 cm</p>
+                                </div>
+                                <div className="text-[#651A1A]">
+                                    <PriceDisplay amount={product.prices["8-10"]} className="text-sm" />
+                                </div>
+                            </div>
+                            {selectedSize === "8-10" && (
+                                <div className="absolute top-1 right-1 bg-black rounded-full p-0.5">
+                                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                                </div>
+                            )}
+                        </button>
+
+                        <button
+                            onClick={() => setSelectedSize("2-3")}
+                            className={`relative w-full rounded-lg p-2 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
+                                ? "bg-[#F5E6D3] border-black"
+                                : "bg-white border-gray-100"
+                                }`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="relative w-8 h-8 flex-shrink-0">
+                                    <Image
+                                        src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
+                                        alt="Small cheesecake box"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="font-black text-[10px] text-black">2–3 Pers.</p>
+                                    <p className="text-[9px] text-black/60">Ø 14 cm</p>
+                                </div>
+                                <div className="text-[#651A1A]">
+                                    <PriceDisplay amount={product.prices["2-3"]} className="text-sm" />
+                                </div>
+                            </div>
+                            {selectedSize === "2-3" && (
+                                <div className="absolute top-1 right-1 bg-black rounded-full p-0.5">
+                                    <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                                </div>
+                            )}
+                        </button>
+                    </div>
+                </div>
+
+                {/* Add to Cart Button */}
+                <button
+                    onClick={addToCart}
+                    className="w-full bg-black text-white py-3 rounded-xl font-black text-xs tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20"
+                >
+                    IN DEN WARENKORB
+                </button>
+            </div>
+        )
+    }
+
     return (
         <div className="flex flex-col h-full justify-center">
             {/* Title */}
@@ -45,11 +135,7 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-black">
                     {product.name}
                 </h1>
-
             </div>
-
-            {/* Price */}
-
 
             {/* Description */}
             <p className="text-base text-black/80 mb-8 leading-relaxed">
@@ -152,23 +238,16 @@ export default function ProductInfo({ product, slug }: ProductInfoProps) {
 
             {/* Guarantee & Payment Info */}
             <div className="mb-8 space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                {/* Guarantee */}
                 <div className="flex items-center gap-3">
                     <div className="bg-[#651A1A]/10 p-2 rounded-full">
                         <CheckCircle className="w-5 h-5 text-[#651A1A]" />
                     </div>
                     <span className="text-sm font-bold text-[#651A1A]">100% Zufriedenheitsgarantie</span>
                 </div>
-
-                {/* Separator */}
                 <div className="h-px bg-gray-200 w-full"></div>
-
-                {/* Payment */}
                 <div className="flex items-center gap-3">
                     <div className="bg-[#651A1A]/10 p-2 rounded-full flex-shrink-0">
-                        <div className="flex gap-1">
-                            <CreditCard className="w-5 h-5 text-[#651A1A]" />
-                        </div>
+                        <CreditCard className="w-5 h-5 text-[#651A1A]" />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-xs font-bold text-[#651A1A] uppercase tracking-wide mb-2">Sichere Bezahlung</span>

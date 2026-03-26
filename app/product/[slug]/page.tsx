@@ -25,14 +25,26 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     <div className="min-h-screen bg-white selection:bg-[#651A1A] selection:text-white">
       <Navbar />
 
-      <main className="pt-32 pb-16">
+      <main className="pt-24 md:pt-32 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 mb-20">
-              {/* Left Side - Image Gallery */}
-              <ProductGallery images={product.images} name={product.name} />
+            {/* Mobile: side by side layout */}
+            <div className="lg:hidden mb-8">
+              <div className="flex gap-4 mb-6">
+                {/* Left - Image */}
+                <div className="w-2/5 flex-shrink-0">
+                  <ProductGallery images={product.images} name={product.name} />
+                </div>
+                {/* Right - Name, description, size */}
+                <div className="flex-1 min-w-0">
+                  <ProductInfo product={product} slug={params.slug} compact />
+                </div>
+              </div>
+            </div>
 
-              {/* Right Side - Product Info */}
+            {/* Desktop: original 2-column layout */}
+            <div className="hidden lg:grid grid-cols-2 gap-20 mb-20">
+              <ProductGallery images={product.images} name={product.name} />
               <ProductInfo product={product} slug={params.slug} />
             </div>
 
