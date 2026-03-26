@@ -1,13 +1,7 @@
-"use client"
-
 import Link from "next/link"
 import Image from "next/image"
 
 export default function HeroSection() {
-  const scrollToProducts = () => {
-    document.getElementById("featured-products")?.scrollIntoView({ behavior: "smooth" })
-  }
-
   return (
     <section className="relative">
       {/* Mobile Layout - Image with button overlaid at bottom */}
@@ -33,12 +27,11 @@ export default function HeroSection() {
               <br />
               TO YOUR HOME
             </h1>
-            <button
-              onClick={scrollToProducts}
-              className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-            >
-              ORDER & DELIVER
-            </button>
+            <Link href="/bestellen">
+              <button className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                ORDER & DELIVER
+              </button>
+            </Link>
           </div>
         </div>
       </div>
