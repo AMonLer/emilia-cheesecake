@@ -21,17 +21,18 @@ export default function HeroSection() {
           {/* Content positioned at bottom of image */}
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-12 px-6 z-20 text-center">
             <h1 className="text-4xl font-black text-white leading-[0.95] mb-8 drop-shadow-lg">
-              BAKED
+              THE BEST
               <br />
-              TO BE SAVORED
+              CHEESECAKE
               <br />
-              SLOWLY
+              TO YOUR HOME
             </h1>
             <Link href="/bestellen">
-              <button className="bg-white text-[#651A1A] font-black px-12 py-4 text-base tracking-wide border-2 border-white hover:bg-[#651A1A] hover:text-white hover:border-[#651A1A] transition-colors">
-                JETZT BESTELLEN
+              <button className="bg-[#651A1A] text-white font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#4A1313] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                JETZT SICHERN
               </button>
             </Link>
+            <p className="text-white/70 text-xs mt-3 tracking-wide">Gratis Lieferung ab 100 CHF</p>
           </div>
         </div>
       </div>
@@ -41,17 +42,18 @@ export default function HeroSection() {
         <div className="bg-[#F5E6D3] flex items-center justify-center px-8 lg:px-16 py-16">
           <div className="max-w-lg">
             <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-[#651A1A] leading-[0.95] mb-8">
-              BAKED
+              THE BEST
               <br />
-              TO BE SAVORED
+              CHEESECAKE
               <br />
-              SLOWLY
+              TO YOUR HOME
             </h1>
             <Link href="/bestellen">
-              <button className="bg-white text-[#651A1A] font-black px-12 py-4 text-base tracking-wide border-2 border-[#651A1A] hover:bg-[#651A1A] hover:text-white transition-colors">
-                JETZT BESTELLEN
+              <button className="bg-[#651A1A] text-white font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#4A1313] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                JETZT SICHERN
               </button>
             </Link>
+            <p className="text-[#651A1A]/50 text-xs mt-3 tracking-wide">Gratis Lieferung ab 100 CHF</p>
           </div>
         </div>
 
