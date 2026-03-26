@@ -87,11 +87,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
             </div>
             <div className="p-6 text-center flex flex-col flex-1">
                 <h3 className="font-black text-lg tracking-tight">{name}</h3>
-                {priceSmall && priceLarge && (
+                {priceSmall && (
                     <div className="flex items-baseline justify-center gap-1 mt-1 mb-2 text-[#651A1A]">
-                        <PriceDisplay amount={priceSmall} className="text-xl" showCurrency={false} />
-                        <span className="font-serif text-lg font-light opacity-60 mx-1">/</span>
-                        <PriceDisplay amount={priceLarge} className="text-xl" />
+                        <span className="text-sm font-medium opacity-60">ab</span>
+                        <PriceDisplay amount={priceSmall} className="text-xl" />
                     </div>
                 )}
                 <p className="text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
