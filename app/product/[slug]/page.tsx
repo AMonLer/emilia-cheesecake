@@ -32,8 +32,8 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
             <div className="lg:hidden mb-8">
               <div className="flex gap-4 mb-6">
                 {/* Left - Image */}
-                <div className="w-2/5 flex-shrink-0">
-                  <ProductGallery images={product.images} name={product.name} />
+                <div className="w-1/2 flex-shrink-0">
+                  <ProductGallery images={product.images} name={product.name} compact />
                 </div>
                 {/* Right - Name, description, size */}
                 <div className="flex-1 min-w-0">
