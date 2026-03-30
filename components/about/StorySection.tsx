@@ -1,23 +1,9 @@
-import Image from "next/image"
-
 export default function StorySection() {
     return (
         <section className="py-24 px-4 bg-white">
-            <div className="container mx-auto max-w-6xl">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                    {/* Left - Image */}
-                    <div className="relative h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl group">
-                        <Image
-                            src="/uberuns.png"
-                            alt="Emilia Cheesecake"
-                            fill
-                            className="object-cover object-[30%] lg:object-center transition-transform duration-700 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    </div>
-
-                    {/* Right - Text */}
-                    <div className="space-y-8">
+            <div className="container mx-auto max-w-4xl">
+                <div>
+                    <div className="space-y-8 text-center">
                         <h2 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#651A1A] tracking-tight leading-[0.95]">
                             Die Geschichte von <br />EMILIA
                         </h2>
