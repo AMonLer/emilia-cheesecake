@@ -333,8 +333,8 @@ export default function Navbar() {
               setIsCartOpen(true)
             }}
           />
-          <div className="fixed inset-0 z-[70] flex items-start sm:items-center justify-center sm:p-6 overflow-y-auto overscroll-contain">
-            <div className="bg-[#F5E6D3] rounded-b-3xl sm:rounded-[2rem] shadow-2xl max-w-2xl w-full flex flex-col overflow-hidden animate-in fade-in slide-in-from-top-4 sm:zoom-in-95 duration-500 border border-[#D4AF85]/30">
+          <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-6 overscroll-contain">
+            <div className="bg-[#F5E6D3] rounded-t-3xl sm:rounded-[2rem] shadow-2xl max-w-2xl w-full max-h-[90vh] sm:max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-500 border border-[#D4AF85]/30">
               {/* Premium Header */}
               <div className="relative flex-shrink-0 bg-gradient-to-br from-[#651A1A] to-[#4A1010] px-5 py-5 sm:p-8 md:p-10 text-center overflow-hidden">
                 {/* Decorative BG elements */}
@@ -356,14 +356,14 @@ export default function Navbar() {
               </div>
 
               {/* Gift Options */}
-              <div className="p-4 sm:p-6 md:p-10 bg-white/50 backdrop-blur-sm relative overflow-y-auto">
-                <div className="grid grid-cols-3 sm:flex sm:flex-wrap sm:justify-center gap-2.5 sm:gap-4 md:gap-5 mb-4 sm:mb-8">
+              <div className="p-5 sm:p-6 md:p-10 bg-white/50 backdrop-blur-sm relative overflow-y-auto">
+                <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-3 sm:gap-4 md:gap-5 mb-4 sm:mb-8">
                   {EASTER_GIFT_OPTIONS.map((gift) => (
                     <button
                       key={gift.slug}
                       type="button"
                       onClick={() => addEasterGift(easterGiftPendingCakeId, gift)}
-                      className="group relative sm:w-[135px] md:w-[160px] flex flex-col items-center bg-white p-2 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm active:scale-95 sm:hover:shadow-2xl sm:hover:border-[#D4AF85]/50 transition-all duration-300 sm:duration-500 sm:hover:-translate-y-2"
+                      className="group relative sm:w-[135px] md:w-[160px] flex flex-col items-center bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm active:scale-95 sm:hover:shadow-2xl sm:hover:border-[#D4AF85]/50 transition-all duration-300 sm:duration-500 sm:hover:-translate-y-2"
                     >
                       {/* Gratis Tag */}
                       <div className="absolute -top-2 sm:-top-3 right-[-3px] sm:right-[-5px] bg-[#651A1A] text-[#F5E6D3] text-[8px] sm:text-[10px] md:text-xs font-bold tracking-widest px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full z-10 shadow-sm border border-[#D4AF85]/20">
@@ -378,7 +378,7 @@ export default function Navbar() {
                         />
                       </div>
 
-                      <span className="text-[9px] sm:text-xs md:text-sm font-bold text-center text-[#651A1A] uppercase tracking-wide sm:tracking-[0.1em] leading-tight">
+                      <span className="text-[10px] sm:text-xs md:text-sm font-bold text-center text-[#651A1A] uppercase tracking-wide sm:tracking-[0.1em] leading-tight">
                         {gift.name}
                       </span>
                     </button>
