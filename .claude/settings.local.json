@@ -61,7 +61,8 @@
       "WebFetch(domain:www.spruengli.ch)",
       "WebFetch(domain:cheesecakelove.ch)",
       "Bash(npx next build:*)",
-      "Bash(npm ls:*)"
+      "Bash(npm ls:*)",
+      "Bash(xargs grep:*)"
     ],
     "deny": [],
     "ask": []
