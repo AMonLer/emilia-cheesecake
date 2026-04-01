@@ -275,34 +275,36 @@ export default function Navbar() {
                   ) : null
                 })()}
 
-                {/* Discount Info */}
-                <div className="space-y-3">
-                  {totalPrice >= 100 ? (
-                    <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
-                      <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
-                      <span className="text-xs font-bold font-serif flex items-center">
-                        -<PriceDisplay
-                          amount={totalPrice * 0.10}
-                          className="text-base font-black"
-                          currencyClassName="text-[0.5em] opacity-100"
-                        />
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
-                      <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
-                        <span>Bis 10% Rabatt</span>
-                        <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
+                {/* Discount Info - hidden when Easter gift is active */}
+                {!cartItems.some(item => item.id.includes('easter-gift')) && (
+                  <div className="space-y-3">
+                    {totalPrice >= 100 ? (
+                      <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
+                        <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
+                        <span className="text-xs font-bold font-serif flex items-center">
+                          -<PriceDisplay
+                            amount={totalPrice * 0.10}
+                            className="text-base font-black"
+                            currencyClassName="text-[0.5em] opacity-100"
+                          />
+                        </span>
                       </div>
-                      <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
-                        <div
-                          className="h-full bg-[#651A1A] transition-all duration-500 rounded-full"
-                          style={{ width: `${(totalPrice / 100) * 100}%` }}
-                        />
+                    ) : (
+                      <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
+                        <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
+                          <span>Bis 10% Rabatt</span>
+                          <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
+                        </div>
+                        <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
+                          <div
+                            className="h-full bg-[#651A1A] transition-all duration-500 rounded-full"
+                            style={{ width: `${(totalPrice / 100) * 100}%` }}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Totals */}
                 <div className="space-y-2">
