@@ -34,6 +34,7 @@ function PaymentSuccessContent() {
 
     // Clear cart and order value after successful payment
     localStorage.removeItem('emilia-cart')
+    localStorage.removeItem('emilia-cart-timestamp')
     localStorage.removeItem('emilia-order-value')
   }, [searchParams])
 

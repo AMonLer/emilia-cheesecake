@@ -43,14 +43,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [isInitialized, setIsInitialized] = useState(false)
   const [easterGiftPendingCakeId, setEasterGiftPendingCakeId] = useState<string | null>(null)
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage on mount (expires after 48h)
   useEffect(() => {
     const savedCart = localStorage.getItem('emilia-cart')
-    if (savedCart) {
-      try {
-        setCartItems(JSON.parse(savedCart))
-      } catch (e) {
-        console.error('Error loading cart from localStorage:', e)
+    const savedTimestamp = localStorage.getItem('emilia-cart-timestamp')
+    if (savedCart && savedTimestamp) {
+      const hoursElapsed = (Date.now() - Number(savedTimestamp)) / (1000 * 60 * 60)
+      if (hoursElapsed < 48) {
+        try {
+          setCartItems(JSON.parse(savedCart))
+        } catch (e) {
+          console.error('Error loading cart from localStorage:', e)
+        }
+      } else {
+        localStorage.removeItem('emilia-cart')
+        localStorage.removeItem('emilia-cart-timestamp')
       }
     }
     setIsInitialized(true)
@@ -60,6 +67,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem('emilia-cart', JSON.stringify(cartItems))
+      if (cartItems.length > 0) {
+        // Only update timestamp when items are added, not on every change
+        if (!localStorage.getItem('emilia-cart-timestamp')) {
+          localStorage.setItem('emilia-cart-timestamp', String(Date.now()))
+        }
+      } else {
+        localStorage.removeItem('emilia-cart-timestamp')
+      }
     }
   }, [cartItems, isInitialized])
 
