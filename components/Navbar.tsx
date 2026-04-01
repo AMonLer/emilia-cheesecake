@@ -252,11 +252,33 @@ export default function Navbar() {
 
             {/* Checkout Section */}
             {cartItems.length > 0 && (
-              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-6">
-                {/* Discount Info - Minimalist */}
+              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-5">
+                {/* Easter Gift Savings */}
+                {(() => {
+                  const giftSavings = cartItems
+                    .filter(item => item.id.includes('easter-gift'))
+                    .reduce((sum, item) => {
+                      const giftName = item.name.replace(' (Oster-Geschenk)', '')
+                      const option = EASTER_GIFT_OPTIONS.find(o => o.name === giftName)
+                      return sum + (option?.realPrice || 0)
+                    }, 0)
+                  return giftSavings > 0 ? (
+                    <div className="flex items-center justify-between gap-3 text-green-700 bg-green-50 border border-green-200/50 p-3 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🎁</span>
+                        <span className="text-xs font-bold tracking-wide">Oster-Geschenk</span>
+                      </div>
+                      <span className="text-sm font-black">
+                        -{giftSavings.toFixed(2)} CHF
+                      </span>
+                    </div>
+                  ) : null
+                })()}
+
+                {/* Discount Info */}
                 <div className="space-y-3">
                   {totalPrice >= 100 ? (
-                    <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-4 rounded-lg">
+                    <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
                       <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
                       <span className="text-xs font-bold font-serif flex items-center">
                         -<PriceDisplay
@@ -267,7 +289,7 @@ export default function Navbar() {
                       </span>
                     </div>
                   ) : (
-                    <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                    <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
                       <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
                         <span>Bis 10% Rabatt</span>
                         <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
@@ -278,37 +300,35 @@ export default function Navbar() {
                           style={{ width: `${(totalPrice / 100) * 100}%` }}
                         />
                       </div>
-                      <p className="text-[10px] text-gray-400 text-center font-light tracking-wide">
-                        Erreichen Sie 100 CHF für 10% Rabatt
-                      </p>
                     </div>
                   )}
+                </div>
 
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between text-sm font-light text-gray-600">
-                      <span>Zwischensumme</span>
-                      <PriceDisplay amount={totalPrice} className="text-base font-bold text-black" />
+                {/* Totals */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm font-light text-gray-500">
+                    <span>Zwischensumme</span>
+                    <PriceDisplay amount={totalPrice} className="text-sm font-bold text-black" />
+                  </div>
+                  <div className="flex items-center justify-between text-sm font-light text-gray-500">
+                    <span>Versand</span>
+                    <PriceDisplay amount={6.00} className="text-sm font-bold text-black" />
+                  </div>
+                  {totalPrice >= 100 && (
+                    <div className="flex items-center justify-between text-sm font-black text-[#651A1A]">
+                      <span>Rabatt (10%)</span>
+                      <span className="flex items-center">
+                        -<PriceDisplay
+                          amount={totalPrice * 0.10}
+                          className="text-sm"
+                          currencyClassName="text-[0.6em] opacity-100"
+                        />
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between text-sm font-light text-gray-600">
-                      <span>Versand</span>
-                      <PriceDisplay amount={6.00} className="text-base font-bold text-black" />
-                    </div>
-                    {totalPrice >= 100 && (
-                      <div className="flex items-center justify-between text-base font-black text-[#651A1A] bg-[#F5E6D3] px-3 py-2 rounded-md -mx-3">
-                        <span>RABATT (10%)</span>
-                        <span className="flex items-center">
-                          -<PriceDisplay
-                            amount={totalPrice * 0.10}
-                            className="text-lg"
-                            currencyClassName="text-[0.6em] opacity-100"
-                          />
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
-                      <span>Gesamt</span>
-                      <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-2xl font-black" />
-                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
+                    <span>Gesamt</span>
+                    <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-2xl font-black" />
                   </div>
                 </div>
 
@@ -343,9 +363,9 @@ export default function Navbar() {
                 <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
 
                 <div className="relative z-10 flex flex-col items-center justify-center">
-                  {/* Elegant Easter Bunny */}
+                  {/* Easter Bunny Image */}
                   <div className="mb-3 sm:mb-4 w-28 h-28 sm:w-36 sm:h-36 opacity-100 drop-shadow-[0_0_15px_rgba(212,175,133,0.3)] pointer-events-none">
-                    <img src="/Easter.png" alt="Easter Graphic" className="w-full h-full object-contain" />
+                    <img src="/Easter.png?timestamp=20260401" alt="Easter Graphic" className="w-full h-full object-contain" />
                   </div>
 
                   <span className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-2 sm:mb-4 border border-[#D4AF85]/30 uppercase">
