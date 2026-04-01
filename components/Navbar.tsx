@@ -319,53 +319,80 @@ export default function Navbar() {
       {easterGiftPendingCakeId && (
         <>
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] transition-opacity duration-300"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] transition-opacity duration-500"
             onClick={() => {
               setEasterGiftPendingCakeId(null)
               setIsCartOpen(true)
             }}
           />
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300">
-              {/* Header */}
-              <div className="bg-[#651A1A] p-6 text-center">
-                <span className="text-3xl mb-2 block">🐣</span>
-                <h3 className="text-xl font-black text-[#F5E6D3]">Oster-Geschenk!</h3>
-                <p className="text-sm text-[#F5E6D3]/80 mt-1">
-                  Wähle eine gratis kleine Torte (2–3 Pers.) zu deiner grossen Torte!
-                </p>
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6">
+            <div className="bg-[#F5E6D3] rounded-[2rem] shadow-2xl max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-500 border border-[#D4AF85]/30">
+              {/* Premium Header */}
+              <div className="relative bg-gradient-to-br from-[#651A1A] to-[#4A1010] p-8 md:p-10 text-center overflow-hidden">
+                {/* Decorative BG elements */}
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
+                
+                <div className="relative z-10 flex flex-col items-center justify-center">
+                  <span className="inline-block px-4 py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-xs font-bold tracking-[0.2em] mb-4 border border-[#D4AF85]/30 uppercase">
+                    Exklusives Angebot
+                  </span>
+                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-[#F5E6D3] mb-3 drop-shadow-md">
+                    Dein Oster-Geschenk!
+                  </h3>
+                  <p className="text-[#F5E6D3]/90 font-light tracking-wide max-w-sm mx-auto text-sm md:text-base">
+                    Als Dankeschön für deine grosse Torte schenken wir dir eine <b className="font-bold">gratis kleine Torte</b> (2–3 Pers.) dazu.
+                  </p>
+                </div>
               </div>
 
               {/* Gift Options */}
-              <div className="p-6">
-                <div className="grid grid-cols-5 gap-3">
+              <div className="p-8 md:p-10 bg-white/50 backdrop-blur-sm relative">
+                <div className="flex flex-wrap justify-center gap-4 md:gap-5 mb-8">
                   {EASTER_GIFT_OPTIONS.map((gift) => (
                     <button
                       key={gift.slug}
                       type="button"
                       onClick={() => addEasterGift(easterGiftPendingCakeId, gift)}
-                      className="flex flex-col items-center p-2 rounded-xl border-2 border-gray-200 bg-white hover:border-[#651A1A] hover:bg-[#F5E6D3] transition-all duration-200 hover:scale-105 hover:shadow-md"
+                      className="group relative w-[135px] md:w-[160px] flex flex-col items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl hover:border-[#D4AF85]/50 transition-all duration-500 hover:-translate-y-2"
                     >
-                      <img
-                        src={gift.image}
-                        alt={gift.name}
-                        className="w-12 h-12 md:w-14 md:h-14 rounded-lg object-cover mb-1"
-                      />
-                      <span className="text-[10px] md:text-xs font-bold text-center leading-tight">{gift.name}</span>
-                      <span className="text-[10px] text-green-600 font-bold">GRATIS</span>
+                      {/* Floating Gratis Tag */}
+                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#D4AF85] text-[10px] md:text-xs font-black tracking-widest px-3 py-1 md:px-4 md:py-1.5 rounded-full z-10 shadow-lg border border-[#D4AF85]/30 transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                        GRATIS
+                      </div>
+                      {/* Static Gratis Tag (when not hovered) */}
+                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#F5E6D3] text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-full z-10 shadow-sm border border-[#D4AF85]/10 group-hover:opacity-0 transition-opacity duration-300">
+                        GRATIS
+                      </div>
+                      
+                      <div className="w-full aspect-square relative mb-4 overflow-hidden rounded-xl bg-[#F5E6D3]/20 border border-gray-50 group-hover:border-[#D4AF85]/30 transition-colors duration-300">
+                        <img
+                          src={gift.image}
+                          alt={gift.name}
+                          className="w-full h-full object-cover group-hover:scale-[1.15] transition-transform duration-700 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]"
+                        />
+                      </div>
+                      
+                      <span className="text-xs md:text-sm font-bold text-center text-[#651A1A] group-hover:text-[#4A1010] transition-colors uppercase tracking-[0.1em] mb-1">
+                        {gift.name}
+                      </span>
                     </button>
                   ))}
                 </div>
 
-                <button
-                  onClick={() => {
-                    setEasterGiftPendingCakeId(null)
-                    setIsCartOpen(true)
-                  }}
-                  className="w-full mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors py-2"
-                >
-                  Nein danke, weiter ohne Geschenk
-                </button>
+                <div className="flex justify-center mt-6">
+                  <button
+                    onClick={() => {
+                      setEasterGiftPendingCakeId(null)
+                      setIsCartOpen(true)
+                    }}
+                    className="relative text-[10px] md:text-xs text-gray-400 hover:text-[#651A1A] font-medium tracking-[0.2em] uppercase transition-all duration-300 group py-2"
+                  >
+                    Nein danke, weiter ohne Geschenk
+                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#D4AF85] transition-all duration-500 group-hover:w-full"></span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
