@@ -325,48 +325,48 @@ export default function Navbar() {
               setIsCartOpen(true)
             }}
           />
-          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 sm:p-6">
-            <div className="bg-[#F5E6D3] rounded-[2rem] shadow-2xl max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-500 border border-[#D4AF85]/30">
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-6">
+            <div className="bg-[#F5E6D3] rounded-3xl sm:rounded-[2rem] shadow-2xl max-w-2xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-500 border border-[#D4AF85]/30">
               {/* Premium Header */}
-              <div className="relative bg-gradient-to-br from-[#651A1A] to-[#4A1010] p-8 md:p-10 text-center overflow-hidden">
+              <div className="relative flex-shrink-0 bg-gradient-to-br from-[#651A1A] to-[#4A1010] p-6 md:p-10 text-center overflow-hidden">
                 {/* Decorative BG elements */}
                 <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
                 <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
                 <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
                 
                 <div className="relative z-10 flex flex-col items-center justify-center">
-                  <span className="inline-block px-4 py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-xs font-bold tracking-[0.2em] mb-4 border border-[#D4AF85]/30 uppercase">
+                  <span className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-3 sm:mb-4 border border-[#D4AF85]/30 uppercase">
                     Exklusives Angebot
                   </span>
-                  <h3 className="text-3xl md:text-4xl font-serif font-bold text-[#F5E6D3] mb-3 drop-shadow-md">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#F5E6D3] mb-2 sm:mb-3 drop-shadow-md">
                     Dein Oster-Geschenk!
                   </h3>
-                  <p className="text-[#F5E6D3]/90 font-light tracking-wide max-w-sm mx-auto text-sm md:text-base">
+                  <p className="text-[#F5E6D3]/90 font-light tracking-wide max-w-sm mx-auto text-xs sm:text-sm md:text-base leading-relaxed">
                     Als Dankeschön für deine grosse Torte schenken wir dir eine <b className="font-bold">gratis kleine Torte</b> (2–3 Pers.) dazu.
                   </p>
                 </div>
               </div>
 
-              {/* Gift Options */}
-              <div className="p-8 md:p-10 bg-white/50 backdrop-blur-sm relative">
-                <div className="flex flex-wrap justify-center gap-4 md:gap-5 mb-8">
+              {/* Gift Options - Scrollable Area */}
+              <div className="p-4 sm:p-6 md:p-10 bg-white/50 backdrop-blur-sm relative overflow-y-auto">
+                <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-5 mb-6 md:mb-8">
                   {EASTER_GIFT_OPTIONS.map((gift) => (
                     <button
                       key={gift.slug}
                       type="button"
                       onClick={() => addEasterGift(easterGiftPendingCakeId, gift)}
-                      className="group relative w-[135px] md:w-[160px] flex flex-col items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl hover:border-[#D4AF85]/50 transition-all duration-500 hover:-translate-y-2"
+                      className="group relative w-[calc(50%-0.6rem)] sm:w-[135px] md:w-[160px] flex flex-col items-center bg-white p-3 sm:p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-2xl hover:border-[#D4AF85]/50 transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2"
                     >
                       {/* Floating Gratis Tag */}
-                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#D4AF85] text-[10px] md:text-xs font-black tracking-widest px-3 py-1 md:px-4 md:py-1.5 rounded-full z-10 shadow-lg border border-[#D4AF85]/30 transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#D4AF85] text-[9px] sm:text-[10px] md:text-xs font-black tracking-widest px-2 py-0.5 sm:px-3 sm:py-1 md:px-4 md:py-1.5 rounded-full z-10 shadow-lg border border-[#D4AF85]/30 transform translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
                         GRATIS
                       </div>
                       {/* Static Gratis Tag (when not hovered) */}
-                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#F5E6D3] text-[9px] font-bold tracking-widest px-2 py-0.5 rounded-full z-10 shadow-sm border border-[#D4AF85]/10 group-hover:opacity-0 transition-opacity duration-300">
+                      <div className="absolute -top-3 right-[-5px] bg-[#651A1A] text-[#F5E6D3] text-[9px] sm:text-[10px] md:text-[9px] font-bold tracking-widest px-2 py-0.5 sm:px-2 sm:py-0.5 rounded-full z-10 shadow-sm border border-[#D4AF85]/10 group-hover:opacity-0 transition-opacity duration-300">
                         GRATIS
                       </div>
                       
-                      <div className="w-full aspect-square relative mb-4 overflow-hidden rounded-xl bg-[#F5E6D3]/20 border border-gray-50 group-hover:border-[#D4AF85]/30 transition-colors duration-300">
+                      <div className="w-full aspect-square relative mb-3 sm:mb-4 overflow-hidden rounded-xl bg-[#F5E6D3]/20 border border-gray-50 group-hover:border-[#D4AF85]/30 transition-colors duration-300">
                         <img
                           src={gift.image}
                           alt={gift.name}
@@ -374,20 +374,20 @@ export default function Navbar() {
                         />
                       </div>
                       
-                      <span className="text-xs md:text-sm font-bold text-center text-[#651A1A] group-hover:text-[#4A1010] transition-colors uppercase tracking-[0.1em] mb-1">
+                      <span className="text-[10px] sm:text-xs md:text-sm font-bold text-center text-[#651A1A] group-hover:text-[#4A1010] transition-colors uppercase tracking-[0.1em] mb-1">
                         {gift.name}
                       </span>
                     </button>
                   ))}
                 </div>
 
-                <div className="flex justify-center mt-6">
+                <div className="flex justify-center mt-4 sm:mt-6 pb-2">
                   <button
                     onClick={() => {
                       setEasterGiftPendingCakeId(null)
                       setIsCartOpen(true)
                     }}
-                    className="relative text-[10px] md:text-xs text-gray-400 hover:text-[#651A1A] font-medium tracking-[0.2em] uppercase transition-all duration-300 group py-2"
+                    className="relative text-[10px] sm:text-[10px] md:text-xs text-gray-500 hover:text-[#651A1A] font-bold tracking-[0.2em] uppercase transition-all duration-300 group py-2"
                   >
                     Nein danke, weiter ohne Geschenk
                     <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#D4AF85] transition-all duration-500 group-hover:w-full"></span>
