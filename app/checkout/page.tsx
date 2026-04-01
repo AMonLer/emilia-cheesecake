@@ -266,7 +266,7 @@ export default function CheckoutPage() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm mb-8">
+        <div className="hidden md:flex items-center gap-2 text-sm mb-8">
           <Link href="/" className="text-pink-500 hover:underline">Warenkorb</Link>
           <ChevronRight className="w-4 h-4 text-gray-400" />
           <span className="text-gray-900 font-medium">Informationen</span>
@@ -278,7 +278,7 @@ export default function CheckoutPage() {
           {/* Left Side - Form */}
           <div className="space-y-8">
             <div>
-              <h1 className="text-3xl font-black mb-8">Emilia</h1>
+              <h1 className="hidden md:block text-3xl font-black mb-8">Emilia</h1>
 
               {/* Contact Section */}
               <div className="mb-8">
