@@ -238,7 +238,7 @@ export default function Navbar() {
                             </div>
                           )}
                           {item.id.includes('easter-gift') ? (
-                            <span className="text-lg font-black text-green-600 tracking-wide">GRATIS</span>
+                            <span className="text-sm font-black text-[#D4AF85] tracking-[0.15em] uppercase drop-shadow-sm">GRATIS</span>
                           ) : (
                             <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
                           )}
@@ -263,12 +263,16 @@ export default function Navbar() {
                       return sum + (option?.realPrice || 0)
                     }, 0)
                   return giftSavings > 0 ? (
-                    <div className="flex items-center justify-between gap-3 text-green-700 bg-green-50 border border-green-200/50 p-3 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">🎁</span>
-                        <span className="text-xs font-bold tracking-wide">Oster-Geschenk</span>
+                    <div className="flex items-center justify-between gap-3 text-[#F5E6D3] bg-[#651A1A] p-4 rounded-xl shadow-md border border-[#D4AF85]/30 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-[#D4AF85]/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
+                      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
+                        {/* Elegant custom gift icon */}
+                        <svg className="w-5 h-5 text-[#D4AF85] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 21v-8.25m0 0V11m0 1.75c-3.5 0-4.5-2.25-4.5-5.25C7.5 4.5 9 3 12 3c3 0 4.5 1.5 4.5 4.5 0 3-1 5.25-4.5 5.25Z" />
+                        </svg>
+                        <span className="text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">Oster-Geschenk</span>
                       </div>
-                      <span className="text-sm font-black">
+                      <span className="text-sm sm:text-base font-serif font-bold text-[#D4AF85] relative z-10 tracking-widest">
                         -{giftSavings.toFixed(2)} CHF
                       </span>
                     </div>
