@@ -28,11 +28,11 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 const EASTER_GIFT_OPTIONS = [
-  { slug: "pistacho", name: "PISTACHIO", image: "/pistacho1.png" },
-  { slug: "original", name: "CLASSIC", image: "/original1.png" },
-  { slug: "lotus", name: "LOTUS", image: "/lotus1.png" },
-  { slug: "chocolate", name: "SCHOGGI", image: "/chocolate1.png" },
-  { slug: "cafe", name: "DULCE DE LECHE", image: "/cafe1.png" },
+  { slug: "pistacho", name: "PISTACHIO", image: "/pistacho3.png" },
+  { slug: "original", name: "CLASSIC", image: "/original3.png" },
+  { slug: "lotus", name: "LOTUS", image: "/lotus3.png" },
+  { slug: "chocolate", name: "SCHOGGI", image: "/chocolate3.png" },
+  { slug: "cafe", name: "DULCE DE LECHE", image: "/cafe3.png" },
 ]
 
 export { EASTER_GIFT_OPTIONS }
