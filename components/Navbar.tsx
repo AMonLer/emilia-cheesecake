@@ -266,7 +266,24 @@ export default function Navbar() {
                     <div className="flex items-center justify-between gap-3 text-[#F5E6D3] bg-[#651A1A] p-4 rounded-xl shadow-md border border-[#D4AF85]/30 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-20 h-20 bg-[#D4AF85]/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
                       <div className="flex items-center gap-2 relative z-10">
-                        <span className="text-base">🐰</span>
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF85] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                          {/* Bunny ears */}
+                          <ellipse cx="9" cy="5.5" rx="1.8" ry="4.5" transform="rotate(-10 9 5.5)" opacity="0.85"/>
+                          <ellipse cx="15" cy="5.5" rx="1.8" ry="4.5" transform="rotate(10 15 5.5)" opacity="0.85"/>
+                          <ellipse cx="9.2" cy="5.5" rx="0.8" ry="3.2" transform="rotate(-10 9.2 5.5)" fill="#651A1A" opacity="0.4"/>
+                          <ellipse cx="14.8" cy="5.5" rx="0.8" ry="3.2" transform="rotate(10 14.8 5.5)" fill="#651A1A" opacity="0.4"/>
+                          {/* Head */}
+                          <circle cx="12" cy="12.5" r="4.5"/>
+                          {/* Eyes */}
+                          <circle cx="10.5" cy="11.8" r="0.6" fill="#651A1A"/>
+                          <circle cx="13.5" cy="11.8" r="0.6" fill="#651A1A"/>
+                          {/* Nose */}
+                          <ellipse cx="12" cy="13.2" rx="0.7" ry="0.5" fill="#651A1A" opacity="0.6"/>
+                          {/* Body */}
+                          <ellipse cx="12" cy="19" rx="3.5" ry="3.8"/>
+                          {/* Tail */}
+                          <circle cx="12" cy="22" r="1" opacity="0.7"/>
+                        </svg>
                         <span className="text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">Oster-Geschenk</span>
                       </div>
                       <span className="text-sm sm:text-base font-serif font-bold text-[#D4AF85] relative z-10 tracking-widest">
