@@ -696,7 +696,7 @@ export default function CheckoutPage() {
                       </div>
                       <p className="text-xs text-gray-600">{item.size} Personen</p>
                       {isGift ? (
-                        <p className="text-xs text-green-600 font-bold mt-1">Oster-Aktion</p>
+                        <p className="text-xs text-gray-400 font-light mt-1">2-3 Personen</p>
                       ) : (
                         <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
                       )}

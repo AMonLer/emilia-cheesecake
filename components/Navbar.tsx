@@ -219,7 +219,7 @@ export default function Navbar() {
 
                         <div className="flex items-end justify-between">
                           {item.id.includes('easter-gift') ? (
-                            <span className="text-xs text-green-600 font-bold">Oster-Aktion</span>
+                            <span className="text-xs text-gray-400 font-light">2-3 Personen</span>
                           ) : (
                             <div className="flex items-center border border-gray-200">
                               <button
