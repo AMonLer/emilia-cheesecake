@@ -267,22 +267,7 @@ export default function Navbar() {
                       <div className="absolute top-0 right-0 w-20 h-20 bg-[#D4AF85]/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
                       <div className="flex items-center gap-2 relative z-10">
                         <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF85] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          {/* Bunny ears */}
-                          <ellipse cx="9" cy="5.5" rx="1.8" ry="4.5" transform="rotate(-10 9 5.5)" opacity="0.85"/>
-                          <ellipse cx="15" cy="5.5" rx="1.8" ry="4.5" transform="rotate(10 15 5.5)" opacity="0.85"/>
-                          <ellipse cx="9.2" cy="5.5" rx="0.8" ry="3.2" transform="rotate(-10 9.2 5.5)" fill="#651A1A" opacity="0.4"/>
-                          <ellipse cx="14.8" cy="5.5" rx="0.8" ry="3.2" transform="rotate(10 14.8 5.5)" fill="#651A1A" opacity="0.4"/>
-                          {/* Head */}
-                          <circle cx="12" cy="12.5" r="4.5"/>
-                          {/* Eyes */}
-                          <circle cx="10.5" cy="11.8" r="0.6" fill="#651A1A"/>
-                          <circle cx="13.5" cy="11.8" r="0.6" fill="#651A1A"/>
-                          {/* Nose */}
-                          <ellipse cx="12" cy="13.2" rx="0.7" ry="0.5" fill="#651A1A" opacity="0.6"/>
-                          {/* Body */}
-                          <ellipse cx="12" cy="19" rx="3.5" ry="3.8"/>
-                          {/* Tail */}
-                          <circle cx="12" cy="22" r="1" opacity="0.7"/>
+                          <path d="M9.5 2C8.8 2 8 2.8 7.5 4C7 5.2 7 6.8 7.5 8.2C8 9.5 8.5 10 9 10.5C9.5 10.8 10 11 10.5 11.2C10 11.5 9 12 8.5 13C7.5 15 8 17.5 9.5 19C10.5 20 11.5 20.5 12 20.5C12.5 20.5 13.5 20 14.5 19C16 17.5 16.5 15 15.5 13C15 12 14 11.5 13.5 11.2C14 11 14.5 10.8 15 10.5C15.5 10 16 9.5 16.5 8.2C17 6.8 17 5.2 16.5 4C16 2.8 15.2 2 14.5 2C13.8 2 13.2 2.8 13 4C12.8 5 13 6 13 6.5C12.5 6.3 11.5 6.3 11 6.5C11 6 11.2 5 11 4C10.8 2.8 10.2 2 9.5 2Z"/>
                         </svg>
                         <span className="text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">Oster-Geschenk</span>
                       </div>
