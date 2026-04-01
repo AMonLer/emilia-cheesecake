@@ -227,6 +227,14 @@ export default function Navbar() {
             {/* Checkout Section */}
             {cartItems.length > 0 && (
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-6">
+                {/* Easter Promo Note */}
+                {cartItems.some(item => item.size === '8-10') && (
+                  <div className="flex items-center gap-2 text-[#651A1A] bg-[#F5E6D3]/50 border border-[#D4AF85]/30 p-3 rounded-lg">
+                    <span className="text-base">🐣</span>
+                    <span className="text-xs font-bold tracking-wide">Gratis Mini-Torte im Checkout wählbar (3.–6. April)</span>
+                  </div>
+                )}
+
                 {/* Discount Info - Minimalist */}
                 <div className="space-y-3">
                   {totalPrice >= 100 ? (

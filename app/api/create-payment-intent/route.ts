@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
         deliveryTime: orderData?.deliveryTime || '',
         discountCode: orderData?.discountCode || '',
         discountPercent: discountPercent ? String(discountPercent) : '',
+        easterPromo: orderData?.easterPromo ? 'true' : '',
         items: JSON.stringify(orderData?.items || []),
       },
     })

@@ -24,6 +24,21 @@ export default function OrderHero() {
                     Jede Kreation ist ein Kunstwerk – handgefertigt mit Liebe und den feinsten Zutaten.
                 </p>
             </div>
+
+            {/* Easter Promotion Banner */}
+            <div className="container mx-auto max-w-3xl relative z-10 mt-8 md:mt-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                <div className="bg-white/80 backdrop-blur-sm border-2 border-[#651A1A]/20 rounded-2xl p-5 md:p-8 text-center shadow-lg">
+                    <p className="text-xs md:text-sm tracking-[0.3em] text-[#651A1A] font-bold uppercase mb-2">
+                        Oster-Aktion
+                    </p>
+                    <h3 className="text-xl md:text-3xl font-black text-[#651A1A] mb-2 md:mb-3 leading-tight">
+                        Gratis Mini-Cheesecake zu jeder grossen Torte!
+                    </h3>
+                    <p className="text-sm md:text-base text-[#651A1A]/70 font-light">
+                        Bestelle eine grosse Torte (8–10 Personen) mit Lieferung zwischen dem 3. und 6. April und erhalte eine kleine Torte (2–3 Personen) deiner Wahl gratis dazu.
+                    </p>
+                </div>
+            </div>
         </section>
     )
 }
