@@ -344,8 +344,8 @@ export default function Navbar() {
 
                 <div className="relative z-10 flex flex-col items-center justify-center">
                   {/* Elegant Easter Bunny */}
-                  <div className="mb-3 sm:mb-4 mt-[-10px] w-24 h-24 sm:w-32 sm:h-32 opacity-90 drop-shadow-[0_0_20px_rgba(212,175,133,0.5)] pointer-events-none">
-                    <img src="/golden-easter-bunny.png" alt="Easter Bunny Design" className="w-full h-full object-contain mix-blend-screen" />
+                  <div className="mb-3 sm:mb-4 mt-[-10px] w-28 h-28 sm:w-36 sm:h-36 opacity-100 drop-shadow-[0_0_25px_rgba(245,230,211,0.6)] pointer-events-none">
+                    <img src="/friendly-easter-bunny.png" alt="Friendly Easter Bunny" className="w-full h-full object-contain mix-blend-screen" />
                   </div>
 
                   <span className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-2 sm:mb-4 border border-[#D4AF85]/30 uppercase">
