@@ -12,7 +12,7 @@ import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-
 import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
 import "react-datepicker/dist/react-datepicker.css"
-import { addHours, eachDayOfInterval, isWithinInterval } from "date-fns"
+import { addHours, eachDayOfInterval } from "date-fns"
 
 registerLocale("de", de)
 
@@ -96,7 +96,6 @@ export default function CheckoutPage() {
   const [discountCodeInput, setDiscountCodeInput] = useState("")
   const [appliedDiscountCode, setAppliedDiscountCode] = useState("")
   const [discountCodeError, setDiscountCodeError] = useState("")
-  const [easterGifts, setEasterGifts] = useState<{ [largeCakeId: string]: string }>({}) // largeCakeId -> selected gift slug
 
   // Allowed postal codes within 10km of Zürich center
   const allowedPostalCodes = new Set([
@@ -136,45 +135,10 @@ export default function CheckoutPage() {
     return [...decemberDates, ...januaryDates]
   }, [])
 
-  // Easter promotion: free small cake with each large cake for deliveries April 3-6
-  const easterGiftOptions = [
-    { slug: "pistacho", name: "PISTACHIO", image: "/pistacho1.png" },
-    { slug: "original", name: "CLASSIC", image: "/original1.png" },
-    { slug: "lotus", name: "LOTUS", image: "/lotus1.png" },
-    { slug: "chocolate", name: "SCHOGGI", image: "/chocolate1.png" },
-    { slug: "cafe", name: "DULCE DE LECHE", image: "/cafe1.png" },
-  ]
-
-  const isEasterPromoDate = useMemo(() => {
-    if (!deliveryDate) return false
-    const easterStart = new Date(2026, 3, 3) // April 3, 2026
-    const easterEnd = new Date(2026, 3, 6, 23, 59, 59) // April 6, 2026
-    return isWithinInterval(deliveryDate, { start: easterStart, end: easterEnd })
-  }, [deliveryDate])
-
-  const largeCakesInCart = useMemo(() => {
-    return cartItems.filter(item => item.size === "8-10")
-  }, [cartItems])
-
-  const isEasterPromoActive = isEasterPromoDate && largeCakesInCart.length > 0
-
-  // Build gift items array for order
+  // Easter gift items from cart (added via popup when adding large cake)
   const easterGiftItems = useMemo(() => {
-    if (!isEasterPromoActive) return []
-    return largeCakesInCart
-      .filter(cake => easterGifts[cake.id])
-      .map(cake => {
-        const gift = easterGiftOptions.find(g => g.slug === easterGifts[cake.id])
-        return gift ? {
-          name: `${gift.name} (Oster-Geschenk)`,
-          quantity: 1,
-          price: 0,
-          size: "2-3",
-          image: gift.image,
-        } : null
-      })
-      .filter(Boolean) as { name: string; quantity: number; price: number; size: string; image: string }[]
-  }, [isEasterPromoActive, largeCakesInCart, easterGifts])
+    return cartItems.filter(item => item.id.includes('easter-gift'))
+  }, [cartItems])
 
   // Generate time slots
   const timeSlots = [
@@ -256,20 +220,12 @@ export default function CheckoutPage() {
             subtotal: totalPrice,
             shippingCost,
             easterPromo: easterGiftItems.length > 0,
-            items: [
-              ...cartItems.map(item => ({
-                name: item.name,
-                quantity: item.quantity,
-                price: item.price,
-                size: item.size
-              })),
-              ...easterGiftItems.map(gift => ({
-                name: gift.name,
-                quantity: gift.quantity,
-                price: gift.price,
-                size: gift.size
-              })),
-            ],
+            items: cartItems.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              size: item.size
+            })),
           },
         }),
       })
@@ -669,61 +625,9 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* Easter Gift Selector */}
-                  {isEasterPromoActive && (
-                    <div className="mt-8 p-5 bg-[#FFFCF8] border-2 border-[#651A1A]/20 rounded-2xl">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-lg">🐣</span>
-                        <h3 className="text-lg font-black text-[#651A1A]">Oster-Geschenk</h3>
-                      </div>
-                      <p className="text-sm text-[#651A1A]/70 mb-4">
-                        Wähle für jede grosse Torte eine gratis kleine Torte (2–3 Personen) aus!
-                      </p>
-
-                      {largeCakesInCart.map((cake, index) => (
-                        <div key={cake.id} className="mb-4 last:mb-0">
-                          {largeCakesInCart.length > 1 && (
-                            <p className="text-xs font-bold text-[#651A1A]/60 uppercase tracking-wider mb-2">
-                              Geschenk für: {cake.name} #{index + 1}
-                            </p>
-                          )}
-                          <div className="grid grid-cols-5 gap-2">
-                            {easterGiftOptions.map((gift) => (
-                              <button
-                                key={gift.slug}
-                                type="button"
-                                onClick={() => setEasterGifts(prev => ({ ...prev, [cake.id]: gift.slug }))}
-                                className={`relative flex flex-col items-center p-2 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
-                                  easterGifts[cake.id] === gift.slug
-                                    ? "border-[#651A1A] bg-[#F5E6D3] shadow-md"
-                                    : "border-gray-200 bg-white hover:border-gray-300"
-                                }`}
-                              >
-                                <img
-                                  src={gift.image}
-                                  alt={gift.name}
-                                  className="w-12 h-12 md:w-14 md:h-14 rounded-lg object-cover mb-1"
-                                />
-                                <span className="text-[10px] md:text-xs font-bold text-center leading-tight">{gift.name}</span>
-                                <span className="text-[10px] text-green-600 font-bold">GRATIS</span>
-                                {easterGifts[cake.id] === gift.slug && (
-                                  <div className="absolute top-1 right-1 bg-[#651A1A] rounded-full w-4 h-4 flex items-center justify-center">
-                                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  </div>
-                                )}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
                   <button
                     onClick={handleContinueToPayment}
-                    className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors mt-6"
+                    className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
                   >
                     Weiter zur Zahlung
                   </button>
@@ -770,51 +674,44 @@ export default function CheckoutPage() {
 
             {/* Cart Items */}
             <div className="space-y-4 mb-6">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex gap-4">
-                  <div className="w-20 h-20 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-sm">{item.name}</h3>
-                    <p className="text-xs text-gray-600">{item.size} Personen</p>
-                    <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
-                  </div>
-                  <div className="font-bold">
-                    <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
-                  </div>
-                </div>
-              ))}
-
-              {/* Easter Gift Items */}
-              {easterGiftItems.map((gift, index) => (
-                <div key={`easter-gift-${index}`} className="flex gap-4 bg-green-50 rounded-lg p-2 -mx-2">
-                  <div className="w-20 h-20 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
-                    <img
-                      src={gift.image}
-                      alt={gift.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-bold text-sm">{gift.name}</h3>
-                      <span className="bg-[#651A1A] text-white text-[9px] px-1.5 py-0.5 rounded-sm tracking-wider font-bold">
-                        GESCHENK
-                      </span>
+              {cartItems.map((item) => {
+                const isGift = item.id.includes('easter-gift')
+                return (
+                  <div key={item.id} className={`flex gap-4 ${isGift ? 'bg-green-50 rounded-lg p-2 -mx-2' : ''}`}>
+                    <div className="w-20 h-20 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <p className="text-xs text-gray-600">{gift.size} Personen</p>
-                    <p className="text-xs text-green-600 font-bold mt-1">Oster-Aktion</p>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm">{item.name}</h3>
+                        {isGift && (
+                          <span className="bg-[#651A1A] text-white text-[9px] px-1.5 py-0.5 rounded-sm tracking-wider font-bold">
+                            GESCHENK
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-600">{item.size} Personen</p>
+                      {isGift ? (
+                        <p className="text-xs text-green-600 font-bold mt-1">Oster-Aktion</p>
+                      ) : (
+                        <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
+                      )}
+                    </div>
+                    <div className="font-bold">
+                      {isGift ? (
+                        <span className="text-green-600 text-sm">GRATIS</span>
+                      ) : (
+                        <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
+                      )}
+                    </div>
                   </div>
-                  <div className="font-bold text-green-600 text-sm">
-                    GRATIS
-                  </div>
-                </div>
-              ))}
+                )
+              })}
+
             </div>
 
             {/* Discount Code */}

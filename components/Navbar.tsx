@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCart } from '@/contexts/CartContext'
+import { useCart, EASTER_GIFT_OPTIONS } from '@/contexts/CartContext'
 import PriceDisplay from '@/components/PriceDisplay'
 
 export default function Navbar() {
@@ -22,7 +22,10 @@ export default function Navbar() {
     updateQuantity,
     removeItem,
     totalPrice,
-    cartItemCount
+    cartItemCount,
+    easterGiftPendingCakeId,
+    setEasterGiftPendingCakeId,
+    addEasterGift,
   } = useCart()
 
   const handleCheckout = () => {
@@ -188,34 +191,49 @@ export default function Navbar() {
                                   ANGEBOT
                                 </span>
                               )}
+                              {item.id.includes('easter-gift') && (
+                                <span className="bg-[#651A1A] text-[#F5E6D3] text-[9px] px-1.5 py-0.5 rounded-sm tracking-widest font-bold">
+                                  GESCHENK
+                                </span>
+                              )}
                             </div>
                             <p className="text-xs text-gray-500 mt-1 font-light">{item.size} Personen</p>
                           </div>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-gray-300 hover:text-black transition-colors duration-200"
-                          >
-                            <X className="w-4 h-4" strokeWidth={1.5} />
-                          </button>
+                          {!item.id.includes('easter-gift') && (
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="text-gray-300 hover:text-black transition-colors duration-200"
+                            >
+                              <X className="w-4 h-4" strokeWidth={1.5} />
+                            </button>
+                          )}
                         </div>
 
                         <div className="flex items-end justify-between">
-                          <div className="flex items-center border border-gray-200">
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
-                            >
-                              −
-                            </button>
-                            <span className="text-xs font-medium w-8 text-center text-black">{item.quantity}</span>
-                            <button
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                              className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
-                            >
-                              +
-                            </button>
-                          </div>
-                          <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
+                          {item.id.includes('easter-gift') ? (
+                            <span className="text-xs text-green-600 font-bold">Oster-Aktion</span>
+                          ) : (
+                            <div className="flex items-center border border-gray-200">
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
+                              >
+                                −
+                              </button>
+                              <span className="text-xs font-medium w-8 text-center text-black">{item.quantity}</span>
+                              <button
+                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
+                              >
+                                +
+                              </button>
+                            </div>
+                          )}
+                          {item.id.includes('easter-gift') ? (
+                            <span className="text-lg font-black text-green-600 tracking-wide">GRATIS</span>
+                          ) : (
+                            <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
+                          )}
                         </div>
                       </div>
                     </div>
@@ -227,14 +245,6 @@ export default function Navbar() {
             {/* Checkout Section */}
             {cartItems.length > 0 && (
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-6">
-                {/* Easter Promo Note */}
-                {cartItems.some(item => item.size === '8-10') && (
-                  <div className="flex items-center gap-2 text-[#651A1A] bg-[#F5E6D3]/50 border border-[#D4AF85]/30 p-3 rounded-lg">
-                    <span className="text-base">🐣</span>
-                    <span className="text-xs font-bold tracking-wide">Gratis Mini-Torte im Checkout wählbar (3.–6. April)</span>
-                  </div>
-                )}
-
                 {/* Discount Info - Minimalist */}
                 <div className="space-y-3">
                   {totalPrice >= 100 ? (
@@ -302,6 +312,62 @@ export default function Navbar() {
                 </button>
               </div>
             )}
+          </div>
+        </>
+      )}
+      {/* Easter Gift Modal */}
+      {easterGiftPendingCakeId && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] transition-opacity duration-300"
+            onClick={() => {
+              setEasterGiftPendingCakeId(null)
+              setIsCartOpen(true)
+            }}
+          />
+          <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+              {/* Header */}
+              <div className="bg-[#651A1A] p-6 text-center">
+                <span className="text-3xl mb-2 block">🐣</span>
+                <h3 className="text-xl font-black text-[#F5E6D3]">Oster-Geschenk!</h3>
+                <p className="text-sm text-[#F5E6D3]/80 mt-1">
+                  Wähle eine gratis kleine Torte (2–3 Pers.) zu deiner grossen Torte!
+                </p>
+              </div>
+
+              {/* Gift Options */}
+              <div className="p-6">
+                <div className="grid grid-cols-5 gap-3">
+                  {EASTER_GIFT_OPTIONS.map((gift) => (
+                    <button
+                      key={gift.slug}
+                      type="button"
+                      onClick={() => addEasterGift(easterGiftPendingCakeId, gift)}
+                      className="flex flex-col items-center p-2 rounded-xl border-2 border-gray-200 bg-white hover:border-[#651A1A] hover:bg-[#F5E6D3] transition-all duration-200 hover:scale-105 hover:shadow-md"
+                    >
+                      <img
+                        src={gift.image}
+                        alt={gift.name}
+                        className="w-12 h-12 md:w-14 md:h-14 rounded-lg object-cover mb-1"
+                      />
+                      <span className="text-[10px] md:text-xs font-bold text-center leading-tight">{gift.name}</span>
+                      <span className="text-[10px] text-green-600 font-bold">GRATIS</span>
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setEasterGiftPendingCakeId(null)
+                    setIsCartOpen(true)
+                  }}
+                  className="w-full mt-4 text-sm text-gray-400 hover:text-gray-600 transition-colors py-2"
+                >
+                  Nein danke, weiter ohne Geschenk
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}
