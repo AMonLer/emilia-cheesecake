@@ -265,15 +265,12 @@ export default function Navbar() {
                   return giftSavings > 0 ? (
                     <div className="flex items-center justify-between gap-3 text-[#F5E6D3] bg-[#651A1A] p-4 rounded-xl shadow-md border border-[#D4AF85]/30 relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-20 h-20 bg-[#D4AF85]/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
-                      <div className="flex items-center gap-2 sm:gap-3 relative z-10">
-                        {/* Elegant custom rabbit SVG icon */}
-                        <svg className="w-6 h-6 sm:w-7 sm:h-7 text-[#D4AF85] flex-shrink-0 drop-shadow-md" viewBox="0 0 512 512" fill="currentColor">
-                           <path d="M410.7 202.9c-2.3-10.4-13.4-38.6-43.5-51.2-11.4-4.8-19.8-19.1-13-33 7.8-15.8 19-38.3 14.1-57.1C359.8 29.8 333.3 8 296 8c-29.2 0-53 17.5-62 44.5-9.3 27.6-5 50.8 10 70.4 1 1.4-1 3.5-2.6 3.1-23.3-5.2-46.7-18.4-69-42.5-3.4-3.6-9.1-3.6-12.4 .1C81 161.9 44.4 256.7 67.2 338.4l1.1 4c2.6 9 6.2 18 10.9 26.6 20.3 37.1 57.3 64.6 100 74 19 4.2 38.6 6.3 58.4 6.3h22.9c73.9 0 138-51 154-124 10-45.7 3.3-91.8-16.7-133.5zM293.4 205.8c-10.3 0-18.5-8.3-18.5-18.5s8.3-18.5 18.5-18.5 18.5 8.3 18.5 18.5-8.3 18.5-18.5 18.5z"/>
-                        </svg>
+                      <div className="flex items-center gap-2 relative z-10">
+                        <span className="text-base">🐰</span>
                         <span className="text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">Oster-Geschenk</span>
                       </div>
-                      <span className="text-xl sm:text-2xl font-serif font-black text-[#D4AF85] relative z-10 tracking-widest drop-shadow-[0_0_12px_rgba(212,175,133,0.7)]">
-                        -{giftSavings.toFixed(2)}  <span className="text-xs sm:text-sm font-bold tracking-[0.2em] uppercase ml-0.5">CHF</span>
+                      <span className="text-sm sm:text-base font-serif font-bold text-[#D4AF85] relative z-10 tracking-widest">
+                        -{giftSavings.toFixed(2)} CHF
                       </span>
                     </div>
                   ) : null
