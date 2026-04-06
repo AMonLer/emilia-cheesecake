@@ -88,10 +88,9 @@ export async function POST(req: NextRequest) {
       }
 
       // Enviar notificación por Telegram
-      const easterPromoTag = metadata.easterPromo === 'true' ? '\n🐣 <b>OSTER-AKTION AKTIV</b>\n' : ''
       const telegramMessage = `
 🎉 <b>NUEVO PEDIDO RECIBIDO</b>
-${easterPromoTag}
+
 💰 <b>Total:</b> CHF ${amount.toFixed(2)}
 
 👤 <b>Cliente:</b>

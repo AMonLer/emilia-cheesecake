@@ -2,11 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X, Search, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCart, EASTER_GIFT_OPTIONS } from '@/contexts/CartContext'
+import { useCart } from '@/contexts/CartContext'
 import PriceDisplay from '@/components/PriceDisplay'
 
 export default function Navbar() {
@@ -23,18 +23,7 @@ export default function Navbar() {
     removeItem,
     totalPrice,
     cartItemCount,
-    easterGiftPendingCakeId,
-    setEasterGiftPendingCakeId,
-    addEasterGift,
   } = useCart()
-
-  // Block body scroll when Easter gift modal is open
-  useEffect(() => {
-    if (easterGiftPendingCakeId) {
-      document.body.style.overflow = 'hidden'
-      return () => { document.body.style.overflow = '' }
-    }
-  }, [easterGiftPendingCakeId])
 
   const handleCheckout = () => {
     setIsCartOpen(false)
@@ -199,29 +188,19 @@ export default function Navbar() {
                                   ANGEBOT
                                 </span>
                               )}
-                              {item.id.includes('easter-gift') && (
-                                <span className="bg-[#651A1A] text-[#F5E6D3] text-[9px] px-1.5 py-0.5 rounded-sm tracking-widest font-bold">
-                                  GESCHENK
-                                </span>
-                              )}
                             </div>
                             <p className="text-xs text-gray-500 mt-1 font-light">{item.size} Personen</p>
                           </div>
-                          {!item.id.includes('easter-gift') && (
-                            <button
-                              onClick={() => removeItem(item.id)}
-                              className="text-gray-300 hover:text-black transition-colors duration-200"
-                            >
-                              <X className="w-4 h-4" strokeWidth={1.5} />
-                            </button>
-                          )}
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="text-gray-300 hover:text-black transition-colors duration-200"
+                          >
+                            <X className="w-4 h-4" strokeWidth={1.5} />
+                          </button>
                         </div>
 
                         <div className="flex items-end justify-between">
-                          {item.id.includes('easter-gift') ? (
-                            <span className="text-xs text-gray-400 font-light">2-3 Personen</span>
-                          ) : (
-                            <div className="flex items-center border border-gray-200">
+                          <div className="flex items-center border border-gray-200">
                               <button
                                 onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                 className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
@@ -236,12 +215,7 @@ export default function Navbar() {
                                 +
                               </button>
                             </div>
-                          )}
-                          {item.id.includes('easter-gift') ? (
-                            <span className="text-sm font-black text-[#D4AF85] tracking-[0.15em] uppercase drop-shadow-sm">GRATIS</span>
-                          ) : (
-                            <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
-                          )}
+                          <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
                         </div>
                       </div>
                     </div>
@@ -253,43 +227,7 @@ export default function Navbar() {
             {/* Checkout Section */}
             {cartItems.length > 0 && (
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-5">
-                {/* Easter Gift Savings */}
-                {(() => {
-                  const giftSavings = cartItems
-                    .filter(item => item.id.includes('easter-gift'))
-                    .reduce((sum, item) => {
-                      const giftName = item.name.replace(' (Oster-Geschenk)', '')
-                      const option = EASTER_GIFT_OPTIONS.find(o => o.name === giftName)
-                      return sum + (option?.realPrice || 0)
-                    }, 0)
-                  return giftSavings > 0 ? (
-                    <div className="flex items-center justify-between gap-3 text-[#F5E6D3] bg-[#651A1A] p-4 rounded-xl shadow-md border border-[#D4AF85]/30 relative overflow-hidden">
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-[#D4AF85]/10 rounded-full blur-2xl transform translate-x-1/2 -translate-y-1/2"></div>
-                      <div className="flex items-center gap-2 relative z-10">
-                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#D4AF85] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <ellipse cx="9" cy="5.5" rx="1.8" ry="4.5" transform="rotate(-10 9 5.5)" opacity="0.85"/>
-                          <ellipse cx="15" cy="5.5" rx="1.8" ry="4.5" transform="rotate(10 15 5.5)" opacity="0.85"/>
-                          <ellipse cx="9.2" cy="5.5" rx="0.8" ry="3.2" transform="rotate(-10 9.2 5.5)" fill="#651A1A" opacity="0.4"/>
-                          <ellipse cx="14.8" cy="5.5" rx="0.8" ry="3.2" transform="rotate(10 14.8 5.5)" fill="#651A1A" opacity="0.4"/>
-                          <circle cx="12" cy="12.5" r="4.5"/>
-                          <circle cx="10.5" cy="11.8" r="0.6" fill="#651A1A"/>
-                          <circle cx="13.5" cy="11.8" r="0.6" fill="#651A1A"/>
-                          <ellipse cx="12" cy="13.2" rx="0.7" ry="0.5" fill="#651A1A" opacity="0.6"/>
-                          <ellipse cx="12" cy="19" rx="3.5" ry="3.8"/>
-                          <circle cx="12" cy="22" r="1" opacity="0.7"/>
-                        </svg>
-                        <span className="text-[10px] sm:text-xs font-bold tracking-[0.15em] uppercase">Oster-Geschenk</span>
-                      </div>
-                      <span className="text-sm sm:text-base font-serif font-bold text-[#D4AF85] relative z-10 tracking-widest">
-                        -{giftSavings.toFixed(2)} CHF
-                      </span>
-                    </div>
-                  ) : null
-                })()}
-
-                {/* Discount Info - hidden when Easter gift is active */}
-                {!cartItems.some(item => item.id.includes('easter-gift')) && (
-                  <div className="space-y-3">
+                <div className="space-y-3">
                     {totalPrice >= 100 ? (
                       <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
                         <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
@@ -316,7 +254,6 @@ export default function Navbar() {
                       </div>
                     )}
                   </div>
-                )}
 
                 {/* Totals */}
                 <div className="space-y-2">
@@ -354,90 +291,6 @@ export default function Navbar() {
                 </button>
               </div>
             )}
-          </div>
-        </>
-      )}
-      {/* Easter Gift Modal */}
-      {easterGiftPendingCakeId && (
-        <>
-          <div
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60] transition-opacity duration-500 touch-none"
-            onClick={() => {
-              setEasterGiftPendingCakeId(null)
-              setIsCartOpen(true)
-            }}
-          />
-          <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center sm:p-6 overscroll-contain">
-            <div className="bg-[#F5E6D3] rounded-t-3xl sm:rounded-[2rem] shadow-2xl max-w-2xl w-full max-h-[90vh] sm:max-h-[92vh] flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-500 border border-[#D4AF85]/30">
-              {/* Premium Header */}
-              <div className="relative flex-shrink-0 bg-gradient-to-br from-[#651A1A] to-[#4A1010] px-5 py-5 sm:p-8 md:p-10 text-center overflow-hidden">
-                {/* Decorative BG elements */}
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] mix-blend-overlay"></div>
-                <div className="absolute -top-12 -right-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
-                <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-[#D4AF85]/20 rounded-full blur-2xl"></div>
-
-                <div className="relative z-10 flex flex-col items-center justify-center">
-                  {/* Easter Bunny Image */}
-                  <div className="mb-3 sm:mb-4 w-28 h-28 sm:w-36 sm:h-36 opacity-100 drop-shadow-[0_0_15px_rgba(212,175,133,0.3)] pointer-events-none">
-                    <img src="/Easter.png?timestamp=20260401" alt="Easter Graphic" className="w-full h-full object-contain" />
-                  </div>
-
-                  <span className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 bg-[#D4AF85]/10 text-[#D4AF85] rounded-full text-[10px] sm:text-xs font-bold tracking-[0.2em] mb-2 sm:mb-4 border border-[#D4AF85]/30 uppercase">
-                    Exklusives Angebot
-                  </span>
-                  <h3 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold text-[#F5E6D3] mb-1.5 sm:mb-3 drop-shadow-md">
-                    Dein Oster-Geschenk!
-                  </h3>
-                  <p className="text-[#F5E6D3]/90 font-light tracking-wide max-w-sm mx-auto text-xs sm:text-sm md:text-base leading-relaxed">
-                    Wähle eine <b className="font-bold">kleine Torte</b> zu deiner grossen Torte!
-                  </p>
-                </div>
-              </div>
-
-              {/* Gift Options */}
-              <div className="p-5 sm:p-6 md:p-10 bg-white/50 backdrop-blur-sm relative overflow-y-auto">
-                <div className="grid grid-cols-2 sm:flex sm:flex-wrap sm:justify-center gap-3 sm:gap-4 md:gap-5 mb-4 sm:mb-8">
-                  {EASTER_GIFT_OPTIONS.map((gift) => (
-                    <button
-                      key={gift.slug}
-                      type="button"
-                      onClick={() => addEasterGift(easterGiftPendingCakeId, gift)}
-                      className="group relative sm:w-[135px] md:w-[160px] flex flex-col items-center bg-white p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-gray-100 shadow-sm active:scale-95 sm:hover:shadow-2xl sm:hover:border-[#D4AF85]/50 transition-all duration-300 sm:duration-500 sm:hover:-translate-y-2"
-                    >
-                      {/* Gratis Tag */}
-                      <div className="absolute -top-2 sm:-top-3 right-[-3px] sm:right-[-5px] bg-[#651A1A] text-[#F5E6D3] text-[8px] sm:text-[10px] md:text-xs font-bold tracking-widest px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full z-10 shadow-sm border border-[#D4AF85]/20">
-                        GRATIS
-                      </div>
-
-                      <div className="w-full aspect-square relative mb-2 sm:mb-4 overflow-hidden rounded-lg sm:rounded-xl bg-[#F5E6D3]/20 border border-gray-50">
-                        <img
-                          src={gift.image}
-                          alt={gift.name}
-                          className="w-full h-full object-cover sm:group-hover:scale-[1.15] transition-transform duration-700"
-                        />
-                      </div>
-
-                      <span className="text-[10px] sm:text-xs md:text-sm font-bold text-center text-[#651A1A] uppercase tracking-wide sm:tracking-[0.1em] leading-tight">
-                        {gift.name}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-
-                <div className="flex justify-center pb-1 sm:pb-2">
-                  <button
-                    onClick={() => {
-                      setEasterGiftPendingCakeId(null)
-                      setIsCartOpen(true)
-                    }}
-                    className="relative text-[10px] md:text-xs text-gray-400 hover:text-[#651A1A] font-bold tracking-[0.15em] sm:tracking-[0.2em] uppercase transition-all duration-300 group py-2"
-                  >
-                    Nein danke, weiter ohne Geschenk
-                    <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#D4AF85] transition-all duration-500 group-hover:w-full"></span>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </>
       )}

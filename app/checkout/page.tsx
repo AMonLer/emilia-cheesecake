@@ -135,11 +135,6 @@ export default function CheckoutPage() {
     return [...decemberDates, ...januaryDates]
   }, [])
 
-  // Easter gift items from cart (added via popup when adding large cake)
-  const easterGiftItems = useMemo(() => {
-    return cartItems.filter(item => item.id.includes('easter-gift'))
-  }, [cartItems])
-
   // Generate time slots
   const timeSlots = [
     "09:00 - 12:00",
@@ -219,7 +214,6 @@ export default function CheckoutPage() {
             discountCode: appliedDiscountCode,
             subtotal: totalPrice,
             shippingCost,
-            easterPromo: easterGiftItems.length > 0,
             items: cartItems.map(item => ({
               name: item.name,
               quantity: item.quantity,
@@ -674,10 +668,8 @@ export default function CheckoutPage() {
 
             {/* Cart Items */}
             <div className="space-y-4 mb-6">
-              {cartItems.map((item) => {
-                const isGift = item.id.includes('easter-gift')
-                return (
-                  <div key={item.id} className={`flex gap-4 ${isGift ? 'bg-green-50 rounded-lg p-2 -mx-2' : ''}`}>
+              {cartItems.map((item) => (
+                  <div key={item.id} className="flex gap-4">
                     <div className="w-20 h-20 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
                       <img
                         src={item.image}
@@ -686,31 +678,15 @@ export default function CheckoutPage() {
                       />
                     </div>
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-bold text-sm">{item.name}</h3>
-                        {isGift && (
-                          <span className="bg-[#651A1A] text-white text-[9px] px-1.5 py-0.5 rounded-sm tracking-wider font-bold">
-                            GESCHENK
-                          </span>
-                        )}
-                      </div>
+                      <h3 className="font-bold text-sm">{item.name}</h3>
                       <p className="text-xs text-gray-600">{item.size} Personen</p>
-                      {isGift ? (
-                        <p className="text-xs text-gray-400 font-light mt-1">2-3 Personen</p>
-                      ) : (
-                        <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
-                      )}
+                      <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
                     </div>
                     <div className="font-bold">
-                      {isGift ? (
-                        <span className="text-green-600 text-sm">GRATIS</span>
-                      ) : (
-                        <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
-                      )}
+                      <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
                     </div>
                   </div>
-                )
-              })}
+              ))}
 
             </div>
 

@@ -25,20 +25,6 @@ export default function OrderHero() {
                 </p>
             </div>
 
-            {/* Easter Promotion Banner */}
-            <div className="container mx-auto max-w-xl relative z-10 mt-4 md:mt-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                <div className="bg-white/80 backdrop-blur-sm border border-[#651A1A]/15 rounded-xl px-4 py-3 md:px-6 md:py-4 text-center shadow-md">
-                    <p className="text-[9px] md:text-[10px] tracking-[0.25em] text-[#651A1A] font-bold uppercase mb-1">
-                        Oster-Aktion
-                    </p>
-                    <h3 className="text-sm md:text-lg font-black text-[#651A1A] mb-1 leading-tight">
-                        Gratis Mini-Cheesecake zu jeder grossen Torte!
-                    </h3>
-                    <p className="text-[11px] md:text-xs text-[#651A1A]/60 font-light leading-snug">
-                        Lieferung zwischen dem 3. und 6. April.
-                    </p>
-                </div>
-            </div>
         </section>
     )
 }
