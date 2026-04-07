@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import Image from 'next/image'
 import { ShoppingBag, Banknote, Receipt, TrendingUp, Download, LogOut } from 'lucide-react'
 import { getSession } from '@/lib/admin-auth'
 import { defaultMonth, fetchSalesForMonth, type SaleRow } from '@/lib/sales'
@@ -58,22 +59,32 @@ export default async function SalesPage({
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-[#FAF9F6]">
       {/* Header */}
-      <header className="bg-white border-b border-stone-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6 flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="font-[family-name:var(--font-playfair)] text-3xl text-stone-900 tracking-tight">
-              Emilia <span className="text-pink-600">Sales</span>
-            </h1>
-            <p className="text-xs text-stone-500 mt-1 uppercase tracking-widest">
-              {session.role === 'admin' ? 'Admin dashboard' : 'Partner dashboard'}
-            </p>
+      <header className="bg-white border-b border-[#E6D5C0]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-5 flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/logo.png"
+              alt="Emilia"
+              width={56}
+              height={56}
+              className="object-contain"
+              priority
+            />
+            <div>
+              <p className="font-[family-name:var(--font-playfair)] text-xl text-[#651A1A] leading-tight">
+                Sales Dashboard
+              </p>
+              <p className="text-[10px] text-stone-500 mt-0.5 uppercase tracking-widest">
+                {session.role === 'admin' ? 'Admin' : 'Partner'}
+              </p>
+            </div>
           </div>
           <form method="POST" action="/api/admin/logout">
             <button
               type="submit"
-              className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-stone-900 transition-colors"
+              className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-[#651A1A] transition-colors"
             >
               <LogOut className="w-4 h-4" />
               Sign out
@@ -86,7 +97,7 @@ export default async function SalesPage({
         {/* Toolbar */}
         <div className="mb-8 flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <h2 className="font-[family-name:var(--font-playfair)] text-4xl text-stone-900 mb-1">
+            <h2 className="font-[family-name:var(--font-playfair)] text-4xl text-[#1a1a1a] mb-1">
               {monthLabel(month)}
             </h2>
             <p className="text-sm text-stone-500">
@@ -107,19 +118,19 @@ export default async function SalesPage({
                   name="month"
                   type="month"
                   defaultValue={month}
-                  className="rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent transition"
+                  className="rounded-lg border border-[#E6D5C0] bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#651A1A]/30 focus:border-[#651A1A] transition"
                 />
               </div>
               <button
                 type="submit"
-                className="bg-stone-900 hover:bg-stone-800 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
+                className="bg-[#651A1A] hover:bg-[#8B3A3A] text-white px-5 py-2 rounded-lg text-sm font-medium transition shadow-sm"
               >
                 Apply
               </button>
             </form>
             <a
               href={`/admin/sales/export?month=${month}`}
-              className="inline-flex items-center gap-2 bg-white border border-stone-300 hover:bg-stone-50 hover:border-stone-400 text-stone-700 px-4 py-2 rounded-lg text-sm font-medium transition"
+              className="inline-flex items-center gap-2 bg-white border border-[#E6D5C0] hover:bg-[#FFFCF8] hover:border-[#651A1A] text-[#651A1A] px-4 py-2 rounded-lg text-sm font-medium transition"
             >
               <Download className="w-4 h-4" />
               Export CSV
@@ -161,16 +172,16 @@ export default async function SalesPage({
             </div>
 
             {/* Table */}
-            <div className="bg-white border border-stone-200 rounded-xl shadow-sm overflow-hidden">
-              <div className="px-6 py-4 border-b border-stone-100">
-                <h3 className="font-[family-name:var(--font-playfair)] text-xl text-stone-900">
+            <div className="bg-white border border-[#E6D5C0] rounded-xl shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-[#F5E6D3]">
+                <h3 className="font-[family-name:var(--font-playfair)] text-xl text-[#651A1A]">
                   Orders
                 </h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-sm">
                   <thead>
-                    <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-stone-100">
+                    <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
                       <th className="text-left px-6 py-3 font-medium">Date</th>
                       <th className="text-left px-6 py-3 font-medium">Customer</th>
                       <th className="text-right px-6 py-3 font-medium">Total</th>
@@ -179,23 +190,23 @@ export default async function SalesPage({
                       <th className="text-right px-6 py-3 font-medium">5%</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-stone-100">
+                  <tbody className="divide-y divide-[#F5E6D3]">
                     {summary.rows.length === 0 && (
                       <tr>
                         <td colSpan={6} className="px-6 py-16 text-center">
-                          <ShoppingBag className="w-10 h-10 text-stone-300 mx-auto mb-3" />
+                          <ShoppingBag className="w-10 h-10 text-[#E6D5C0] mx-auto mb-3" />
                           <p className="text-stone-500 text-sm">No orders this month yet</p>
                         </td>
                       </tr>
                     )}
                     {summary.rows.map((r) => (
-                      <tr key={r.id} className="hover:bg-stone-50 transition-colors">
+                      <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors">
                         <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
                           <div>{formatDate(r.date)}</div>
                           <div className="text-xs text-stone-400">{formatTime(r.date)}</div>
                         </td>
-                        <td className="px-6 py-4 text-stone-900 font-medium">{r.customerName}</td>
-                        <td className="px-6 py-4 text-right text-stone-900 tabular-nums">
+                        <td className="px-6 py-4 text-[#1a1a1a] font-medium">{r.customerName}</td>
+                        <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums">
                           {formatCHF(r.total)}
                         </td>
                         <td className="px-6 py-4 text-right text-stone-400 tabular-nums">
@@ -204,28 +215,28 @@ export default async function SalesPage({
                         <td className="px-6 py-4 text-right text-stone-700 tabular-nums">
                           {formatCHF(r.base)}
                         </td>
-                        <td className="px-6 py-4 text-right font-semibold text-pink-600 tabular-nums">
+                        <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums">
                           {formatCHF(r.commission)}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                   {summary.rows.length > 0 && (
-                    <tfoot className="bg-stone-50 border-t border-stone-200">
+                    <tfoot className="bg-[#FFFCF8] border-t border-[#E6D5C0]">
                       <tr className="text-sm">
-                        <td className="px-6 py-4 font-semibold text-stone-900" colSpan={2}>
+                        <td className="px-6 py-4 font-semibold text-[#1a1a1a]" colSpan={2}>
                           Total
                         </td>
-                        <td className="px-6 py-4 text-right font-semibold text-stone-900 tabular-nums">
+                        <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
                           {formatCHF(summary.totals.total)}
                         </td>
                         <td className="px-6 py-4 text-right text-stone-500 tabular-nums">
                           {formatCHF(summary.totals.shipping)}
                         </td>
-                        <td className="px-6 py-4 text-right font-semibold text-stone-900 tabular-nums">
+                        <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
                           {formatCHF(summary.totals.base)}
                         </td>
-                        <td className="px-6 py-4 text-right font-bold text-pink-600 tabular-nums">
+                        <td className="px-6 py-4 text-right font-bold text-[#651A1A] tabular-nums text-base">
                           {formatCHF(summary.totals.commission)}
                         </td>
                       </tr>
@@ -260,27 +271,27 @@ function StatCard({
     <div
       className={`relative rounded-xl border p-5 transition ${
         highlight
-          ? 'bg-gradient-to-br from-pink-500 to-pink-600 border-pink-600 text-white shadow-lg shadow-pink-200'
-          : 'bg-white border-stone-200 shadow-sm hover:shadow-md'
+          ? 'bg-gradient-to-br from-[#651A1A] to-[#8B3A3A] border-[#651A1A] text-white shadow-lg shadow-[#651A1A]/20'
+          : 'bg-white border-[#E6D5C0] shadow-sm hover:shadow-md hover:border-[#D4AF85]'
       }`}
     >
       <div
         className={`inline-flex items-center justify-center w-9 h-9 rounded-lg mb-3 ${
-          highlight ? 'bg-white/20 text-white' : 'bg-pink-50 text-pink-600'
+          highlight ? 'bg-white/20 text-white' : 'bg-[#F5E6D3] text-[#651A1A]'
         }`}
       >
         {icon}
       </div>
       <div
         className={`text-[10px] uppercase tracking-widest mb-1 ${
-          highlight ? 'text-pink-100' : 'text-stone-500'
+          highlight ? 'text-[#F5E6D3]' : 'text-stone-500'
         }`}
       >
         {label}
       </div>
       <div
         className={`text-2xl font-semibold tabular-nums ${
-          highlight ? 'text-white' : 'text-stone-900'
+          highlight ? 'text-white' : 'text-[#1a1a1a]'
         }`}
       >
         {value}

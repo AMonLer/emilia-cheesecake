@@ -49,7 +49,7 @@ export default function LoginForm() {
           required
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+          className="w-full rounded-lg border border-[#E6D5C0] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#651A1A]/30 focus:border-[#651A1A] transition"
         />
       </div>
 
@@ -64,7 +64,7 @@ export default function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+          className="w-full rounded-lg border border-[#E6D5C0] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#651A1A]/30 focus:border-[#651A1A] transition"
         />
       </div>
 
@@ -77,7 +77,7 @@ export default function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-pink-500 hover:bg-pink-600 disabled:opacity-50 text-white font-medium py-2 rounded-md text-sm transition"
+        className="w-full bg-[#651A1A] hover:bg-[#8B3A3A] disabled:opacity-50 text-white font-medium py-2.5 rounded-lg text-sm transition shadow-sm"
       >
         {loading ? 'Signing in…' : 'Sign in'}
       </button>
