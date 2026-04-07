@@ -65,9 +65,10 @@ export function checkCredentials(username: string, password: string): Role | nul
     { role: 'partner', user: process.env.PARTNER_USER, pass: process.env.PARTNER_PASS },
   ]
 
+  const normalizedUsername = username.trim().toLowerCase()
   for (const c of candidates) {
     if (!c.user || !c.pass) continue
-    if (username === c.user && constantTimeEqual(password, c.pass)) {
+    if (normalizedUsername === c.user.trim().toLowerCase() && constantTimeEqual(password, c.pass)) {
       return c.role
     }
   }
