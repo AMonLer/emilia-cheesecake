@@ -3,6 +3,13 @@ import Stripe from 'stripe'
 const FALLBACK_SHIPPING_CHF = 6
 const COMMISSION_RATE = 0.05
 
+export interface SaleItem {
+  name: string
+  size?: string
+  quantity: number
+  price: number
+}
+
 export interface SaleRow {
   id: string
   date: Date
@@ -11,6 +18,16 @@ export interface SaleRow {
   shipping: number
   base: number
   commission: number
+  // Admin-only details (parsed from PaymentIntent metadata)
+  customerEmail: string
+  customerPhone: string
+  address: string
+  postalCode: string
+  city: string
+  kanton: string
+  deliveryDate: string
+  deliveryTime: string
+  items: SaleItem[]
 }
 
 export interface SalesSummary {
@@ -88,6 +105,23 @@ function getZurichOffsetMinutes(date: Date): number {
   return Math.round((asUtc - date.getTime()) / (60 * 1000))
 }
 
+export function previousMonth(monthStr: string): string {
+  const [yearStr, monthNumStr] = monthStr.split('-')
+  const year = Number(yearStr)
+  const month = Number(monthNumStr)
+  if (!year || !month) throw new Error(`Invalid month: ${monthStr}`)
+  const prevYear = month === 1 ? year - 1 : year
+  const prevMonth = month === 1 ? 12 : month - 1
+  return `${prevYear}-${String(prevMonth).padStart(2, '0')}`
+}
+
+export function monthLongLabel(monthStr: string, locale = 'en-US'): string {
+  const [y, m] = monthStr.split('-').map(Number)
+  return new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }).format(
+    new Date(y, m - 1, 1)
+  )
+}
+
 export function defaultMonth(): string {
   // Current month in Europe/Zurich
   const fmt = new Intl.DateTimeFormat('en-CA', {
@@ -123,6 +157,17 @@ export async function fetchSalesForMonth(monthStr: string): Promise<SalesSummary
       const shipping = Number.isFinite(shippingMeta) && shippingMeta > 0 ? shippingMeta : FALLBACK_SHIPPING_CHF
       const base = Math.max(0, total - shipping)
       const commission = base * COMMISSION_RATE
+
+      let items: SaleItem[] = []
+      if (pi.metadata?.items) {
+        try {
+          const parsed = JSON.parse(pi.metadata.items)
+          if (Array.isArray(parsed)) items = parsed
+        } catch {
+          // ignore malformed items
+        }
+      }
+
       rows.push({
         id: pi.id,
         date: new Date(pi.created * 1000),
@@ -131,6 +176,15 @@ export async function fetchSalesForMonth(monthStr: string): Promise<SalesSummary
         shipping,
         base,
         commission,
+        customerEmail: pi.metadata?.customerEmail?.trim() || '',
+        customerPhone: pi.metadata?.customerPhone?.trim() || '',
+        address: pi.metadata?.address?.trim() || '',
+        postalCode: pi.metadata?.postalCode?.trim() || '',
+        city: pi.metadata?.city?.trim() || '',
+        kanton: pi.metadata?.kanton?.trim() || '',
+        deliveryDate: pi.metadata?.deliveryDate?.trim() || '',
+        deliveryTime: pi.metadata?.deliveryTime?.trim() || '',
+        items,
       })
     }
 

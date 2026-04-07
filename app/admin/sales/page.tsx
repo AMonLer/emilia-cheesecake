@@ -1,8 +1,29 @@
 import { redirect } from 'next/navigation'
 import Image from 'next/image'
-import { ShoppingBag, Banknote, Receipt, TrendingUp, Download, LogOut } from 'lucide-react'
+import {
+  ShoppingBag,
+  Banknote,
+  Receipt,
+  TrendingUp,
+  Download,
+  LogOut,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+} from 'lucide-react'
 import { getSession } from '@/lib/admin-auth'
-import { defaultMonth, fetchSalesForMonth, type SaleRow } from '@/lib/sales'
+import {
+  defaultMonth,
+  fetchSalesForMonth,
+  monthLongLabel,
+  previousMonth,
+  type SaleRow,
+  type SalesSummary,
+} from '@/lib/sales'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,11 +49,18 @@ function formatTime(d: Date): string {
   }).format(d)
 }
 
-function monthLabel(monthStr: string): string {
-  const [y, m] = monthStr.split('-').map(Number)
-  return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(
-    new Date(y, m - 1, 1)
-  )
+interface DeltaResult {
+  direction: 'up' | 'down' | 'flat'
+  pct: number | null // null when previous is 0 (avoid div-by-zero)
+}
+
+function computeDelta(current: number, previous: number): DeltaResult {
+  if (previous === 0 && current === 0) return { direction: 'flat', pct: 0 }
+  if (previous === 0) return { direction: 'up', pct: null }
+  const diff = current - previous
+  const pct = (diff / previous) * 100
+  if (Math.abs(pct) < 0.5) return { direction: 'flat', pct }
+  return { direction: pct > 0 ? 'up' : 'down', pct }
 }
 
 export default async function SalesPage({
@@ -49,14 +77,21 @@ export default async function SalesPage({
     searchParams.month && /^\d{4}-\d{2}$/.test(searchParams.month)
       ? searchParams.month
       : defaultMonth()
+  const prevMonth = previousMonth(month)
 
-  let summary: { rows: SaleRow[]; totals: any } | null = null
+  let current: SalesSummary | null = null
+  let previous: SalesSummary | null = null
   let error: string | null = null
   try {
-    summary = await fetchSalesForMonth(month)
+    ;[current, previous] = await Promise.all([
+      fetchSalesForMonth(month),
+      fetchSalesForMonth(prevMonth),
+    ])
   } catch (err: any) {
     error = err.message || 'Failed to load sales'
   }
+
+  const isAdmin = session.role === 'admin'
 
   return (
     <div className="min-h-screen bg-[#FAF9F6]">
@@ -77,7 +112,7 @@ export default async function SalesPage({
                 Sales Dashboard
               </p>
               <p className="text-[10px] text-stone-500 mt-0.5 uppercase tracking-widest">
-                {session.role === 'admin' ? 'Admin' : 'Partner'}
+                {isAdmin ? 'Admin' : 'Partner'}
               </p>
             </div>
           </div>
@@ -98,10 +133,11 @@ export default async function SalesPage({
         <div className="mb-8 flex items-end justify-between gap-4 flex-wrap">
           <div>
             <h2 className="font-[family-name:var(--font-playfair)] text-4xl text-[#1a1a1a] mb-1">
-              {monthLabel(month)}
+              {monthLongLabel(month)}
             </h2>
             <p className="text-sm text-stone-500">
-              {summary?.totals.count ?? 0} order{(summary?.totals.count ?? 0) === 1 ? '' : 's'} this period
+              {current?.totals.count ?? 0} order
+              {(current?.totals.count ?? 0) === 1 ? '' : 's'} this period · vs {monthLongLabel(prevMonth)}
             </p>
           </div>
           <div className="flex items-end gap-2 flex-wrap">
@@ -144,29 +180,37 @@ export default async function SalesPage({
           </div>
         )}
 
-        {summary && (
+        {current && previous && (
           <>
-            {/* Stat cards */}
+            {/* Stat cards with month-over-month comparison */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
               <StatCard
                 icon={<ShoppingBag className="w-5 h-5" />}
                 label="Orders"
-                value={String(summary.totals.count)}
+                value={String(current.totals.count)}
+                delta={computeDelta(current.totals.count, previous.totals.count)}
+                deltaLabel={`${previous.totals.count} last month`}
               />
               <StatCard
                 icon={<Banknote className="w-5 h-5" />}
                 label="Gross sales"
-                value={formatCHF(summary.totals.total)}
+                value={formatCHF(current.totals.total)}
+                delta={computeDelta(current.totals.total, previous.totals.total)}
+                deltaLabel={`${formatCHF(previous.totals.total)} last month`}
               />
               <StatCard
                 icon={<Receipt className="w-5 h-5" />}
                 label="Net (excl. shipping)"
-                value={formatCHF(summary.totals.base)}
+                value={formatCHF(current.totals.base)}
+                delta={computeDelta(current.totals.base, previous.totals.base)}
+                deltaLabel={`${formatCHF(previous.totals.base)} last month`}
               />
               <StatCard
                 icon={<TrendingUp className="w-5 h-5" />}
                 label="Commission 5%"
-                value={formatCHF(summary.totals.commission)}
+                value={formatCHF(current.totals.commission)}
+                delta={computeDelta(current.totals.commission, previous.totals.commission)}
+                deltaLabel={`${formatCHF(previous.totals.commission)} last month`}
                 highlight
               />
             </div>
@@ -178,72 +222,11 @@ export default async function SalesPage({
                   Orders
                 </h3>
               </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full text-sm">
-                  <thead>
-                    <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
-                      <th className="text-left px-6 py-3 font-medium">Date</th>
-                      <th className="text-left px-6 py-3 font-medium">Customer</th>
-                      <th className="text-right px-6 py-3 font-medium">Total</th>
-                      <th className="text-right px-6 py-3 font-medium">Shipping</th>
-                      <th className="text-right px-6 py-3 font-medium">Net</th>
-                      <th className="text-right px-6 py-3 font-medium">5%</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#F5E6D3]">
-                    {summary.rows.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="px-6 py-16 text-center">
-                          <ShoppingBag className="w-10 h-10 text-[#E6D5C0] mx-auto mb-3" />
-                          <p className="text-stone-500 text-sm">No orders this month yet</p>
-                        </td>
-                      </tr>
-                    )}
-                    {summary.rows.map((r) => (
-                      <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors">
-                        <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
-                          <div>{formatDate(r.date)}</div>
-                          <div className="text-xs text-stone-400">{formatTime(r.date)}</div>
-                        </td>
-                        <td className="px-6 py-4 text-[#1a1a1a] font-medium">{r.customerName}</td>
-                        <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums">
-                          {formatCHF(r.total)}
-                        </td>
-                        <td className="px-6 py-4 text-right text-stone-400 tabular-nums">
-                          {formatCHF(r.shipping)}
-                        </td>
-                        <td className="px-6 py-4 text-right text-stone-700 tabular-nums">
-                          {formatCHF(r.base)}
-                        </td>
-                        <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums">
-                          {formatCHF(r.commission)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  {summary.rows.length > 0 && (
-                    <tfoot className="bg-[#FFFCF8] border-t border-[#E6D5C0]">
-                      <tr className="text-sm">
-                        <td className="px-6 py-4 font-semibold text-[#1a1a1a]" colSpan={2}>
-                          Total
-                        </td>
-                        <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
-                          {formatCHF(summary.totals.total)}
-                        </td>
-                        <td className="px-6 py-4 text-right text-stone-500 tabular-nums">
-                          {formatCHF(summary.totals.shipping)}
-                        </td>
-                        <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
-                          {formatCHF(summary.totals.base)}
-                        </td>
-                        <td className="px-6 py-4 text-right font-bold text-[#651A1A] tabular-nums text-base">
-                          {formatCHF(summary.totals.commission)}
-                        </td>
-                      </tr>
-                    </tfoot>
-                  )}
-                </table>
-              </div>
+              {isAdmin ? (
+                <AdminOrdersTable summary={current} />
+              ) : (
+                <PartnerOrdersTable summary={current} />
+              )}
             </div>
 
             <p className="mt-6 text-xs text-stone-400 text-center">
@@ -256,17 +239,224 @@ export default async function SalesPage({
   )
 }
 
+/* ───────────── Partner table (minimal: date + total + 5%) ───────────── */
+
+function PartnerOrdersTable({ summary }: { summary: SalesSummary }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
+            <th className="text-left px-6 py-3 font-medium">Date</th>
+            <th className="text-right px-6 py-3 font-medium">Total</th>
+            <th className="text-right px-6 py-3 font-medium">Your 5%</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-[#F5E6D3]">
+          {summary.rows.length === 0 && (
+            <tr>
+              <td colSpan={3} className="px-6 py-16 text-center">
+                <ShoppingBag className="w-10 h-10 text-[#E6D5C0] mx-auto mb-3" />
+                <p className="text-stone-500 text-sm">No orders this month yet</p>
+              </td>
+            </tr>
+          )}
+          {summary.rows.map((r) => (
+            <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors">
+              <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
+                <div>{formatDate(r.date)}</div>
+                <div className="text-xs text-stone-400">{formatTime(r.date)}</div>
+              </td>
+              <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums">
+                {formatCHF(r.total)}
+              </td>
+              <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums">
+                {formatCHF(r.commission)}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        {summary.rows.length > 0 && (
+          <tfoot className="bg-[#FFFCF8] border-t border-[#E6D5C0]">
+            <tr className="text-sm">
+              <td className="px-6 py-4 font-semibold text-[#1a1a1a]">Total</td>
+              <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
+                {formatCHF(summary.totals.total)}
+              </td>
+              <td className="px-6 py-4 text-right font-bold text-[#651A1A] tabular-nums text-base">
+                {formatCHF(summary.totals.commission)}
+              </td>
+            </tr>
+          </tfoot>
+        )}
+      </table>
+    </div>
+  )
+}
+
+/* ───────────── Admin table (full details, expandable rows via <details>) ───────────── */
+
+function AdminOrdersTable({ summary }: { summary: SalesSummary }) {
+  if (summary.rows.length === 0) {
+    return (
+      <div className="px-6 py-16 text-center">
+        <ShoppingBag className="w-10 h-10 text-[#E6D5C0] mx-auto mb-3" />
+        <p className="text-stone-500 text-sm">No orders this month yet</p>
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm">
+          <thead>
+            <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
+              <th className="text-left px-6 py-3 font-medium">Date</th>
+              <th className="text-left px-6 py-3 font-medium">Customer</th>
+              <th className="text-left px-6 py-3 font-medium">Delivery</th>
+              <th className="text-right px-6 py-3 font-medium">Total</th>
+              <th className="text-right px-6 py-3 font-medium">Net</th>
+              <th className="text-right px-6 py-3 font-medium">5%</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#F5E6D3]">
+            {summary.rows.map((r) => (
+              <AdminOrderRow key={r.id} row={r} />
+            ))}
+          </tbody>
+          <tfoot className="bg-[#FFFCF8] border-t border-[#E6D5C0]">
+            <tr className="text-sm">
+              <td className="px-6 py-4 font-semibold text-[#1a1a1a]" colSpan={3}>
+                Total
+              </td>
+              <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
+                {formatCHF(summary.totals.total)}
+              </td>
+              <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
+                {formatCHF(summary.totals.base)}
+              </td>
+              <td className="px-6 py-4 text-right font-bold text-[#651A1A] tabular-nums text-base">
+                {formatCHF(summary.totals.commission)}
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </>
+  )
+}
+
+function AdminOrderRow({ row }: { row: SaleRow }) {
+  return (
+    <tr className="hover:bg-[#FFFCF8] transition-colors align-top">
+      <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
+        <div>{formatDate(row.date)}</div>
+        <div className="text-xs text-stone-400">{formatTime(row.date)}</div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="font-medium text-[#1a1a1a]">{row.customerName}</div>
+        {row.customerEmail && (
+          <div className="text-xs text-stone-500 flex items-center gap-1 mt-0.5">
+            <Mail className="w-3 h-3" />
+            {row.customerEmail}
+          </div>
+        )}
+        {row.customerPhone && (
+          <div className="text-xs text-stone-500 flex items-center gap-1 mt-0.5">
+            <Phone className="w-3 h-3" />
+            {row.customerPhone}
+          </div>
+        )}
+        {(row.address || row.city) && (
+          <div className="text-xs text-stone-500 flex items-start gap-1 mt-0.5">
+            <MapPin className="w-3 h-3 mt-0.5 flex-shrink-0" />
+            <span>
+              {row.address}
+              {row.address && (row.postalCode || row.city) ? ', ' : ''}
+              {row.postalCode} {row.city}
+              {row.kanton ? ` (${row.kanton})` : ''}
+            </span>
+          </div>
+        )}
+        {row.items.length > 0 && (
+          <details className="mt-2">
+            <summary className="text-xs text-[#651A1A] cursor-pointer hover:underline select-none">
+              {row.items.length} item{row.items.length === 1 ? '' : 's'}
+            </summary>
+            <ul className="mt-1 text-xs text-stone-600 space-y-0.5 pl-4">
+              {row.items.map((it, idx) => (
+                <li key={idx}>
+                  • {it.name}
+                  {it.size ? ` (${it.size})` : ''} × {it.quantity}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </td>
+      <td className="px-6 py-4 text-xs text-stone-600 whitespace-nowrap">
+        {row.deliveryDate && (
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3 h-3" />
+            {row.deliveryDate}
+          </div>
+        )}
+        {row.deliveryTime && <div className="text-stone-400 mt-0.5">{row.deliveryTime}</div>}
+      </td>
+      <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums whitespace-nowrap">
+        {formatCHF(row.total)}
+      </td>
+      <td className="px-6 py-4 text-right text-stone-700 tabular-nums whitespace-nowrap">
+        {formatCHF(row.base)}
+      </td>
+      <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums whitespace-nowrap">
+        {formatCHF(row.commission)}
+      </td>
+    </tr>
+  )
+}
+
+/* ───────────── Stat card with delta ───────────── */
+
 function StatCard({
   icon,
   label,
   value,
+  delta,
+  deltaLabel,
   highlight,
 }: {
   icon: React.ReactNode
   label: string
   value: string
+  delta: DeltaResult
+  deltaLabel: string
   highlight?: boolean
 }) {
+  const deltaColor =
+    delta.direction === 'up'
+      ? highlight
+        ? 'text-emerald-200'
+        : 'text-emerald-600'
+      : delta.direction === 'down'
+        ? highlight
+          ? 'text-rose-200'
+          : 'text-rose-600'
+        : highlight
+          ? 'text-[#F5E6D3]/70'
+          : 'text-stone-400'
+
+  const DeltaIcon =
+    delta.direction === 'up' ? ArrowUpRight : delta.direction === 'down' ? ArrowDownRight : Minus
+
+  const pctText =
+    delta.pct === null
+      ? 'New'
+      : delta.direction === 'flat'
+        ? '0%'
+        : `${delta.pct > 0 ? '+' : ''}${delta.pct.toFixed(0)}%`
+
   return (
     <div
       className={`relative rounded-xl border p-5 transition ${
@@ -295,6 +485,13 @@ function StatCard({
         }`}
       >
         {value}
+      </div>
+      <div className={`flex items-center gap-1 text-xs mt-2 ${deltaColor}`}>
+        <DeltaIcon className="w-3.5 h-3.5" />
+        <span className="font-medium tabular-nums">{pctText}</span>
+        <span className={`ml-1 ${highlight ? 'text-[#F5E6D3]/60' : 'text-stone-400'}`}>
+          {deltaLabel}
+        </span>
       </div>
     </div>
   )
