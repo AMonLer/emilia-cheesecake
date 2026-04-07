@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
         deliveryTime: orderData?.deliveryTime || '',
         discountCode: orderData?.discountCode || '',
         discountPercent: discountPercent ? String(discountPercent) : '',
+        subtotal: subtotal ? subtotal.toFixed(2) : '',
+        shippingCost: shippingCost ? shippingCost.toFixed(2) : '',
         items: JSON.stringify(orderData?.items || []),
       },
     })
