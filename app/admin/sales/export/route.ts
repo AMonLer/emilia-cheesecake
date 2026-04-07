@@ -15,7 +15,7 @@ function csvEscape(value: string | number): string {
 export async function GET(req: NextRequest) {
   const session = getSession()
   if (!session) {
-    return NextResponse.redirect(new URL('/admin/login?next=/admin/ventas', req.url))
+    return NextResponse.redirect(new URL('/admin/login?next=/admin/sales', req.url))
   }
 
   const monthParam = req.nextUrl.searchParams.get('month')
@@ -28,16 +28,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: err.message || 'Error' }, { status: 500 })
   }
 
-  const header = ['Fecha', 'Cliente', 'Total CHF', 'Envio CHF', 'Base CHF', 'Comision 5% CHF']
+  const header = ['Date', 'Customer', 'Total CHF', 'Shipping CHF', 'Net CHF', 'Commission 5% CHF']
   const lines: string[] = [header.join(',')]
 
-  const dateFmt = new Intl.DateTimeFormat('de-CH', {
+  const dateFmt = new Intl.DateTimeFormat('en-GB', {
     timeZone: 'Europe/Zurich',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   })
 
   for (const row of summary.rows) {
@@ -58,7 +59,7 @@ export async function GET(req: NextRequest) {
   lines.push(
     [
       'TOTAL',
-      `(${summary.totals.count} pedidos)`,
+      `(${summary.totals.count} orders)`,
       summary.totals.total.toFixed(2),
       summary.totals.shipping.toFixed(2),
       summary.totals.base.toFixed(2),
@@ -73,7 +74,7 @@ export async function GET(req: NextRequest) {
     status: 200,
     headers: {
       'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="ventas-emilia-${month}.csv"`,
+      'Content-Disposition': `attachment; filename="emilia-sales-${month}.csv"`,
       'Cache-Control': 'no-store',
     },
   })

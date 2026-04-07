@@ -23,14 +23,14 @@ export default function LoginForm() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error || 'Error de login')
+        setError(data.error || 'Login failed')
         return
       }
-      const next = searchParams.get('next') || '/admin/ventas'
+      const next = searchParams.get('next') || '/admin/sales'
       router.push(next)
       router.refresh()
     } catch (err: any) {
-      setError(err.message || 'Error de red')
+      setError(err.message || 'Network error')
     } finally {
       setLoading(false)
     }
@@ -40,7 +40,7 @@ export default function LoginForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-          Usuario
+          Username
         </label>
         <input
           id="username"
@@ -55,7 +55,7 @@ export default function LoginForm() {
 
       <div>
         <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-          Contraseña
+          Password
         </label>
         <input
           id="password"
@@ -79,7 +79,7 @@ export default function LoginForm() {
         disabled={loading}
         className="w-full bg-pink-500 hover:bg-pink-600 disabled:opacity-50 text-white font-medium py-2 rounded-md text-sm transition"
       >
-        {loading ? 'Entrando…' : 'Entrar'}
+        {loading ? 'Signing in…' : 'Sign in'}
       </button>
     </form>
   )
