@@ -25,11 +25,19 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // List all env var names that start with ADMIN or PARTNER, to catch typos
+  const allKeys = Object.keys(process.env)
+    .filter((k) => /^(ADMIN|PARTNER)/i.test(k))
+    .sort()
+
   return NextResponse.json({
-    ADMIN_USER: inspect('ADMIN_USER'),
-    ADMIN_PASS: inspect('ADMIN_PASS'),
-    PARTNER_USER: inspect('PARTNER_USER'),
-    PARTNER_PASS: inspect('PARTNER_PASS'),
-    ADMIN_SESSION_SECRET: { set: !!secret, length: secret.length },
+    expected: {
+      ADMIN_USER: inspect('ADMIN_USER'),
+      ADMIN_PASS: inspect('ADMIN_PASS'),
+      PARTNER_USER: inspect('PARTNER_USER'),
+      PARTNER_PASS: inspect('PARTNER_PASS'),
+      ADMIN_SESSION_SECRET: { set: !!secret, length: secret.length },
+    },
+    allMatchingKeys: allKeys,
   })
 }
