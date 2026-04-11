@@ -49,12 +49,12 @@ export default function AdminNotificationEmail({
   return (
     <Html>
       <Head />
-      <Preview>🎉 Nuevo Pedido - {customerName}</Preview>
+      <Preview>🎉 Neue Bestellung - {customerName}</Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Heading style={headerTitle}>🎉 Nuevo Pedido Recibido</Heading>
+            <Heading style={headerTitle}>🎉 Neue Bestellung erhalten</Heading>
           </Section>
 
           {/* Content */}
@@ -62,23 +62,23 @@ export default function AdminNotificationEmail({
             {/* Customer Info */}
             <Section style={infoBox}>
               <Heading as="h2" style={sectionTitle}>
-                Información del Cliente
+                Kundeninformationen
               </Heading>
               <Text style={detailText}>
-                <strong>Nombre:</strong> {customerName}
+                <strong>Name:</strong> {customerName}
               </Text>
               <Text style={detailText}>
-                <strong>Email:</strong> {customerEmail}
+                <strong>E-Mail:</strong> {customerEmail}
               </Text>
               <Text style={detailText}>
-                <strong>Teléfono:</strong> {phone}
+                <strong>Telefon:</strong> {phone}
               </Text>
             </Section>
 
             {/* Delivery Address */}
             <Section style={infoBox}>
               <Heading as="h2" style={sectionTitle}>
-                Dirección de Entrega
+                Lieferadresse
               </Heading>
               <Text style={addressText}>
                 {address}
@@ -92,20 +92,20 @@ export default function AdminNotificationEmail({
             {/* Delivery Details */}
             <Section style={infoBox}>
               <Heading as="h2" style={sectionTitle}>
-                Detalles de Entrega
+                Lieferdetails
               </Heading>
               <Text style={detailText}>
-                <strong>Fecha:</strong> {deliveryDate}
+                <strong>Datum:</strong> {deliveryDate}
               </Text>
               <Text style={detailText}>
-                <strong>Hora:</strong> {deliveryTime}
+                <strong>Uhrzeit:</strong> {deliveryTime}
               </Text>
             </Section>
 
             {/* Products */}
             <Section style={infoBox}>
               <Heading as="h2" style={sectionTitle}>
-                Productos
+                Produkte
               </Heading>
               {items.map((item, index) => (
                 <Section key={index} style={productRow}>
@@ -114,7 +114,7 @@ export default function AdminNotificationEmail({
                     {item.size && <span> ({item.size} Personen)</span>}
                     <br />
                     <span style={productDetails}>
-                      Cantidad: {item.quantity} - CHF{' '}
+                      Menge: {item.quantity} - CHF{' '}
                       {(item.price * item.quantity).toFixed(2)}
                     </span>
                   </Text>
@@ -122,31 +122,31 @@ export default function AdminNotificationEmail({
               ))}
               <Hr style={divider} />
               <Text style={totalText}>
-                <strong>Total: CHF {amount.toFixed(2)}</strong>
+                <strong>Gesamt: CHF {amount.toFixed(2)}</strong>
               </Text>
             </Section>
 
             {/* Payment Info */}
             <Section style={infoBox}>
               <Heading as="h2" style={sectionTitle}>
-                Pago
+                Zahlung
               </Heading>
               <Text style={detailText}>
-                <strong>Total:</strong> CHF {amount.toFixed(2)}
+                <strong>Gesamt:</strong> CHF {amount.toFixed(2)}
               </Text>
               <Text style={detailText}>
-                <strong>Método:</strong> {paymentMethod}
+                <strong>Methode:</strong> {paymentMethod}
               </Text>
               <Text style={detailText}>
-                <strong>ID de Pago:</strong> {orderId}
+                <strong>Zahlungs-ID:</strong> {orderId}
               </Text>
             </Section>
 
             {/* Action Note */}
             <Section style={actionBox}>
               <Text style={actionText}>
-                ⚠️ <strong>Acción requerida:</strong> Preparar pedido para{' '}
-                {deliveryDate} entre {deliveryTime}
+                ⚠️ <strong>Aktion erforderlich:</strong> Bestellung vorbereiten für{' '}
+                {deliveryDate} zwischen {deliveryTime}
               </Text>
             </Section>
           </Section>
@@ -154,7 +154,7 @@ export default function AdminNotificationEmail({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              Este es un email automático generado por el sistema de pedidos.
+              Dies ist eine automatische E-Mail vom Bestellsystem.
             </Text>
           </Section>
         </Container>

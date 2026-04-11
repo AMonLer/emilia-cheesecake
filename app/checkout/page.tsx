@@ -157,7 +157,7 @@ export default function CheckoutPage() {
     const upsellProduct = {
       id: `clasica-upsell-${Date.now()}`,
       name: "CLASSIC",
-      price: 16.11, // Discounted upsell price (10% off 17.90)
+      price: 12.51, // Discounted upsell price (10% off 13.90)
       size: "2-3",
       image: "/original3.png",
       quantity: 1
@@ -780,8 +780,8 @@ export default function CheckoutPage() {
                     <p className="text-sm font-bold">CLASSIC (2-3 Personen)</p>
                     <p className="text-xs text-gray-600">(10% RABATT)</p>
                     <p className="text-sm">
-                      <span className="font-bold"><PriceDisplay amount={16.11} showCurrency={false} className="text-sm" /> CHF</span>{" "}
-                      <span className="text-gray-500 line-through"><PriceDisplay amount={17.90} showCurrency={false} className="text-sm" /> CHF</span>
+                      <span className="font-bold"><PriceDisplay amount={12.51} showCurrency={false} className="text-sm" /> CHF</span>{" "}
+                      <span className="text-gray-500 line-through"><PriceDisplay amount={13.90} showCurrency={false} className="text-sm" /> CHF</span>
                     </p>
                   </div>
                   <button

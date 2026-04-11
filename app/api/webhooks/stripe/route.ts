@@ -169,7 +169,7 @@ ${productsText}
       await resend.emails.send({
         from: process.env.EMAIL_FROM || 'info@emilialab.com',
         to: process.env.EMAIL_TO || 'info@emilialab.com',
-        subject: `🎉 Nuevo Pedido - ${metadata.customerName || 'Cliente'}`,
+        subject: `🎉 Neue Bestellung - ${metadata.customerName || 'Kunde'}`,
         html: adminEmailHtml,
       })
 

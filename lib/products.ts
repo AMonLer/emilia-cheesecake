@@ -2,8 +2,8 @@ export const products: { [key: string]: any } = {
     "pistacho": {
         name: "PISTACHIO",
         prices: {
-            "8-10": 55.90,  // CHF for 8-10 people
-            "2-3": 21.90    // CHF for 2-3 people
+            "8-10": 47.90,  // CHF for 8-10 people
+            "2-3": 16.90    // CHF for 2-3 people
         },
         description: "Unser Bestseller. Echte Pistaziencreme, zarte Textur und ein grüner, eleganter und ausgewogener Geschmack. Delikat, aromatisch und süchtig machend.",
         images: ["/pistacho1.png", "/pistacho2.png"],
@@ -15,13 +15,13 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "CLASSIC",
-                price: 49.90,
+                price: 40.90,
                 image: "/original1.png"
             },
             {
                 id: 2,
                 name: "SCHOGGI",
-                price: 51.90,
+                price: 42.90,
                 image: "/chocolate1.png"
             }
         ]
@@ -29,8 +29,8 @@ export const products: { [key: string]: any } = {
     "lotus": {
         name: "LOTUS",
         prices: {
-            "8-10": 53.90,
-            "2-3": 19.90
+            "8-10": 42.90,
+            "2-3": 14.90
         },
         description: "Die süßeste aus der Kollektion. Karamell, sanfte Gewürze und eine umhüllende Creme, die jeden Bissen in puren Komfort verwandelt.",
         images: ["/lotus1.png", "/lotus2.png"],
@@ -42,13 +42,13 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "PISTACHIO",
-                price: 55.90,
+                price: 47.90,
                 image: "/pistacho1.png"
             },
             {
                 id: 2,
                 name: "DULCE DE LECHE",
-                price: 52.90,
+                price: 43.90,
                 image: "/cafe1.png"
             }
         ]
@@ -56,8 +56,8 @@ export const products: { [key: string]: any } = {
     "chocolate": {
         name: "SCHOGGI",
         prices: {
-            "8-10": 51.90,
-            "2-3": 18.90
+            "8-10": 42.90,
+            "2-3": 14.90
         },
         description: "Cremige Schweizer Schokolade mit einem tiefen Geschmack, der umhüllt, ohne zu überwältigen. Eine perfekte Balance zwischen Intensität und Sanftheit.",
         images: ["/chocolate1.png", "/chocolate2.png"],
@@ -69,13 +69,13 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "DULCE DE LECHE",
-                price: 52.90,
+                price: 43.90,
                 image: "/cafe1.png"
             },
             {
                 id: 2,
                 name: "CLASSIC",
-                price: 49.90,
+                price: 40.90,
                 image: "/original1.png"
             }
         ]
@@ -83,8 +83,8 @@ export const products: { [key: string]: any } = {
     "original": {
         name: "CLASSIC",
         prices: {
-            "8-10": 49.90,
-            "2-3": 17.90
+            "8-10": 40.90,
+            "2-3": 13.90
         },
         description: "Das Rezept, mit dem alles begann. Cremig, seidig und im baskischen Stil gebacken. Pure Emilia-Essenz: einfach, perfekt, unvergesslich.",
         images: ["/original1.png", "/original2.png"],
@@ -96,13 +96,13 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "PISTACHIO",
-                price: 55.90,
+                price: 47.90,
                 image: "/pistacho1.png"
             },
             {
                 id: 2,
                 name: "LOTUS",
-                price: 53.90,
+                price: 42.90,
                 image: "/lotus1.png"
             }
         ]
@@ -110,8 +110,8 @@ export const products: { [key: string]: any } = {
     "cafe": {
         name: "DULCE DE LECHE",
         prices: {
-            "8-10": 52.90,
-            "2-3": 20.90
+            "8-10": 43.90,
+            "2-3": 15.40
         },
         description: "Cremiges Dulce de Leche mit zartem Karamell und einer verführerischen Süße. Eine lateinamerikanische Köstlichkeit, die jeden Bissen zu einem unvergesslichen Erlebnis macht.",
         images: ["/cafe1.png", "/cafe2.png"],
@@ -123,13 +123,13 @@ export const products: { [key: string]: any } = {
             {
                 id: 1,
                 name: "SCHOGGI",
-                price: 51.90,
+                price: 42.90,
                 image: "/chocolate1.png"
             },
             {
                 id: 2,
                 name: "PISTACHIO",
-                price: 55.90,
+                price: 47.90,
                 image: "/pistacho1.png"
             }
         ]

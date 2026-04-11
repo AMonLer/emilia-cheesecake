@@ -248,6 +248,7 @@ function PartnerOrdersTable({ summary }: { summary: SalesSummary }) {
         <thead>
           <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
             <th className="text-left px-6 py-3 font-medium">Date</th>
+            <th className="text-left px-6 py-3 font-medium">Items</th>
             <th className="text-right px-6 py-3 font-medium">Total</th>
             <th className="text-right px-6 py-3 font-medium">Your 5%</th>
           </tr>
@@ -255,22 +256,41 @@ function PartnerOrdersTable({ summary }: { summary: SalesSummary }) {
         <tbody className="divide-y divide-[#F5E6D3]">
           {summary.rows.length === 0 && (
             <tr>
-              <td colSpan={3} className="px-6 py-16 text-center">
+              <td colSpan={4} className="px-6 py-16 text-center">
                 <ShoppingBag className="w-10 h-10 text-[#E6D5C0] mx-auto mb-3" />
                 <p className="text-stone-500 text-sm">No orders this month yet</p>
               </td>
             </tr>
           )}
           {summary.rows.map((r) => (
-            <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors">
+            <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors align-top">
               <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
                 <div>{formatDate(r.date)}</div>
                 <div className="text-xs text-stone-400">{formatTime(r.date)}</div>
               </td>
-              <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums">
+              <td className="px-6 py-4">
+                {r.items.length > 0 ? (
+                  <details>
+                    <summary className="text-xs text-[#651A1A] cursor-pointer hover:underline select-none">
+                      {r.items.length} item{r.items.length === 1 ? '' : 's'}
+                    </summary>
+                    <ul className="mt-1 text-xs text-stone-600 space-y-0.5 pl-4">
+                      {r.items.map((it, idx) => (
+                        <li key={idx}>
+                          • {it.name}
+                          {it.size ? ` (${it.size})` : ''} × {it.quantity}
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                ) : (
+                  <span className="text-xs text-stone-400">—</span>
+                )}
+              </td>
+              <td className="px-6 py-4 text-right text-[#1a1a1a] tabular-nums whitespace-nowrap">
                 {formatCHF(r.total)}
               </td>
-              <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums">
+              <td className="px-6 py-4 text-right font-semibold text-[#651A1A] tabular-nums whitespace-nowrap">
                 {formatCHF(r.commission)}
               </td>
             </tr>
@@ -279,7 +299,9 @@ function PartnerOrdersTable({ summary }: { summary: SalesSummary }) {
         {summary.rows.length > 0 && (
           <tfoot className="bg-[#FFFCF8] border-t border-[#E6D5C0]">
             <tr className="text-sm">
-              <td className="px-6 py-4 font-semibold text-[#1a1a1a]">Total</td>
+              <td className="px-6 py-4 font-semibold text-[#1a1a1a]" colSpan={2}>
+                Total
+              </td>
               <td className="px-6 py-4 text-right font-semibold text-[#1a1a1a] tabular-nums">
                 {formatCHF(summary.totals.total)}
               </td>
