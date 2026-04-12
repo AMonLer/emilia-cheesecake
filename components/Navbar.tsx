@@ -12,9 +12,6 @@ import PriceDisplay from '@/components/PriceDisplay'
 export default function Navbar() {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [language, setLanguage] = useState<'DE' | 'EN'>('DE')
-  const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false)
-
   const {
     cartItems,
     isCartOpen,
@@ -41,7 +38,7 @@ export default function Navbar() {
                 href="/uber-uns"
                 className="group relative text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
               >
-                {language === 'DE' ? 'Über Uns' : 'About Us'}
+                Über Uns
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />
               </Link>
             </div>
@@ -60,47 +57,6 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-6 flex-1 justify-end">
-              {/* Language Selector */}
-              <div className="hidden md:block relative group">
-                <button
-                  onClick={() => setIsLanguageDropdownOpen(!isLanguageDropdownOpen)}
-                  className="text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-widest flex items-center gap-1"
-                >
-                  {language}
-                  <span className="w-1 h-1 rounded-full bg-[#D4AF85] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </button>
-                {isLanguageDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setIsLanguageDropdownOpen(false)}
-                    />
-                    <div className="absolute right-0 top-full mt-4 bg-[#651A1A] border border-[#8B3A3A] rounded-xl shadow-xl z-20 min-w-[100px] overflow-hidden py-2">
-                      <button
-                        onClick={() => {
-                          setLanguage('DE')
-                          setIsLanguageDropdownOpen(false)
-                        }}
-                        className={`block w-full text-left px-6 py-2 text-xs tracking-widest hover:bg-white/5 transition-colors ${language === 'DE' ? 'text-white font-bold' : 'text-[#F5E6D3]/70'
-                          }`}
-                      >
-                        DE
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLanguage('EN')
-                          setIsLanguageDropdownOpen(false)
-                        }}
-                        className={`block w-full text-left px-6 py-2 text-xs tracking-widest hover:bg-white/5 transition-colors ${language === 'EN' ? 'text-white font-bold' : 'text-[#F5E6D3]/70'
-                          }`}
-                      >
-                        EN
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-
               {/* Shopping Bag */}
               <Button
                 variant="ghost"
