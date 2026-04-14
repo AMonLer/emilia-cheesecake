@@ -8,18 +8,24 @@ export default function StorySection() {
                             Die Geschichte von <br />EMILIA
                         </h2>
                         <div className="space-y-6 text-lg leading-relaxed text-gray-700 font-light">
-                            <p>
-                                Im Norden Spaniens, in den engen Gassen von <span className="font-medium text-[#651A1A]">San Sebastián</span> – wo die Luft nach frisch gebackenem Brot und karamellisiertem Zucker duftet – entdeckten wir den <span className="font-medium text-[#651A1A]">perfekten baskischen Käsekuchen</span>. Cremig, mit der charakteristischen dunklen Oberfläche und einer Textur, die auf der Zunge zergeht.
+                            <p className="text-xl md:text-2xl font-medium text-[#651A1A]">
+                                Cheesecake war für mich schon immer eine Obsession.
                             </p>
                             <p>
-                                Wir wussten sofort: Diesen Geschmack müssen wir nach <span className="font-medium text-[#651A1A]">Zürich</span> bringen. Aber nicht als bloße Kopie. Wir wollten das <span className="font-medium text-[#651A1A]">Original ehren</span>, respektieren und ihm unsere <span className="font-medium text-[#651A1A]">eigene Handschrift</span> verleihen.
+                                Als Kind habe ich ihn für meine <span className="font-medium text-[#651A1A]">Familie und Freunde</span> gebacken — immer auf der Suche nach diesem <span className="font-medium text-[#651A1A]">Moment der Stille</span> nach dem ersten Bissen.
+                            </p>
+                            <p>
+                                Als Erwachsene führte mich diese Leidenschaft dazu, zu studieren, zu lesen und nach <span className="font-medium text-[#651A1A]">Spanien</span> zu reisen, um die bekanntesten Basque Cheesecakes zu probieren — in <span className="font-medium text-[#651A1A]">Madrid</span>, <span className="font-medium text-[#651A1A]">San Sebastián</span> und <span className="font-medium text-[#651A1A]">Bilbao</span> — und jedes Detail des perfekten Rezepts zu verstehen.
+                            </p>
+                            <p>
+                                So entstand <span className="font-medium text-[#651A1A]">Emilia</span>, hier in <span className="font-medium text-[#651A1A]">Zürich</span>.
+                            </p>
+                            <p>
+                                Ein Cheesecake aus Zutaten, die zählen: <span className="font-medium text-[#651A1A]">spanischer Käse</span> mit Herkunft, <span className="font-medium text-[#651A1A]">Pistazien aus Gaziantep</span> (die besten der Welt), <span className="font-medium text-[#651A1A]">Schweizer Schokolade</span> und <span className="font-medium text-[#651A1A]">Eier von einem Hof in Dietikon</span> — meinem Zuhause.
                             </p>
                             <div className="pl-6 border-l-4 border-[#651A1A]/20 italic text-gray-600">
-                                "Nach unzähligen Versuchen, Rezeptanpassungen und schlaflosen Nächten in unserer kleinen Küche entstand <span className="font-medium text-[#651A1A]">EMILIA</span>."
+                                Immer auf der Suche nach dem Cheesecake, den ich selbst gerne bekommen würde. 🧡
                             </div>
-                            <p>
-                                Eine wahre Hommage an <span className="font-medium text-[#651A1A]">Tradition</span> und <span className="font-medium text-[#651A1A]">echtes Handwerk</span>.
-                            </p>
                         </div>
                     </div>
                 </div>
