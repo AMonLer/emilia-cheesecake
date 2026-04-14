@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronRight, ChevronLeft, X } from "lucide-react"
@@ -112,6 +112,18 @@ export default function CheckoutPage() {
   ])
 
   const isPostalCodeValid = (code: string) => allowedPostalCodes.has(code.trim())
+
+  // Meta Pixel: InitiateCheckout
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).fbq && cartItems.length > 0) {
+      ;(window as any).fbq('track', 'InitiateCheckout', {
+        content_ids: cartItems.map(item => item.name),
+        num_items: cartItems.length,
+        value: totalPrice,
+        currency: 'CHF',
+      })
+    }
+  }, [])
 
   // Calculate minimum delivery date (36 hours from now)
   const minDeliveryDate = useMemo(() => addHours(new Date(), 36), [])

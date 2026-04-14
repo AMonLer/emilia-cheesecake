@@ -8,6 +8,7 @@ import Image from "next/image"
 declare global {
   interface Window {
     gtag: (...args: any[]) => void
+    fbq: (...args: any[]) => void
   }
 }
 
@@ -21,6 +22,16 @@ function PaymentSuccessContent() {
     // Get order value from localStorage
     const orderValue = localStorage.getItem('emilia-order-value')
     const value = orderValue ? parseFloat(orderValue) : 60.0
+
+    // Meta Pixel: Purchase
+    if (typeof window !== 'undefined' && window.fbq) {
+      const eventId = `purchase-${paymentIntent || Date.now()}`
+      window.fbq('track', 'Purchase', {
+        value: value,
+        currency: 'CHF',
+        content_type: 'product',
+      }, { eventID: eventId })
+    }
 
     // Send Google Ads conversion event
     if (typeof window !== 'undefined' && window.gtag) {

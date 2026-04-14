@@ -8,7 +8,15 @@ import ProductGallery from "@/components/product/ProductGallery"
 import ProductInfo from "@/components/product/ProductInfo"
 import RelatedProducts from "@/components/product/RelatedProducts"
 
+declare global {
+  interface Window {
+    fbq: (...args: any[]) => void
+  }
+}
+
 export default function ProductPage({ params }: { params: { slug: string } }) {
+  const product = products[params.slug]
+
   useEffect(() => {
     // Disable browser scroll restoration so it doesn't override our scroll
     if ('scrollRestoration' in history) {
@@ -18,12 +26,23 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     // Fallback for browsers that restore scroll after paint
     const raf = requestAnimationFrame(() => window.scrollTo(0, 0))
     const timer = setTimeout(() => window.scrollTo(0, 0), 100)
+
+    // Meta Pixel: ViewContent
+    if (product && typeof window !== 'undefined' && window.fbq) {
+      window.fbq('track', 'ViewContent', {
+        content_name: product.name,
+        content_ids: [params.slug],
+        content_type: 'product',
+        value: product.prices['8-10'],
+        currency: 'CHF',
+      })
+    }
+
     return () => {
       cancelAnimationFrame(raf)
       clearTimeout(timer)
     }
-  }, [params.slug])
-  const product = products[params.slug]
+  }, [params.slug, product])
 
   if (!product) {
     return (

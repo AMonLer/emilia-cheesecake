@@ -7,6 +7,12 @@ import { Check, CheckCircle, CreditCard } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
 
+declare global {
+  interface Window {
+    fbq: (...args: any[]) => void
+  }
+}
+
 interface ProductInfoProps {
     product: any
     slug: string
@@ -34,6 +40,17 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         }
 
         addToCartContext(newItem)
+
+        // Meta Pixel: AddToCart
+        if (typeof window !== 'undefined' && window.fbq) {
+            window.fbq('track', 'AddToCart', {
+                content_name: product.name,
+                content_ids: [slug],
+                content_type: 'product',
+                value: product.prices[selectedSize],
+                currency: 'CHF',
+            })
+        }
     }
 
     if (compact === "top") {

@@ -4,6 +4,53 @@ import { Resend } from 'resend'
 import { render } from '@react-email/render'
 import OrderConfirmationEmail from '@/emails/OrderConfirmation'
 import AdminNotificationEmail from '@/emails/AdminNotification'
+import crypto from 'crypto'
+
+const META_PIXEL_ID = '26409977948633382'
+const META_ACCESS_TOKEN = process.env.META_CAPI_ACCESS_TOKEN || ''
+
+async function sendMetaCAPI(eventName: string, eventId: string, amount: number, email?: string) {
+  if (!META_ACCESS_TOKEN) {
+    console.warn('Meta CAPI: no access token configured, skipping')
+    return
+  }
+
+  const eventData: any = {
+    event_name: eventName,
+    event_time: Math.floor(Date.now() / 1000),
+    event_id: eventId,
+    action_source: 'website',
+    event_source_url: 'https://www.emilialab.com/payment-success',
+    user_data: {},
+    custom_data: {
+      value: amount,
+      currency: 'CHF',
+    },
+  }
+
+  if (email) {
+    eventData.user_data.em = [crypto.createHash('sha256').update(email.trim().toLowerCase()).digest('hex')]
+  }
+
+  try {
+    const res = await fetch(`https://graph.facebook.com/v21.0/${META_PIXEL_ID}/events`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        data: [eventData],
+        access_token: META_ACCESS_TOKEN,
+      }),
+    })
+    const result = await res.json()
+    if (res.ok) {
+      console.log('✅ Meta CAPI Purchase enviado:', result)
+    } else {
+      console.error('Meta CAPI error:', result)
+    }
+  } catch (error) {
+    console.error('Meta CAPI fetch error:', error)
+  }
+}
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -174,6 +221,10 @@ ${productsText}
       })
 
       console.log('✅ Emails enviados correctamente')
+
+      // Meta CAPI: Purchase (server-side, deduplicates with browser pixel via eventId)
+      const eventId = `purchase-${paymentIntent.id}`
+      await sendMetaCAPI('Purchase', eventId, amount, metadata.customerEmail)
     } catch (error) {
       console.error('Error enviando emails:', error)
     }
