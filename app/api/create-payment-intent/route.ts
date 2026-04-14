@@ -17,19 +17,14 @@ export async function POST(req: NextRequest) {
     let discountPercent = 0
 
     if (subtotal > 0) {
-      if (rawDiscountCode === 'gratis991199111991110') {
-        // Test code: total = 1 CHF, no shipping
-        finalAmount = 1
-      } else {
-        if (rawDiscountCode === 'holaswitzerland') {
-          discountPercent = subtotal >= 100 ? 15 : 10
-        } else if (subtotal >= 100) {
-          discountPercent = 10
-        }
-
-        const discountValue = subtotal * (discountPercent / 100)
-        finalAmount = subtotal - discountValue + shippingCost
+      if (rawDiscountCode === 'holaswitzerland') {
+        discountPercent = subtotal >= 100 ? 15 : 10
+      } else if (subtotal >= 100) {
+        discountPercent = 10
       }
+
+      const discountValue = subtotal * (discountPercent / 100)
+      finalAmount = subtotal - discountValue + shippingCost
     }
 
     // Crear Payment Intent con metadata del pedido

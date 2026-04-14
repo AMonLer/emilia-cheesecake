@@ -158,14 +158,12 @@ export default function CheckoutPage() {
   // Calculate discount and shipping
   const shippingCost = totalPrice >= 100 ? 0 : 6.90
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
-  const isTestCode = normalizedDiscountCode === "gratis991199111991110"
   const hasCodeDiscount = normalizedDiscountCode === "holaswitzerland"
   const codeDiscountRate = totalPrice >= 100 ? 0.15 : 0.10
   const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
   const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0
-  const discount = isTestCode ? (totalPrice - 1) : hasCodeDiscount ? codeDiscount : automaticDiscount
-  const effectiveShipping = isTestCode ? 0 : shippingCost
-  const finalPrice = totalPrice - discount + effectiveShipping
+  const discount = hasCodeDiscount ? codeDiscount : automaticDiscount
+  const finalPrice = totalPrice - discount + shippingCost
 
   const handleAddUpsellProduct = () => {
     const upsellProduct = {
@@ -227,7 +225,7 @@ export default function CheckoutPage() {
             deliveryTime,
             discountCode: appliedDiscountCode,
             subtotal: totalPrice,
-            shippingCost: effectiveShipping,
+            shippingCost,
             items: cartItems.map(item => ({
               name: item.name,
               quantity: item.quantity,
@@ -726,7 +724,7 @@ export default function CheckoutPage() {
                       setDiscountCodeError("")
                       return
                     }
-                    if (normalized === "holaswitzerland" || normalized === "gratis991199111991110") {
+                    if (normalized === "holaswitzerland") {
                       setAppliedDiscountCode(discountCodeInput.trim())
                       setDiscountCodeError("")
                     } else {
@@ -766,10 +764,10 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between text-sm">
                 <span>Versand</span>
-                {effectiveShipping === 0 ? (
+                {shippingCost === 0 ? (
                   <span className="text-green-600 font-bold">Gratis</span>
                 ) : (
-                  <PriceDisplay amount={effectiveShipping} className="text-sm" />
+                  <PriceDisplay amount={shippingCost} className="text-sm" />
                 )}
               </div>
               <div className="flex justify-between text-lg font-black border-t pt-3">
