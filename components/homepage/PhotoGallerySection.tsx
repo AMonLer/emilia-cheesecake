@@ -1,87 +1,135 @@
 import Image from "next/image"
 import { Instagram } from "lucide-react"
 
-const galleryItems = [
+const galleryItemsRow1 = [
     { src: "/IG1.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG2.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG3.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG4.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG5.jpg", alt: "Pistachio Cheesecake" },
+]
+
+const galleryItemsRow2 = [
     { src: "/IG6.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG7.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG8.jpg", alt: "Emilia Cheesecake" },
     { src: "/IG9.jpg", alt: "Emilia Cheesecake" },
+    { src: "/IG1.jpg", alt: "Pistachio Cheesecake" }, // Reusing one to balance
 ]
 
 export default function PhotoGallerySection() {
     return (
         <section className="py-24 relative overflow-hidden bg-[#F8EBDD]">
             {/* Decorative Background Elements */}
-            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white/60 to-transparent pointer-events-none" />
-            <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-3xl opacity-40 pointer-events-none animate-pulse" />
-            <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#651A1A] rounded-full mix-blend-multiply filter blur-3xl opacity-10 pointer-events-none" />
-
-            <div className="container mx-auto px-4 mb-12 text-center relative">
-                <h2 className="text-4xl md:text-5xl font-black tracking-tight text-[#651A1A] mb-2 uppercase">
-                    Unsere Kreationen
+            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white/60 to-transparent pointer-events-none z-10" />
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-[#EEC8B7]/40 to-transparent rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none" />
+            
+            <div className="container mx-auto px-4 mb-16 text-center relative z-20">
+                <h2 className="text-5xl md:text-6xl font-black tracking-tight text-[#651A1A] mb-2 uppercase">
+                    Unsere <span className="font-serif font-medium italic capitalize text-5xl md:text-7xl text-[#651A1A]/90 tracking-normal inline-block ml-1">Kreationen</span>
                 </h2>
             </div>
 
-            {/* Scrolling Banner */}
-            <div className="relative w-full overflow-hidden py-8">
+            {/* Scrolling Banners */}
+            <div className="relative w-full overflow-hidden py-4 z-20 flex flex-col gap-6 md:gap-10">
                 <style jsx>{`
-                    @keyframes scroll {
+                    @keyframes scrollLeft {
                         0% { transform: translateX(0); }
                         100% { transform: translateX(-50%); }
                     }
-                    .animate-scroll {
-                        animation: scroll 40s linear infinite;
+                    @keyframes scrollRight {
+                        0% { transform: translateX(-50%); }
+                        100% { transform: translateX(0); }
                     }
-                    .animate-scroll:hover {
+                    .animate-scroll-left {
+                        animation: scrollLeft 45s linear infinite;
+                    }
+                    .animate-scroll-right {
+                        animation: scrollRight 45s linear infinite;
+                    }
+                    .scroll-container:hover > div {
                         animation-play-state: paused;
                     }
                 `}</style>
 
-                <div className="flex w-max animate-scroll">
-                    {[...galleryItems, ...galleryItems].map((item, index) => (
-                        <div
-                            key={index}
-                            className="w-[280px] md:w-[350px] px-4 flex-shrink-0 group cursor-pointer"
-                        >
-                            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] mb-6 shadow-xl shadow-[#651A1A]/10 border-[6px] border-white transition-transform duration-500 group-hover:-translate-y-2">
-                                <Image
-                                    src={item.src}
-                                    alt={item.alt}
-                                    fill
-                                    className="object-cover transition-transform duration-700 group-hover:scale-110"
-                                />
-                                {/* Overlay with Instagram Icon */}
-                                <div className="absolute inset-0 bg-[#651A1A]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                                    <div className="bg-white p-4 rounded-full shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-                                        <Instagram className="w-6 h-6 text-[#651A1A]" />
+                {/* Row 1 - Left */}
+                <div className="scroll-container w-full overflow-hidden">
+                    <div className="flex w-max animate-scroll-left">
+                        {[...galleryItemsRow1, ...galleryItemsRow1, ...galleryItemsRow1].map((item, index) => (
+                            <div
+                                key={index}
+                                className="w-[260px] md:w-[320px] px-3 md:px-5 flex-shrink-0 group cursor-pointer"
+                            >
+                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl md:rounded-[2rem] shadow-lg shadow-[#651A1A]/10 transition-all duration-500 group-hover:-translate-y-2 border border-white/50">
+                                    <Image
+                                        src={item.src}
+                                        alt={item.alt}
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    />
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">
+                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex flex-col items-center gap-2">
+                                            <Instagram className="w-8 h-8 text-white drop-shadow-md" strokeWidth={1.5} />
+                                            <span className="text-white text-xs font-semibold tracking-wider uppercase drop-shadow-md">Auf Instagram ansehen</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+                </div>
+
+                {/* Row 2 - Right */}
+                <div className="scroll-container w-full overflow-hidden">
+                    <div className="flex w-max animate-scroll-right">
+                        {[...galleryItemsRow2, ...galleryItemsRow2, ...galleryItemsRow2].map((item, index) => (
+                            <div
+                                key={index}
+                                className="w-[260px] md:w-[320px] px-3 md:px-5 flex-shrink-0 group cursor-pointer"
+                            >
+                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl md:rounded-[2rem] shadow-lg shadow-[#651A1A]/10 transition-all duration-500 group-hover:-translate-y-2 border border-white/50">
+                                    <Image
+                                        src={item.src}
+                                        alt={item.alt}
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                                    />
+                                    {/* Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">
+                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex flex-col items-center gap-2">
+                                            <Instagram className="w-8 h-8 text-white drop-shadow-md" strokeWidth={1.5} />
+                                            <span className="text-white text-xs font-semibold tracking-wider uppercase drop-shadow-md">Auf Instagram ansehen</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 
-            <div className="text-center mt-8 relative z-10">
+            <div className="text-center mt-16 relative z-30">
                 <a
                     href="https://www.instagram.com/emilia.cheesecake/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex flex-col items-center gap-4 group"
                 >
-                    <div className="p-5 rounded-full bg-white shadow-lg shadow-[#651A1A]/10 group-hover:shadow-xl group-hover:shadow-[#651A1A]/20 group-hover:-translate-y-1 transition-all duration-300">
-                        <Instagram className="w-8 h-8 text-[#651A1A]" strokeWidth={1.5} />
+                    <div className="p-6 rounded-full bg-white shadow-xl shadow-[#651A1A]/10 group-hover:shadow-2xl group-hover:shadow-[#651A1A]/20 group-hover:-translate-y-2 transition-all duration-500">
+                        <div className="bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-lg p-px group-hover:scale-110 transition-transform duration-500">
+                            <div className="bg-white rounded-lg p-2">
+                                <Instagram className="w-8 h-8 text-[#651A1A]" strokeWidth={2} />
+                            </div>
+                        </div>
                     </div>
-                    <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#651A1A] group-hover:opacity-70 transition-opacity border-b border-transparent group-hover:border-[#651A1A]/30 pb-0.5">
+                    <span className="text-sm font-bold tracking-[0.2em] uppercase text-[#651A1A] group-hover:text-black transition-colors border-b-2 border-transparent group-hover:border-[#651A1A]/30 pb-1">
                         Folge uns auf Instagram
                     </span>
                 </a>
             </div>
+            
+            <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-white/80 to-transparent pointer-events-none z-10" />
         </section>
     )
 }

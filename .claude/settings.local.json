@@ -62,7 +62,11 @@
       "WebFetch(domain:cheesecakelove.ch)",
       "Bash(npx next build:*)",
       "Bash(npm ls:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(npx tsc:*)",
+      "Bash(rm:*)",
+      "Bash(mv \"The best Basque cheesecake has arrived in Zurich!!! And it is DELICIOUS 😍 \\(giveaway below!!\\)Wit.mp4\" \"zurich_roamer.mp4\")",
+      "Bash(mv \"1776361983501.publer.com.mp4\" \"laviedechloee.mp4\")"
     ],
     "deny": [],
     "ask": []

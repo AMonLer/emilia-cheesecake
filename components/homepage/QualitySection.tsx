@@ -7,10 +7,10 @@ export default function QualitySection() {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
                     {/* Lado izquierdo - Texto */}
-                    <div className="space-y-6 text-center lg:text-left order-2 lg:order-1">
-                        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight text-[#651A1A]">
-                            DEIN CHEESECAKE,
-                            <br className="hidden lg:block" />
+                    <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10">
+                        <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
+                            DEIN <span className="font-serif italic font-medium capitalize text-6xl md:text-7xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1">Cheesecake</span>,
+                            <br />
                             WIE ER SEIN SOLL
                         </h2>
                         <p className="text-base md:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 text-[#651A1A]/80">
@@ -26,13 +26,16 @@ export default function QualitySection() {
                     </div>
 
                     {/* Lado derecho - Imagen */}
-                    <div className="relative h-[400px] lg:h-[600px] w-full order-1 lg:order-2">
-                        <Image
-                            src="/Generated Image January 31, 2026 - 12_00AM.jpeg"
-                            alt="Fall Party Desserts"
-                            fill
-                            className="object-cover rounded-3xl shadow-2xl"
-                        />
+                    <div className="relative h-[400px] lg:h-[600px] w-full order-1 lg:order-2 group">
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-[#F5E6D3] rounded-full filter blur-[80px] opacity-60 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none -z-10" />
+                        <div className="relative w-full h-full transform transition-transform duration-700 group-hover:-translate-y-2">
+                            <Image
+                                src="/Generated Image January 31, 2026 - 12_00AM.jpeg"
+                                alt="Fall Party Desserts"
+                                fill
+                                className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
+                            />
+                        </div>
                         {/* Decorative element */}
                         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
                         <div className="absolute -top-6 -right-6 w-32 h-32 border-4 border-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
