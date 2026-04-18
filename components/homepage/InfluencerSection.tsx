@@ -29,7 +29,7 @@ export default function InfluencerSection() {
                     </span>
                     <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-[#651A1A] tracking-tighter leading-[0.95]">
                         SEEN ON <br className="md:hidden" />
-                        <span className="font-serif font-medium italic text-3xl md:text-5xl lg:text-6xl text-[#651A1A]/90 ml-2 md:ml-3">Instagram</span>
+                        <span className="font-serif font-medium italic text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 ml-2 md:ml-3 py-1">Instagram</span>
                     </h2>
                 </div>
 

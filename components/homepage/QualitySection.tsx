@@ -7,9 +7,9 @@ export default function QualitySection() {
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
                     {/* Lado izquierdo - Texto */}
-                    <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10">
-                        <h2 className="text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
-                            DEIN <span className="font-serif italic font-medium capitalize text-6xl md:text-7xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1">Cheesecake</span>,
+                    <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10 w-full mb-6">
+                        <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
+                            DEIN <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1 py-1">Cheesecake</span>,
                             <br />
                             WIE ER SEIN SOLL
                         </h2>

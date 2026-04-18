@@ -5,9 +5,9 @@ export default function FeaturedProducts() {
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12 max-w-3xl mx-auto">
-                    <h2 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 tracking-tighter leading-[0.95] text-[#651A1A]">
+                    <h2 className="text-4xl md:text-5xl lg:text-7xl font-black mb-6 tracking-tighter leading-[0.95] text-[#651A1A]">
                         UNSERE <br className="md:hidden" />
-                        <span className="font-serif italic font-medium capitalize text-6xl md:text-7xl lg:text-8xl text-[#651A1A]/90 tracking-normal md:ml-1 mt-2 md:mt-0 inline-block">Cheesecakes</span>
+                        <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal md:ml-1 mt-2 md:mt-0 inline-block py-1">Cheesecakes</span>
                     </h2>
                     <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium">
                         Fünf Sorten, alle frisch auf Bestellung gebacken.

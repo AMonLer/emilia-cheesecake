@@ -25,9 +25,9 @@ export default function ProductExperienceSection() {
                     <div className="space-y-8 order-2 text-center">
                         <div className="space-y-4">
                             <h2 className="flex flex-col items-center justify-center font-black tracking-tighter text-[#651A1A] leading-[0.9]">
-                                <span className="text-4xl md:text-5xl lg:text-6xl uppercase">SAN SEBASTIAN</span>
-                                <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-7xl text-[#651A1A]/90 tracking-normal py-1">Cheesecake</span>
-                                <span className="text-2xl md:text-3xl lg:text-4xl uppercase tracking-widest text-[#651A1A]/80 mt-1">AUS ZÜRICH</span>
+                                <span className="text-4xl md:text-5xl lg:text-7xl uppercase">SAN SEBASTIAN</span>
+                                <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal py-1">Cheesecake</span>
+                                <span className="text-3xl md:text-4xl lg:text-5xl uppercase tracking-widest text-[#651A1A]/80 mt-1">AUS ZÜRICH</span>
                             </h2>
                             <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full -mt-2 opacity-30 transform -rotate-1"></div>
                         </div>

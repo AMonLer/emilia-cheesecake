@@ -25,8 +25,8 @@ export default function PhotoGallerySection() {
             <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-[#EEC8B7]/40 to-transparent rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none" />
             
             <div className="container mx-auto px-4 mb-16 text-center relative z-20">
-                <h2 className="text-5xl md:text-6xl font-black tracking-tight text-[#651A1A] mb-2 uppercase">
-                    Unsere <span className="font-serif font-medium italic capitalize text-5xl md:text-7xl text-[#651A1A]/90 tracking-normal inline-block ml-1">Kreationen</span>
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A] mb-2 uppercase">
+                    Unsere <span className="font-serif font-medium italic capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal inline-block ml-1 py-1">Kreationen</span>
                 </h2>
             </div>
 
