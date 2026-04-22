@@ -3,7 +3,8 @@ import { Client } from '@notionhq/client'
 const notion = process.env.NOTION_TOKEN
   ? new Client({ auth: process.env.NOTION_TOKEN })
   : null
-const databaseId = process.env.NOTION_DATABASE_ID
+// NOTION_DATABASE_ID holds the data_source_id (Notion API 2025+)
+const dataSourceId = process.env.NOTION_DATABASE_ID
 
 export type OrderForNotion = {
   paymentIntentId: string
@@ -32,7 +33,7 @@ function parseDeliveryDateTime(deliveryDate: string, deliveryTime: string) {
 }
 
 export async function createOrderInNotion(order: OrderForNotion) {
-  if (!notion || !databaseId) {
+  if (!notion || !dataSourceId) {
     console.warn('Notion no configurado, saltando')
     return
   }
@@ -50,7 +51,7 @@ export async function createOrderInNotion(order: OrderForNotion) {
 
   try {
     await notion.pages.create({
-      parent: { database_id: databaseId },
+      parent: { type: 'data_source_id', data_source_id: dataSourceId } as any,
       properties: {
         Order: {
           title: [
