@@ -4,6 +4,7 @@ import { Resend } from 'resend'
 import { render } from '@react-email/render'
 import OrderConfirmationEmail from '@/emails/OrderConfirmation'
 import AdminNotificationEmail from '@/emails/AdminNotification'
+import { createOrderInNotion } from '@/lib/notion'
 import crypto from 'crypto'
 
 const META_PIXEL_ID = '26409977948633382'
@@ -225,6 +226,22 @@ ${productsText}
       // Meta CAPI: Purchase (server-side, deduplicates with browser pixel via eventId)
       const eventId = `purchase-${paymentIntent.id}`
       await sendMetaCAPI('Purchase', eventId, amount, metadata.customerEmail)
+
+      // Crear pedido en Notion (calendario móvil)
+      await createOrderInNotion({
+        paymentIntentId: paymentIntent.id,
+        customerName: metadata.customerName || '',
+        customerEmail: metadata.customerEmail || '',
+        customerPhone: metadata.customerPhone || '',
+        address: metadata.address || '',
+        postalCode: metadata.postalCode || '',
+        city: metadata.city || '',
+        kanton: metadata.kanton || '',
+        deliveryDate: metadata.deliveryDate || '',
+        deliveryTime: metadata.deliveryTime || '',
+        amount,
+        items,
+      })
     } catch (error) {
       console.error('Error enviando emails:', error)
     }
