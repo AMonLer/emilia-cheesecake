@@ -59,13 +59,13 @@ while (true) {
       continue
     }
     const items = piItems.get(stripeId)
-    const sizeLabel = (s) => (s === '8-10' ? 'Grande' : s === '2-3' ? 'Pequeño' : s)
+    const formatCakeTag = (name, size) => {
+      if (size === '8-10') return `${name.toUpperCase()} GRANDE`
+      if (size === '2-3') return `${name.toLowerCase()} pequeño`
+      return size ? `${name} ${size}` : name
+    }
     const cakeTags = Array.from(
-      new Set(
-        items
-          .filter((i) => i.name)
-          .map((i) => (i.size ? `${i.name} ${sizeLabel(i.size)}` : i.name)),
-      ),
+      new Set(items.filter((i) => i.name).map((i) => formatCakeTag(i.name, i.size))),
     )
     await notion.pages.update({
       page_id: row.id,

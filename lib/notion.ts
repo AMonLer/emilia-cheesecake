@@ -21,10 +21,10 @@ export type OrderForNotion = {
   items: Array<{ name: string; size?: string; quantity: number; price: number }>
 }
 
-function sizeLabel(size: string): string {
-  if (size === '8-10') return 'Grande'
-  if (size === '2-3') return 'Pequeño'
-  return size
+function formatCakeTag(name: string, size?: string): string {
+  if (size === '8-10') return `${name.toUpperCase()} GRANDE`
+  if (size === '2-3') return `${name.toLowerCase()} pequeño`
+  return size ? `${name} ${size}` : name
 }
 
 function parseDeliveryDateTime(deliveryDate: string, deliveryTime: string) {
@@ -52,11 +52,7 @@ export async function createOrderInNotion(order: OrderForNotion) {
     )
     .join('\n')
   const cakeTags = Array.from(
-    new Set(
-      order.items
-        .filter((i) => i.name)
-        .map((i) => (i.size ? `${i.name} ${sizeLabel(i.size)}` : i.name)),
-    ),
+    new Set(order.items.filter((i) => i.name).map((i) => formatCakeTag(i.name, i.size))),
   )
   const fullAddress = [order.address, `${order.postalCode} ${order.city}`.trim(), order.kanton]
     .filter(Boolean)

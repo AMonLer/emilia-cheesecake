@@ -16,16 +16,16 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN })
 const dataSourceId = process.env.NOTION_DATABASE_ID
 
 const desired = [
-  { name: 'PISTACHIO Grande', color: 'green' },
-  { name: 'PISTACHIO Pequeño', color: 'green' },
-  { name: 'LOTUS Grande', color: 'orange' },
-  { name: 'LOTUS Pequeño', color: 'orange' },
-  { name: 'SCHOGGI Grande', color: 'brown' },
-  { name: 'SCHOGGI Pequeño', color: 'brown' },
-  { name: 'CLASSIC Grande', color: 'yellow' },
-  { name: 'CLASSIC Pequeño', color: 'yellow' },
-  { name: 'DULCE DE LECHE Grande', color: 'red' },
-  { name: 'DULCE DE LECHE Pequeño', color: 'red' },
+  { name: 'PISTACHIO GRANDE', color: 'green' },
+  { name: 'pistachio pequeño', color: 'green' },
+  { name: 'LOTUS GRANDE', color: 'orange' },
+  { name: 'lotus pequeño', color: 'orange' },
+  { name: 'SCHOGGI GRANDE', color: 'brown' },
+  { name: 'schoggi pequeño', color: 'brown' },
+  { name: 'CLASSIC GRANDE', color: 'yellow' },
+  { name: 'classic pequeño', color: 'yellow' },
+  { name: 'DULCE DE LECHE GRANDE', color: 'red' },
+  { name: 'dulce de leche pequeño', color: 'red' },
 ]
 
 console.log('🎨 Configurando opciones y colores de Cakes...\n')
@@ -33,12 +33,14 @@ console.log('🎨 Configurando opciones y colores de Cakes...\n')
 const ds = await notion.dataSources.retrieve({ data_source_id: dataSourceId })
 const currentOptions = ds.properties.Cakes.multi_select.options
 
-// Merge: existing options stay (with id), desired ones get the right color
-const merged = [...currentOptions.map((o) => ({ id: o.id, name: o.name, color: o.color }))]
+// Start with all existing options, keyed by case-insensitive name
+const merged = currentOptions.map((o) => ({ id: o.id, name: o.name, color: o.color }))
 
 for (const d of desired) {
-  const existing = merged.find((o) => o.name === d.name)
+  // Case-insensitive match with any existing option
+  const existing = merged.find((o) => o.name.toLowerCase() === d.name.toLowerCase())
   if (existing) {
+    existing.name = d.name // rename to desired case
     existing.color = d.color
   } else {
     merged.push({ name: d.name, color: d.color })
