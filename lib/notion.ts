@@ -45,6 +45,13 @@ export async function createOrderInNotion(order: OrderForNotion) {
         `• ${i.name}${i.size ? ` (${i.size})` : ''} x${i.quantity} — CHF ${(i.price * i.quantity).toFixed(2)}`,
     )
     .join('\n')
+  const cakeTags = Array.from(
+    new Set(
+      order.items
+        .filter((i) => i.name)
+        .map((i) => (i.size ? `${i.name} ${i.size}` : i.name)),
+    ),
+  )
   const fullAddress = [order.address, `${order.postalCode} ${order.city}`.trim(), order.kanton]
     .filter(Boolean)
     .join(', ')
@@ -79,6 +86,9 @@ export async function createOrderInNotion(order: OrderForNotion) {
         Total: { number: order.amount },
         'Stripe ID': {
           rich_text: [{ text: { content: order.paymentIntentId } }],
+        },
+        Cakes: {
+          multi_select: cakeTags.map((name) => ({ name })),
         },
       },
     })
