@@ -33,25 +33,21 @@ console.log('🎨 Configurando opciones y colores de Cakes...\n')
 const ds = await notion.dataSources.retrieve({ data_source_id: dataSourceId })
 const currentOptions = ds.properties.Cakes.multi_select.options
 
-// Start with all existing options, keyed by case-insensitive name
-const merged = currentOptions.map((o) => ({ id: o.id, name: o.name, color: o.color }))
+// Notion doesn't support renaming a multi_select option when the new name
+// differs only in case (treated as duplicate). So drop any existing option
+// that collides case-insensitively with a desired name, then add desireds fresh.
+const desiredNamesLower = new Set(desired.map((d) => d.name.toLowerCase()))
+const kept = currentOptions
+  .filter((o) => !desiredNamesLower.has(o.name.toLowerCase()))
+  .map((o) => ({ id: o.id, name: o.name, color: o.color }))
 
-for (const d of desired) {
-  // Case-insensitive match with any existing option
-  const existing = merged.find((o) => o.name.toLowerCase() === d.name.toLowerCase())
-  if (existing) {
-    existing.name = d.name // rename to desired case
-    existing.color = d.color
-  } else {
-    merged.push({ name: d.name, color: d.color })
-  }
-}
+const final = [...kept, ...desired]
 
 await notion.dataSources.update({
   data_source_id: dataSourceId,
   properties: {
     Cakes: {
-      multi_select: { options: merged },
+      multi_select: { options: final },
     },
   },
 })
