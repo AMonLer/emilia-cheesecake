@@ -21,6 +21,12 @@ export type OrderForNotion = {
   items: Array<{ name: string; size?: string; quantity: number; price: number }>
 }
 
+function sizeLabel(size: string): string {
+  if (size === '8-10') return 'Grande'
+  if (size === '2-3') return 'Pequeño'
+  return size
+}
+
 function parseDeliveryDateTime(deliveryDate: string, deliveryTime: string) {
   const [d, m, y] = deliveryDate.split('.')
   if (!d || !m || !y) return null
@@ -49,7 +55,7 @@ export async function createOrderInNotion(order: OrderForNotion) {
     new Set(
       order.items
         .filter((i) => i.name)
-        .map((i) => (i.size ? `${i.name} ${i.size}` : i.name)),
+        .map((i) => (i.size ? `${i.name} ${sizeLabel(i.size)}` : i.name)),
     ),
   )
   const fullAddress = [order.address, `${order.postalCode} ${order.city}`.trim(), order.kanton]
