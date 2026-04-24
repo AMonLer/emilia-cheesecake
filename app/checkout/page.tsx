@@ -97,7 +97,7 @@ export default function CheckoutPage() {
   const [appliedDiscountCode, setAppliedDiscountCode] = useState("")
   const [discountCodeError, setDiscountCodeError] = useState("")
 
-  // Allowed postal codes within 10km of Zürich center
+  // Allowed postal codes: Zürich agglomeration + Baden (AG)
   const allowedPostalCodes = new Set([
     "8000", "8001", "8002", "8003", "8004", "8005", "8006", "8008", "8010", "8012",
     "8021", "8022", "8024", "8027", "8031", "8032", "8034", "8036", "8037", "8038",
@@ -108,7 +108,8 @@ export default function CheckoutPage() {
     "8106", "8117", "8118", "8121", "8122", "8123", "8125", "8126", "8127", "8134",
     "8135", "8142", "8143", "8152", "8153", "8302", "8303", "8304", "8305", "8306",
     "8600", "8602", "8603", "8700", "8702", "8703", "8800", "8802", "8803", "8901",
-    "8902", "8903", "8904", "8905", "8906", "8952", "8953"
+    "8902", "8903", "8904", "8905", "8906", "8907", "8951", "8952", "8953", "8954", "8955", "8956", "8957",
+    "5400", "5401", "5404", "5405", "5406", "5408"
   ])
 
   const isPostalCodeValid = (code: string) => allowedPostalCodes.has(code.trim())
@@ -156,7 +157,7 @@ export default function CheckoutPage() {
   ]
 
   // Calculate discount and shipping
-  const shippingCost = totalPrice >= 100 ? 0 : 6.90
+  const shippingCost = totalPrice >= 100 ? 0 : 8.40
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
   const hasCodeDiscount = normalizedDiscountCode === "holaswitzerland"
   const codeDiscountRate = totalPrice >= 100 ? 0.15 : 0.10
@@ -169,7 +170,7 @@ export default function CheckoutPage() {
     const upsellProduct = {
       id: `clasica-upsell-${Date.now()}`,
       name: "CLASSIC",
-      price: 12.51, // Discounted upsell price (10% off 13.90)
+      price: 14.31, // Discounted upsell price (10% off 15.90)
       size: "2-3",
       image: "/original3.png",
       quantity: 1
@@ -792,8 +793,8 @@ export default function CheckoutPage() {
                     <p className="text-sm font-bold">CLASSIC (2-3 Personen)</p>
                     <p className="text-xs text-gray-600">(10% RABATT)</p>
                     <p className="text-sm">
-                      <span className="font-bold"><PriceDisplay amount={12.51} showCurrency={false} className="text-sm" /> CHF</span>{" "}
-                      <span className="text-gray-500 line-through"><PriceDisplay amount={13.90} showCurrency={false} className="text-sm" /> CHF</span>
+                      <span className="font-bold"><PriceDisplay amount={14.31} showCurrency={false} className="text-sm" /> CHF</span>{" "}
+                      <span className="text-gray-500 line-through"><PriceDisplay amount={15.90} showCurrency={false} className="text-sm" /> CHF</span>
                     </p>
                   </div>
                   <button
