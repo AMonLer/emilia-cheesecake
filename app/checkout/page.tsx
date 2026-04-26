@@ -145,7 +145,10 @@ export default function CheckoutPage() {
     const decemberDates = eachDayOfInterval({ start: dec20, end: dec31 })
     const januaryDates = eachDayOfInterval({ start: jan1, end: jan6 })
 
-    return [...decemberDates, ...januaryDates]
+    // Block this Thursday (April 30, 2026)
+    const thisThursday = new Date(2026, 3, 30)
+
+    return [...decemberDates, ...januaryDates, thisThursday]
   }, [])
 
   // Generate time slots

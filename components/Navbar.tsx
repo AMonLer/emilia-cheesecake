@@ -219,7 +219,11 @@ export default function Navbar() {
                   </div>
                   <div className="flex items-center justify-between text-sm font-light text-gray-500">
                     <span>Versand</span>
-                    <PriceDisplay amount={6.00} className="text-sm font-bold text-black" />
+                    {totalPrice >= 100 ? (
+                      <span className="text-sm font-bold text-green-600">Gratis</span>
+                    ) : (
+                      <PriceDisplay amount={8.40} className="text-sm font-bold text-black" />
+                    )}
                   </div>
                   {totalPrice >= 100 && (
                     <div className="flex items-center justify-between text-sm font-black text-[#651A1A]">
@@ -235,7 +239,7 @@ export default function Navbar() {
                   )}
                   <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                     <span>Gesamt</span>
-                    <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + 6)} className="text-2xl font-black" />
+                    <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + (totalPrice >= 100 ? 0 : 8.40))} className="text-2xl font-black" />
                   </div>
                 </div>
 
