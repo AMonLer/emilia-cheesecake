@@ -34,19 +34,6 @@ function pickAddress(addr: AddressObject | AddressObject[] | undefined): { name:
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization') || ''
   const expected = process.env.INBOX_API_TOKEN
-
-  if (req.nextUrl.searchParams.get('debug') === '1') {
-    const e = expected || ''
-    return NextResponse.json({
-      env_present: !!expected,
-      env_length: e.length,
-      env_first6: e.slice(0, 6),
-      env_last6: e.slice(-6),
-      auth_header_received: !!auth,
-      auth_header_length: auth.length,
-    })
-  }
-
   if (!expected) {
     return NextResponse.json({ error: 'INBOX_API_TOKEN not configured' }, { status: 500 })
   }
