@@ -101,6 +101,10 @@ async function fetchStripeDay(date: string, stripe: Stripe): Promise<{ revenue: 
 }
 
 // ─── Notion helpers ──────────────────────────────────────────────────────
+function isLive(page: any): boolean {
+  return !page?.archived && !page?.in_trash
+}
+
 async function existingRowsForDate(notion: NotionClient, date: string): Promise<number> {
   const resp: any = await (notion as any).dataSources.query({
     data_source_id: NOTION_SPEND_DS_ID,
@@ -110,7 +114,7 @@ async function existingRowsForDate(notion: NotionClient, date: string): Promise<
     },
     page_size: 100,
   })
-  return resp?.results?.length ?? 0
+  return (resp?.results || []).filter(isLive).length
 }
 
 async function writeSpendRow(notion: NotionClient, date: string, row: SpendRow) {
@@ -153,6 +157,7 @@ async function sumChfBetween(
       start_cursor: cursor,
     })
     for (const page of resp.results) {
+      if (!isLive(page)) continue
       const v = page.properties?.CHF?.number
       if (typeof v === 'number') total += v
     }
@@ -285,9 +290,36 @@ async function handle(req: NextRequest) {
 
   const date = req.nextUrl.searchParams.get('date') || yesterdayISO()
   const force = req.nextUrl.searchParams.get('force') === '1'
+  const wipe = req.nextUrl.searchParams.get('wipe') === '1'
 
   const notion = new NotionClient({ auth: notionToken })
   const stripe = new Stripe(stripeKey)
+
+  // Wipe all rows in the DB (one-shot recovery for accumulated duplicates)
+  if (wipe) {
+    let archived = 0
+    let cursor: string | undefined
+    do {
+      const resp: any = await (notion as any).dataSources.query({
+        data_source_id: NOTION_SPEND_DS_ID,
+        page_size: 100,
+        start_cursor: cursor,
+      })
+      for (const page of resp.results) {
+        try {
+          await notion.pages.update({ page_id: page.id, in_trash: true } as any)
+          archived++
+        } catch {
+          try {
+            await notion.pages.update({ page_id: page.id, archived: true } as any)
+            archived++
+          } catch {}
+        }
+      }
+      cursor = resp.has_more ? resp.next_cursor : undefined
+    } while (cursor)
+    return NextResponse.json({ ok: true, wiped: archived })
+  }
 
   // Idempotence
   const existing = await existingRowsForDate(notion, date)
@@ -351,8 +383,8 @@ async function handle(req: NextRequest) {
     })
   }
 
-  if (force && existing > 0) {
-    // Limpiamos antes de re-escribir
+  if (force) {
+    // Archivar TODAS las filas existentes para esa fecha (incluso si parecían archivadas pero no lo estaban)
     let cursor: string | undefined
     do {
       const resp: any = await (notion as any).dataSources.query({
@@ -362,7 +394,12 @@ async function handle(req: NextRequest) {
         start_cursor: cursor,
       })
       for (const page of resp.results) {
-        await notion.pages.update({ page_id: page.id, archived: true } as any)
+        if (!isLive(page)) continue
+        try {
+          await notion.pages.update({ page_id: page.id, in_trash: true } as any)
+        } catch {
+          await notion.pages.update({ page_id: page.id, archived: true } as any)
+        }
       }
       cursor = resp.has_more ? resp.next_cursor : undefined
     } while (cursor)
