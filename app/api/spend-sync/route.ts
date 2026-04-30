@@ -137,6 +137,9 @@ async function getTotalsBetween(
   since: string,
   until: string,
 ): Promise<{ expense: number; income: number; rowsSeen: number; rowsLive: number; sourceCounts: Record<string, number> }> {
+  // No Notion-side date filter — Vercel's runtime appears to silently exclude
+  // some rows (esp. Stripe Revenue) when the Date filter is active. Pull all
+  // rows and partition in JS. DB stays small (<200 rows total).
   let expense = 0
   let income = 0
   let rowsSeen = 0
@@ -146,18 +149,14 @@ async function getTotalsBetween(
   do {
     const resp: any = await (notion as any).dataSources.query({
       data_source_id: NOTION_SPEND_DS_ID,
-      filter: {
-        and: [
-          { property: 'Date', date: { on_or_after: since } },
-          { property: 'Date', date: { on_or_before: until } },
-        ],
-      },
       page_size: 100,
       start_cursor: cursor,
     })
     for (const page of resp.results) {
       rowsSeen++
       if (!isLive(page)) continue
+      const dateStart = page.properties?.Date?.date?.start
+      if (!dateStart || dateStart < since || dateStart > until) continue
       rowsLive++
       const v = page.properties?.CHF?.number
       if (typeof v !== 'number') continue
