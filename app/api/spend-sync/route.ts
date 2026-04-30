@@ -436,6 +436,7 @@ async function handle(req: NextRequest) {
     monthRowsSeen: monthTotals.rowsSeen,
     monthRowsLive: monthTotals.rowsLive,
     monthSources: monthTotals.sourceCounts,
+    notionTokenPrefix: notionToken.slice(0, 8) + '...' + notionToken.slice(-4),
   }
 
   // ── Phase 2: Haiku insight ──
