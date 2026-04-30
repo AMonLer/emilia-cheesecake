@@ -136,11 +136,12 @@ async function getTotalsBetween(
   notion: NotionClient,
   since: string,
   until: string,
-): Promise<{ expense: number; income: number; rowsSeen: number; rowsLive: number }> {
+): Promise<{ expense: number; income: number; rowsSeen: number; rowsLive: number; sourceCounts: Record<string, number> }> {
   let expense = 0
   let income = 0
   let rowsSeen = 0
   let rowsLive = 0
+  const sourceCounts: Record<string, number> = {}
   let cursor: string | undefined
   do {
     const resp: any = await (notion as any).dataSources.query({
@@ -160,13 +161,14 @@ async function getTotalsBetween(
       rowsLive++
       const v = page.properties?.CHF?.number
       if (typeof v !== 'number') continue
-      const source = page.properties?.Source?.select?.name
+      const source = page.properties?.Source?.select?.name || '(null)'
+      sourceCounts[source] = (sourceCounts[source] || 0) + 1
       if (source === 'Stripe Revenue') income += v
       else expense += v
     }
     cursor = resp.has_more ? resp.next_cursor : undefined
   } while (cursor)
-  return { expense: chf(expense), income: chf(income), rowsSeen, rowsLive }
+  return { expense: chf(expense), income: chf(income), rowsSeen, rowsLive, sourceCounts }
 }
 
 async function findCalloutBlocks(notion: NotionClient): Promise<{
@@ -430,7 +432,11 @@ async function handle(req: NextRequest) {
   const dayTotal = dayExpenses
   const monthTotal = chf(monthExpenses)
   const yearTotal = chf(yearExpenses)
-  const _diag = { monthRowsSeen: monthTotals.rowsSeen, monthRowsLive: monthTotals.rowsLive }
+  const _diag = {
+    monthRowsSeen: monthTotals.rowsSeen,
+    monthRowsLive: monthTotals.rowsLive,
+    monthSources: monthTotals.sourceCounts,
+  }
 
   // ── Phase 2: Haiku insight ──
   let insight = ''
