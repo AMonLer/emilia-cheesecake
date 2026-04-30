@@ -236,6 +236,21 @@ async function generateInsight(payload: any, apiKey: string): Promise<{ insight:
 
 // ─── Handler ─────────────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
+  try {
+    return await handle(req)
+  } catch (err: any) {
+    return NextResponse.json(
+      {
+        error: 'Unhandled exception',
+        message: err?.message?.slice(0, 500) || String(err).slice(0, 500),
+        stack: err?.stack?.split('\n').slice(0, 6).join('\n'),
+      },
+      { status: 500 },
+    )
+  }
+}
+
+async function handle(req: NextRequest) {
   const auth = req.headers.get('authorization') || ''
   const cronSecret = process.env.CRON_SECRET
   if (!cronSecret) return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 })
