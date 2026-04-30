@@ -26,6 +26,7 @@ const SOURCE_TO_CATEGORY: Record<string, string> = {
   'Meta Ads': 'Marketing',
   'Stripe Fees': 'Payments',
   'Tiara Commission': 'Operations',
+  'Stripe Revenue': 'Revenue',
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────
@@ -34,7 +35,7 @@ type SpendRow = {
   concept: string
   chf: number
   category: string
-  type: 'Variable' | 'Fixed (prorated)' | 'Variable %'
+  type: 'Variable' | 'Fixed (prorated)' | 'Variable %' | 'Income'
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────
@@ -127,18 +128,27 @@ async function writeSpendRow(notion: NotionClient, date: string, row: SpendRow) 
   })
 }
 
-async function sumChfBetween(notion: NotionClient, since: string, until: string): Promise<number> {
+async function sumChfBetween(
+  notion: NotionClient,
+  since: string,
+  until: string,
+  filter?: 'expense' | 'income',
+): Promise<number> {
   let total = 0
   let cursor: string | undefined
+  const baseFilters: any[] = [
+    { property: 'Date', date: { on_or_after: since } },
+    { property: 'Date', date: { on_or_before: until } },
+  ]
+  if (filter === 'expense') {
+    baseFilters.push({ property: 'Type', select: { does_not_equal: 'Income' } })
+  } else if (filter === 'income') {
+    baseFilters.push({ property: 'Type', select: { equals: 'Income' } })
+  }
   do {
     const resp: any = await (notion as any).dataSources.query({
       data_source_id: NOTION_SPEND_DS_ID,
-      filter: {
-        and: [
-          { property: 'Date', date: { on_or_after: since } },
-          { property: 'Date', date: { on_or_before: until } },
-        ],
-      },
+      filter: { and: baseFilters },
       page_size: 100,
       start_cursor: cursor,
     })
@@ -151,18 +161,24 @@ async function sumChfBetween(notion: NotionClient, since: string, until: string)
   return chf(total)
 }
 
-async function findCalloutBlocks(notion: NotionClient): Promise<{ insightId?: string; totalsId?: string }> {
+async function findCalloutBlocks(notion: NotionClient): Promise<{
+  insightId?: string
+  totalsId?: string
+  profitId?: string
+}> {
   const resp: any = await notion.blocks.children.list({ block_id: NOTION_DASHBOARD_PAGE_ID, page_size: 50 })
   let insightId: string | undefined
   let totalsId: string | undefined
+  let profitId: string | undefined
   for (const block of resp.results) {
     if (block.type !== 'callout') continue
     const text = (block.callout?.rich_text || []).map((r: any) => r.plain_text || '').join('')
-    if (!insightId && text.includes('Insight de hoy')) insightId = block.id
+    if (!profitId && text.includes('Beneficio')) profitId = block.id
+    else if (!insightId && text.includes('Insight de hoy')) insightId = block.id
     else if (!totalsId && text.includes('Totales')) totalsId = block.id
-    if (insightId && totalsId) break
+    if (insightId && totalsId && profitId) break
   }
-  return { insightId, totalsId }
+  return { insightId, totalsId, profitId }
 }
 
 async function updateCallout(notion: NotionClient, blockId: string, lines: string[], color: string) {
@@ -325,6 +341,15 @@ async function handle(req: NextRequest) {
       type: 'Fixed (prorated)',
     })
   }
+  if (stripeDay.revenue !== 0) {
+    rows.push({
+      source: 'Stripe Revenue',
+      concept: `Stripe revenue (${stripeDay.revenue.toFixed(2)} CHF)`,
+      chf: -stripeDay.revenue,
+      category: SOURCE_TO_CATEGORY['Stripe Revenue'],
+      type: 'Income',
+    })
+  }
 
   if (force && existing > 0) {
     // Limpiamos antes de re-escribir
@@ -348,9 +373,24 @@ async function handle(req: NextRequest) {
   }
 
   // ── Totales ──
-  const dayTotal = chf(rows.reduce((s, r) => s + r.chf, 0))
-  const monthTotal = await sumChfBetween(notion, monthStart(date), date)
-  const yearTotal = await sumChfBetween(notion, yearStart(date), date)
+  const dayExpenses = chf(rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0))
+  const dayRevenue = chf(stripeDay.revenue)
+  const dayProfit = chf(dayRevenue - dayExpenses)
+
+  const [monthExpenses, monthRevenue, yearExpenses, yearRevenue] = await Promise.all([
+    sumChfBetween(notion, monthStart(date), date, 'expense'),
+    sumChfBetween(notion, monthStart(date), date, 'income'),
+    sumChfBetween(notion, yearStart(date), date, 'expense'),
+    sumChfBetween(notion, yearStart(date), date, 'income'),
+  ])
+  const monthProfit = chf(-monthRevenue - monthExpenses)
+  const yearProfit = chf(-yearRevenue - yearExpenses)
+  // Note: revenue rows are stored as negative CHF; sumChfBetween('income') sums those negatives.
+  // So -monthRevenue is the gross positive revenue. Profit = revenue - expenses.
+
+  const dayTotal = dayExpenses // backwards compat for existing callout
+  const monthTotal = chf(monthExpenses)
+  const yearTotal = chf(yearExpenses)
 
   // ── Phase 2: Haiku insight ──
   let insight = ''
@@ -374,7 +414,7 @@ async function handle(req: NextRequest) {
 
   // ── Update Dashboard callouts ──
   try {
-    const { insightId, totalsId } = await findCalloutBlocks(notion)
+    const { insightId, totalsId, profitId } = await findCalloutBlocks(notion)
     if (insightId) {
       const lines = [`Insight de hoy (${date}):`, insight]
       if (anomalies.length) lines.push('⚠️ ' + anomalies.join(' · '))
@@ -385,10 +425,24 @@ async function handle(req: NextRequest) {
         notion,
         totalsId,
         [
-          `Totales (${date}):`,
-          `Hoy: ${dayTotal.toFixed(2)} CHF · Este mes: ${monthTotal.toFixed(2)} CHF · Este año: ${yearTotal.toFixed(2)} CHF`,
+          `Totales gasto (${date}):`,
+          `Hoy: ${dayExpenses.toFixed(2)} CHF · Este mes: ${monthExpenses.toFixed(2)} CHF · Este año: ${yearExpenses.toFixed(2)} CHF`,
         ],
         'gray_background',
+      )
+    }
+    if (profitId) {
+      const fmt = (n: number) => `${n >= 0 ? '+' : ''}${n.toFixed(2)} CHF`
+      await updateCallout(
+        notion,
+        profitId,
+        [
+          `Beneficio (${date}):`,
+          `Ayer: ${fmt(dayProfit)} (rev ${dayRevenue.toFixed(2)} − gasto ${dayExpenses.toFixed(2)})`,
+          `Mes (MTD): ${fmt(monthProfit)} (rev ${(-monthRevenue).toFixed(2)} − gasto ${monthExpenses.toFixed(2)})`,
+          `Año (YTD): ${fmt(yearProfit)} (rev ${(-yearRevenue).toFixed(2)} − gasto ${yearExpenses.toFixed(2)})`,
+        ],
+        dayProfit >= 0 ? 'green_background' : 'red_background',
       )
     }
   } catch (err: any) {
@@ -399,11 +453,16 @@ async function handle(req: NextRequest) {
     ok: true,
     date,
     rows: rows.length,
-    dayTotal,
-    monthTotal,
-    yearTotal,
+    dayExpenses,
+    dayRevenue,
+    dayProfit,
+    monthExpenses,
+    monthRevenue: -monthRevenue,
+    monthProfit,
+    yearExpenses,
+    yearRevenue: -yearRevenue,
+    yearProfit,
     metaSpend,
-    stripeRevenue: stripeDay.revenue,
     stripeFees: stripeDay.fees,
     tiaraCommission,
     insight,
