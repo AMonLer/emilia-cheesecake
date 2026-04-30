@@ -132,38 +132,41 @@ async function writeSpendRow(notion: NotionClient, date: string, row: SpendRow) 
   })
 }
 
-async function sumChfBetween(
+async function getTotalsBetween(
   notion: NotionClient,
   since: string,
   until: string,
-  filter?: 'expense' | 'income',
-): Promise<number> {
-  let total = 0
+): Promise<{ expense: number; income: number; rowsSeen: number; rowsLive: number }> {
+  let expense = 0
+  let income = 0
+  let rowsSeen = 0
+  let rowsLive = 0
   let cursor: string | undefined
-  const baseFilters: any[] = [
-    { property: 'Date', date: { on_or_after: since } },
-    { property: 'Date', date: { on_or_before: until } },
-  ]
-  if (filter === 'expense') {
-    baseFilters.push({ property: 'Type', select: { does_not_equal: 'Income' } })
-  } else if (filter === 'income') {
-    baseFilters.push({ property: 'Type', select: { equals: 'Income' } })
-  }
   do {
     const resp: any = await (notion as any).dataSources.query({
       data_source_id: NOTION_SPEND_DS_ID,
-      filter: { and: baseFilters },
+      filter: {
+        and: [
+          { property: 'Date', date: { on_or_after: since } },
+          { property: 'Date', date: { on_or_before: until } },
+        ],
+      },
       page_size: 100,
       start_cursor: cursor,
     })
     for (const page of resp.results) {
+      rowsSeen++
       if (!isLive(page)) continue
+      rowsLive++
       const v = page.properties?.CHF?.number
-      if (typeof v === 'number') total += v
+      if (typeof v !== 'number') continue
+      const source = page.properties?.Source?.select?.name
+      if (source === 'Stripe Revenue') income += v
+      else expense += v
     }
     cursor = resp.has_more ? resp.next_cursor : undefined
   } while (cursor)
-  return chf(total)
+  return { expense: chf(expense), income: chf(income), rowsSeen, rowsLive }
 }
 
 async function findCalloutBlocks(notion: NotionClient): Promise<{
@@ -414,20 +417,20 @@ async function handle(req: NextRequest) {
   const dayRevenue = chf(stripeDay.revenue)
   const dayProfit = chf(dayRevenue - dayExpenses)
 
-  const [monthExpenses, monthRevenue, yearExpenses, yearRevenue] = await Promise.all([
-    sumChfBetween(notion, monthStart(date), date, 'expense'),
-    sumChfBetween(notion, monthStart(date), date, 'income'),
-    sumChfBetween(notion, yearStart(date), date, 'expense'),
-    sumChfBetween(notion, yearStart(date), date, 'income'),
+  const [monthTotals, yearTotals] = await Promise.all([
+    getTotalsBetween(notion, monthStart(date), date),
+    getTotalsBetween(notion, yearStart(date), date),
   ])
+  const monthExpenses = monthTotals.expense
+  const monthRevenue = monthTotals.income // negative (income rows stored negative)
+  const yearExpenses = yearTotals.expense
+  const yearRevenue = yearTotals.income
   const monthProfit = chf(-monthRevenue - monthExpenses)
   const yearProfit = chf(-yearRevenue - yearExpenses)
-  // Note: revenue rows are stored as negative CHF; sumChfBetween('income') sums those negatives.
-  // So -monthRevenue is the gross positive revenue. Profit = revenue - expenses.
-
-  const dayTotal = dayExpenses // backwards compat for existing callout
+  const dayTotal = dayExpenses
   const monthTotal = chf(monthExpenses)
   const yearTotal = chf(yearExpenses)
+  const _diag = { monthRowsSeen: monthTotals.rowsSeen, monthRowsLive: monthTotals.rowsLive }
 
   // ── Phase 2: Haiku insight ──
   let insight = ''
@@ -504,5 +507,6 @@ async function handle(req: NextRequest) {
     tiaraCommission,
     insight,
     anomalies,
+    diag: _diag,
   })
 }
