@@ -432,11 +432,30 @@ async function handle(req: NextRequest) {
   const dayTotal = dayExpenses
   const monthTotal = chf(monthExpenses)
   const yearTotal = chf(yearExpenses)
+  // EXTRA DIAG: query specifically for Stripe Revenue rows
+  let revenueRowsViaSourceFilter = 0
+  let allRowsCount = 0
+  try {
+    const rev: any = await (notion as any).dataSources.query({
+      data_source_id: NOTION_SPEND_DS_ID,
+      filter: { property: 'Source', select: { equals: 'Stripe Revenue' } },
+      page_size: 100,
+    })
+    revenueRowsViaSourceFilter = (rev.results || []).filter(isLive).length
+    const all: any = await (notion as any).dataSources.query({
+      data_source_id: NOTION_SPEND_DS_ID,
+      page_size: 100,
+    })
+    allRowsCount = (all.results || []).filter(isLive).length
+  } catch {}
+
   const _diag = {
     monthRowsSeen: monthTotals.rowsSeen,
     monthRowsLive: monthTotals.rowsLive,
     monthSources: monthTotals.sourceCounts,
     notionTokenPrefix: notionToken.slice(0, 8) + '...' + notionToken.slice(-4),
+    revenueRowsViaSourceFilter,
+    allRowsFirstPage: allRowsCount,
   }
 
   // ── Phase 2: Haiku insight ──
