@@ -417,28 +417,35 @@ async function handle(req: NextRequest) {
     } while (cursor)
   }
 
-  for (const row of rows) {
-    await writeSpendRow(notion, date, row)
-  }
-
-  // ── Totales ──
+  // ── Compute totals BEFORE writing (Notion has read-after-write eventual consistency).
+  //    We add the in-memory new rows ourselves to get the correct post-write state.
   const dayExpenses = chf(rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0))
   const dayRevenue = chf(stripeDay.revenue)
   const dayProfit = chf(dayRevenue - dayExpenses)
 
-  const [monthTotals, yearTotals] = await Promise.all([
+  const [monthTotalsPre, yearTotalsPre] = await Promise.all([
     getTotalsBetween(notion, monthStart(date), date),
     getTotalsBetween(notion, yearStart(date), date),
   ])
-  const monthExpenses = monthTotals.expense
-  const monthRevenue = monthTotals.income // negative (income rows stored negative)
-  const yearExpenses = yearTotals.expense
-  const yearRevenue = yearTotals.income
+  // Add the in-memory new rows to the pre-write totals
+  const newExpenseSum = rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0)
+  const newIncomeSum = rows.filter((r) => r.type === 'Income').reduce((s, r) => s + r.chf, 0)
+  const monthExpenses = chf(monthTotalsPre.expense + newExpenseSum)
+  const monthRevenue = chf(monthTotalsPre.income + newIncomeSum) // negative
+  const yearExpenses = chf(yearTotalsPre.expense + newExpenseSum)
+  const yearRevenue = chf(yearTotalsPre.income + newIncomeSum)
   const monthProfit = chf(-monthRevenue - monthExpenses)
   const yearProfit = chf(-yearRevenue - yearExpenses)
   const dayTotal = dayExpenses
   const monthTotal = chf(monthExpenses)
   const yearTotal = chf(yearExpenses)
+  // Use combined totals for diag
+  const monthTotals = monthTotalsPre
+
+  // Write the rows AFTER computing totals
+  for (const row of rows) {
+    await writeSpendRow(notion, date, row)
+  }
   // EXTRA DIAG: query specifically for Stripe Revenue rows
   let revenueRowsViaSourceFilter = 0
   let allRowsCount = 0
