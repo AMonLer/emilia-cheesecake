@@ -140,14 +140,30 @@ async function writeSpendRow(notion: NotionClient, date: string, row: SpendRow) 
   })
 }
 
+async function queryDataSourceViaFetch(notionToken: string, cursor?: string): Promise<any> {
+  const body: any = { page_size: 100 }
+  if (cursor) body.start_cursor = cursor
+  const resp = await fetch(`https://api.notion.com/v1/data_sources/${NOTION_SPEND_DS_ID}/query`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${notionToken}`,
+      'Notion-Version': '2025-09-03',
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  })
+  if (!resp.ok) {
+    const text = await resp.text()
+    throw new Error(`Notion query ${resp.status}: ${text.slice(0, 300)}`)
+  }
+  return resp.json()
+}
+
 async function getTotalsBetween(
-  notion: NotionClient,
+  notionToken: string,
   since: string,
   until: string,
 ): Promise<{ expense: number; income: number; rowsSeen: number; rowsLive: number; sourceCounts: Record<string, number> }> {
-  // No Notion-side date filter — Vercel's runtime appears to silently exclude
-  // some rows (esp. Stripe Revenue) when the Date filter is active. Pull all
-  // rows and partition in JS. DB stays small (<200 rows total).
   let expense = 0
   let income = 0
   let rowsSeen = 0
@@ -155,12 +171,8 @@ async function getTotalsBetween(
   const sourceCounts: Record<string, number> = {}
   let cursor: string | undefined
   do {
-    const resp: any = await (notion as any).dataSources.query({
-      data_source_id: NOTION_SPEND_DS_ID,
-      page_size: 100,
-      start_cursor: cursor,
-    })
-    for (const page of resp.results) {
+    const resp: any = await queryDataSourceViaFetch(notionToken, cursor)
+    for (const page of resp.results || []) {
       rowsSeen++
       if (!isLive(page)) continue
       const dateStart = page.properties?.Date?.date?.start
@@ -424,8 +436,8 @@ async function handle(req: NextRequest) {
   const dayProfit = chf(dayRevenue - dayExpenses)
 
   const [monthTotalsPre, yearTotalsPre] = await Promise.all([
-    getTotalsBetween(notion, monthStart(date), date),
-    getTotalsBetween(notion, yearStart(date), date),
+    getTotalsBetween(notionToken, monthStart(date), date),
+    getTotalsBetween(notionToken, yearStart(date), date),
   ])
   // Add the in-memory new rows to the pre-write totals
   const newExpenseSum = rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0)
