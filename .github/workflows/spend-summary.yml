@@ -1,4 +1,4 @@
-name: Spend Summary
+name: Daily Brief & Summary
 
 on:
   schedule:
@@ -14,6 +14,14 @@ jobs:
         with:
           node-version: '20'
       - run: npm ci
-      - run: node scripts/update-summary.mjs
+      - name: Update Notion Beneficio callout
+        run: node scripts/update-summary.mjs
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+      - name: Generate Haiku brief & send Telegram
+        run: node scripts/daily-brief.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
