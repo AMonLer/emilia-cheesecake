@@ -96,6 +96,10 @@ export default function CheckoutPage() {
   const [discountCodeInput, setDiscountCodeInput] = useState("")
   const [appliedDiscountCode, setAppliedDiscountCode] = useState("")
   const [discountCodeError, setDiscountCodeError] = useState("")
+  const [formError, setFormError] = useState("")
+  const [missingFields, setMissingFields] = useState<Set<string>>(new Set())
+  const [deliveryError, setDeliveryError] = useState("")
+  const [paymentInitError, setPaymentInitError] = useState("")
 
   // Allowed postal codes: Zürich agglomeration + Baden (AG)
   const allowedPostalCodes = new Set([
@@ -182,31 +186,51 @@ export default function CheckoutPage() {
     setUpsellAdded(true)
   }
 
-  const handleContinueToDelivery = (e: React.FormEvent) => {
+  const handleContinueToDelivery = (e: React.MouseEvent | React.FormEvent) => {
     e.preventDefault()
 
-    if (!email || !firstName || !lastName || !address || !city || !postalCode) {
-      alert("Bitte füllen Sie alle erforderlichen Felder aus")
+    const missing = new Set<string>()
+    if (!email) missing.add("email")
+    if (!firstName) missing.add("firstName")
+    if (!lastName) missing.add("lastName")
+    if (!address) missing.add("address")
+    if (!city) missing.add("city")
+    if (!postalCode) missing.add("postalCode")
+    setMissingFields(missing)
+
+    if (missing.size > 0) {
+      setFormError("Bitte füllen Sie alle Pflichtfelder aus (rot markiert).")
+      // Scroll first missing field into view
+      requestAnimationFrame(() => {
+        const first = document.querySelector('[data-error="true"]') as HTMLElement | null
+        first?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        first?.focus?.()
+      })
       return
     }
 
     // Validate postal code is within delivery area
     if (!isPostalCodeValid(postalCode)) {
       setPostalCodeError("Leider liefern wir nur im Umkreis von 10km um Zürich Zentrum. Ihre Postleitzahl liegt ausserhalb unseres Liefergebiets.")
+      setFormError("")
       return
     }
 
     setPostalCodeError("")
+    setFormError("")
+    setMissingFields(new Set())
     setShowDeliveryStep(true)
   }
 
-  const handleContinueToPayment = async (e: React.FormEvent) => {
+  const handleContinueToPayment = async (e: React.MouseEvent | React.FormEvent) => {
     e.preventDefault()
 
     if (!deliveryDate || !deliveryTime) {
-      alert("Bitte wählen Sie Lieferdatum und -zeit")
+      setDeliveryError("Bitte wählen Sie Lieferdatum und -zeit.")
       return
     }
+    setDeliveryError("")
+    setPaymentInitError("")
 
     try {
       const response = await fetch('/api/create-payment-intent', {
@@ -248,11 +272,11 @@ export default function CheckoutPage() {
         setClientSecret(data.clientSecret)
         setShowPayment(true)
       } else {
-        alert('Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.')
+        setPaymentInitError("Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.")
       }
     } catch (error) {
       console.error('Error:', error)
-      alert('Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.')
+      setPaymentInitError("Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.")
     }
   }
 
@@ -302,8 +326,9 @@ export default function CheckoutPage() {
                   type="email"
                   placeholder="E-Mail"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                  onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
+                  data-error={missingFields.has('email')}
+                  className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('email') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                   required
                 />
                 <input
@@ -339,16 +364,18 @@ export default function CheckoutPage() {
                           type="text"
                           placeholder="Vorname"
                           value={firstName}
-                          onChange={(e) => setFirstName(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                          onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
+                          data-error={missingFields.has('firstName')}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('firstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
                         <input
                           type="text"
                           placeholder="Nachname"
                           value={lastName}
-                          onChange={(e) => setLastName(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                          onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
+                          data-error={missingFields.has('lastName')}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('lastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
                       </div>
@@ -357,8 +384,9 @@ export default function CheckoutPage() {
                         type="text"
                         placeholder="Adresse"
                         value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                        onChange={(e) => { setAddress(e.target.value); if (missingFields.has('address')) { const m = new Set(missingFields); m.delete('address'); setMissingFields(m) } }}
+                        data-error={missingFields.has('address')}
+                        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('address') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                         required
                       />
 
@@ -367,8 +395,9 @@ export default function CheckoutPage() {
                           type="text"
                           placeholder="Stadt"
                           value={city}
-                          onChange={(e) => setCity(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+                          onChange={(e) => { setCity(e.target.value); if (missingFields.has('city')) { const m = new Set(missingFields); m.delete('city'); setMissingFields(m) } }}
+                          data-error={missingFields.has('city')}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('city') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
                         <input
@@ -378,8 +407,10 @@ export default function CheckoutPage() {
                           onChange={(e) => {
                             setPostalCode(e.target.value)
                             setPostalCodeError("")
+                            if (missingFields.has('postalCode')) { const m = new Set(missingFields); m.delete('postalCode'); setMissingFields(m) }
                           }}
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${postalCodeError ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
+                          data-error={missingFields.has('postalCode') || !!postalCodeError}
+                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${postalCodeError || missingFields.has('postalCode') ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
                             }`}
                           required
                         />
@@ -401,7 +432,14 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  {formError && (
+                    <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
+                      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span>{formError}</span>
+                    </div>
+                  )}
                   <button
+                    type="button"
                     onClick={handleContinueToDelivery}
                     className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
                   >
@@ -635,7 +673,14 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  {(deliveryError || paymentInitError) && (
+                    <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
+                      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span>{deliveryError || paymentInitError}</span>
+                    </div>
+                  )}
                   <button
+                    type="button"
                     onClick={handleContinueToPayment}
                     className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
                   >
