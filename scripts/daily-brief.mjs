@@ -8,7 +8,8 @@ function loadEnv() {
     NOTION_TOKEN: process.env.NOTION_TOKEN,
     ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
     TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
-    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
+    // Brief uses a separate chat_id so it doesn't mix with order notifications
+    TELEGRAM_BRIEF_CHAT_ID: process.env.TELEGRAM_BRIEF_CHAT_ID,
   }
   if (Object.values(env).some((v) => !v) && fs.existsSync('.env.local')) {
     const local = Object.fromEntries(
@@ -237,7 +238,7 @@ const tgResp = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN
   method: 'POST',
   headers: { 'content-type': 'application/json' },
   body: JSON.stringify({
-    chat_id: env.TELEGRAM_CHAT_ID,
+    chat_id: env.TELEGRAM_BRIEF_CHAT_ID,
     text: message,
     parse_mode: 'HTML',
     disable_web_page_preview: true,
