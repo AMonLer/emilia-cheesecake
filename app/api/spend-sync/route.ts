@@ -429,60 +429,30 @@ async function handle(req: NextRequest) {
     } while (cursor)
   }
 
-  // ── Compute totals BEFORE writing (Notion has read-after-write eventual consistency).
-  //    We add the in-memory new rows ourselves to get the correct post-write state.
+  // Day totals (computed from in-memory rows — always accurate)
   const dayExpenses = chf(rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0))
   const dayRevenue = chf(stripeDay.revenue)
   const dayProfit = chf(dayRevenue - dayExpenses)
-
-  const [monthTotalsPre, yearTotalsPre] = await Promise.all([
-    getTotalsBetween(notionToken, monthStart(date), date),
-    getTotalsBetween(notionToken, yearStart(date), date),
-  ])
-  // Add the in-memory new rows to the pre-write totals
-  const newExpenseSum = rows.filter((r) => r.type !== 'Income').reduce((s, r) => s + r.chf, 0)
-  const newIncomeSum = rows.filter((r) => r.type === 'Income').reduce((s, r) => s + r.chf, 0)
-  const monthExpenses = chf(monthTotalsPre.expense + newExpenseSum)
-  const monthRevenue = chf(monthTotalsPre.income + newIncomeSum) // negative
-  const yearExpenses = chf(yearTotalsPre.expense + newExpenseSum)
-  const yearRevenue = chf(yearTotalsPre.income + newIncomeSum)
-  const monthProfit = chf(-monthRevenue - monthExpenses)
-  const yearProfit = chf(-yearRevenue - yearExpenses)
   const dayTotal = dayExpenses
-  const monthTotal = chf(monthExpenses)
-  const yearTotal = chf(yearExpenses)
-  // Use combined totals for diag
-  const monthTotals = monthTotalsPre
 
-  // Write the rows AFTER computing totals
+  // Write rows
   for (const row of rows) {
     await writeSpendRow(notion, date, row)
   }
-  // EXTRA DIAG: query specifically for Stripe Revenue rows
-  let revenueRowsViaSourceFilter = 0
-  let allRowsCount = 0
-  try {
-    const rev: any = await (notion as any).dataSources.query({
-      data_source_id: NOTION_SPEND_DS_ID,
-      filter: { property: 'Source', select: { equals: 'Stripe Revenue' } },
-      page_size: 100,
-    })
-    revenueRowsViaSourceFilter = (rev.results || []).filter(isLive).length
-    const all: any = await (notion as any).dataSources.query({
-      data_source_id: NOTION_SPEND_DS_ID,
-      page_size: 100,
-    })
-    allRowsCount = (all.results || []).filter(isLive).length
-  } catch {}
 
-  const _diag = {
-    monthRowsSeen: monthTotals.rowsSeen,
-    monthRowsLive: monthTotals.rowsLive,
-    monthSources: monthTotals.sourceCounts,
-    notionTokenPrefix: notionToken.slice(0, 8) + '...' + notionToken.slice(-4),
-    revenueRowsViaSourceFilter,
-    allRowsFirstPage: allRowsCount,
-  }
+  // MTD/YTD totals are no longer computed in the cron (Notion API on Vercel
+  // has unreliable read-after-write behavior). User reads them directly from
+  // the linked DB views in Dashboard Financiero (right-click CHF column →
+  // Calculate → Sum). Set placeholder values so the response shape stays consistent.
+  const monthExpenses = 0
+  const monthRevenue = 0
+  const monthProfit = 0
+  const yearExpenses = 0
+  const yearRevenue = 0
+  const yearProfit = 0
+  const monthTotal = 0
+  const yearTotal = 0
+  const _diag = { rowsWritten: rows.length }
 
   // ── Phase 2: Haiku insight ──
   let insight = ''
@@ -517,8 +487,8 @@ async function handle(req: NextRequest) {
         notion,
         totalsId,
         [
-          `Totales gasto (${date}):`,
-          `Hoy: ${dayExpenses.toFixed(2)} CHF · Este mes: ${monthExpenses.toFixed(2)} CHF · Este año: ${yearExpenses.toFixed(2)} CHF`,
+          `Gasto del día (${date}): ${dayExpenses.toFixed(2)} CHF`,
+          `Para totales mes/año, abre las vistas 📆 Este mes / 🗓️ Este año abajo y activa Calculate → Sum en la columna CHF.`,
         ],
         'gray_background',
       )
@@ -529,10 +499,9 @@ async function handle(req: NextRequest) {
         notion,
         profitId,
         [
-          `Beneficio (${date}):`,
-          `Ayer: ${fmt(dayProfit)} (rev ${dayRevenue.toFixed(2)} − gasto ${dayExpenses.toFixed(2)})`,
-          `Mes (MTD): ${fmt(monthProfit)} (rev ${(-monthRevenue).toFixed(2)} − gasto ${monthExpenses.toFixed(2)})`,
-          `Año (YTD): ${fmt(yearProfit)} (rev ${(-yearRevenue).toFixed(2)} − gasto ${yearExpenses.toFixed(2)})`,
+          `Beneficio ayer (${date}): ${fmt(dayProfit)}`,
+          `Ingresos Stripe: ${dayRevenue.toFixed(2)} CHF · Gastos: ${dayExpenses.toFixed(2)} CHF`,
+          `Beneficio mes/año: ver totales abajo (Calculate → Sum en columna CHF de las vistas).`,
         ],
         dayProfit >= 0 ? 'green_background' : 'red_background',
       )
