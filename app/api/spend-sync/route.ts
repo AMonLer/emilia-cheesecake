@@ -106,15 +106,23 @@ function isLive(page: any): boolean {
 }
 
 async function existingRowsForDate(notion: NotionClient, date: string): Promise<number> {
-  const resp: any = await (notion as any).dataSources.query({
-    data_source_id: NOTION_SPEND_DS_ID,
-    filter: {
-      property: 'Date',
-      date: { equals: date },
-    },
-    page_size: 100,
-  })
-  return (resp?.results || []).filter(isLive).length
+  // Bypass Notion date filter (unreliable on Vercel runtime). Pull all rows
+  // and match in JS. DB is small enough.
+  let count = 0
+  let cursor: string | undefined
+  do {
+    const resp: any = await (notion as any).dataSources.query({
+      data_source_id: NOTION_SPEND_DS_ID,
+      page_size: 100,
+      start_cursor: cursor,
+    })
+    for (const page of resp.results || []) {
+      if (!isLive(page)) continue
+      if (page.properties?.Date?.date?.start === date) count++
+    }
+    cursor = resp.has_more ? resp.next_cursor : undefined
+  } while (cursor)
+  return count
 }
 
 async function writeSpendRow(notion: NotionClient, date: string, row: SpendRow) {
