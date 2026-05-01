@@ -1,0 +1,19 @@
+name: Spend Summary
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # 04:00 UTC daily (2h after Vercel spend-sync at 02:00 UTC)
+  workflow_dispatch:  # allow manual trigger from GitHub UI
+
+jobs:
+  summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: node scripts/update-summary.mjs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
