@@ -41,8 +41,8 @@ type SpendRow = {
 // ─── Helpers ─────────────────────────────────────────────────────────────
 function yesterdayISO(): string {
   const d = new Date()
-  d.setUTCDate(d.getUTCDate() - 1)
-  return d.toISOString().slice(0, 10)
+  d.setDate(d.getDate() - 1)
+  return zurichISODate(d)
 }
 
 function monthStart(dateISO: string): string {
@@ -51,6 +51,65 @@ function monthStart(dateISO: string): string {
 
 function yearStart(dateISO: string): string {
   return dateISO.slice(0, 4) + '-01-01'
+}
+
+function zurichISODate(date: Date): string {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Zurich',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(date)
+  const get = (type: string) => parts.find((p) => p.type === type)?.value
+  return `${get('year')}-${get('month')}-${get('day')}`
+}
+
+function previousMonthRange(dateISO: string): { start: string; end: string; label: string } {
+  const [yearStr, monthStr] = dateISO.split('-')
+  const year = Number(yearStr)
+  const month = Number(monthStr)
+  const previous = new Date(Date.UTC(year, month - 2, 1))
+  const start = previous.toISOString().slice(0, 10)
+  const endDate = new Date(Date.UTC(year, month - 1, 0))
+  const end = endDate.toISOString().slice(0, 10)
+  return { start, end, label: start.slice(0, 7) }
+}
+
+function addDaysISO(dateISO: string, days: number): string {
+  const [year, month, day] = dateISO.split('-').map(Number)
+  const d = new Date(Date.UTC(year, month - 1, day + days))
+  return d.toISOString().slice(0, 10)
+}
+
+function zurichWallClockToUnix(dateISO: string, hour: number, minute = 0, second = 0): number {
+  const [year, month, day] = dateISO.split('-').map(Number)
+  const utcGuess = Date.UTC(year, month - 1, day, hour, minute, second)
+  const offsetMinutes = getZurichOffsetMinutes(new Date(utcGuess))
+  return Math.floor((utcGuess - offsetMinutes * 60 * 1000) / 1000)
+}
+
+function getZurichOffsetMinutes(date: Date): number {
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Zurich',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+  const parts = fmt.formatToParts(date)
+  const get = (type: string) => Number(parts.find((p) => p.type === type)?.value)
+  const asUtc = Date.UTC(
+    get('year'),
+    get('month') - 1,
+    get('day'),
+    get('hour'),
+    get('minute'),
+    get('second'),
+  )
+  return Math.round((asUtc - date.getTime()) / (60 * 1000))
 }
 
 function chf(n: number): number {
@@ -71,8 +130,8 @@ async function fetchMetaSpend(date: string, accessToken: string): Promise<number
 }
 
 async function fetchStripeDay(date: string, stripe: Stripe): Promise<{ revenue: number; fees: number }> {
-  const start = Math.floor(new Date(`${date}T00:00:00Z`).getTime() / 1000)
-  const end = start + 24 * 3600
+  const start = zurichWallClockToUnix(date, 0)
+  const end = zurichWallClockToUnix(addDaysISO(date, 1), 0)
   let revenue = 0
   let fees = 0
   let startingAfter: string | undefined
@@ -182,12 +241,16 @@ async function getTotalsBetween(
       if (typeof v !== 'number') continue
       const source = page.properties?.Source?.select?.name || '(null)'
       sourceCounts[source] = (sourceCounts[source] || 0) + 1
-      if (source === 'Stripe Revenue') income += v
+      if (source === 'Stripe Revenue') income += -v
       else expense += v
     }
     cursor = resp.has_more ? resp.next_cursor : undefined
   } while (cursor)
   return { expense: chf(expense), income: chf(income), rowsSeen, rowsLive, sourceCounts }
+}
+
+function profitFromTotals(t: { expense: number; income: number }) {
+  return chf(t.income - t.expense)
 }
 
 async function findCalloutBlocks(notion: NotionClient): Promise<{
@@ -305,9 +368,9 @@ async function handle(req: NextRequest) {
   const stripeKey = process.env.STRIPE_SECRET_KEY
   const metaToken = process.env.META_ACCESS_TOKEN
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  if (!notionToken || !stripeKey || !metaToken || !anthropicKey) {
+  if (!notionToken || !stripeKey) {
     return NextResponse.json(
-      { error: 'Missing one of NOTION_TOKEN, STRIPE_SECRET_KEY, META_ACCESS_TOKEN, ANTHROPIC_API_KEY' },
+      { error: 'Missing NOTION_TOKEN or STRIPE_SECRET_KEY' },
       { status: 500 },
     )
   }
@@ -353,7 +416,7 @@ async function handle(req: NextRequest) {
 
   // ── Phase 1: pull deterministic data ──
   const [metaSpend, stripeDay] = await Promise.all([
-    fetchMetaSpend(date, metaToken),
+    metaToken ? fetchMetaSpend(date, metaToken) : Promise.resolve(0),
     fetchStripeDay(date, stripe),
   ])
 
@@ -440,19 +503,46 @@ async function handle(req: NextRequest) {
     await writeSpendRow(notion, date, row)
   }
 
-  // MTD/YTD totals are no longer computed in the cron (Notion API on Vercel
-  // has unreliable read-after-write behavior). User reads them directly from
-  // the linked DB views in Dashboard Financiero (right-click CHF column →
-  // Calculate → Sum). Set placeholder values so the response shape stays consistent.
-  const monthExpenses = 0
-  const monthRevenue = 0
-  const monthProfit = 0
-  const yearExpenses = 0
-  const yearRevenue = 0
-  const yearProfit = 0
-  const monthTotal = 0
-  const yearTotal = 0
-  const _diag = { rowsWritten: rows.length }
+  const today = zurichISODate(new Date())
+  const thisMonth = monthStart(today)
+  const thisYear = yearStart(today)
+  const previousMonth = previousMonthRange(today)
+
+  let yesterdayTotals = { expense: dayExpenses, income: dayRevenue, rowsSeen: 0, rowsLive: rows.length, sourceCounts: {} }
+  let monthTotals = { expense: 0, income: 0, rowsSeen: 0, rowsLive: 0, sourceCounts: {} }
+  let previousMonthTotals = { expense: 0, income: 0, rowsSeen: 0, rowsLive: 0, sourceCounts: {} }
+  let yearTotals = { expense: 0, income: 0, rowsSeen: 0, rowsLive: 0, sourceCounts: {} }
+
+  try {
+    ;[yesterdayTotals, monthTotals, previousMonthTotals, yearTotals] = await Promise.all([
+      getTotalsBetween(notionToken, date, date),
+      getTotalsBetween(notionToken, thisMonth, today),
+      getTotalsBetween(notionToken, previousMonth.start, previousMonth.end),
+      getTotalsBetween(notionToken, thisYear, today),
+    ])
+    if (yesterdayTotals.rowsLive === 0) {
+      yesterdayTotals = { expense: dayExpenses, income: dayRevenue, rowsSeen: 0, rowsLive: rows.length, sourceCounts: {} }
+    }
+  } catch {
+    yesterdayTotals = { expense: dayExpenses, income: dayRevenue, rowsSeen: 0, rowsLive: rows.length, sourceCounts: {} }
+  }
+
+  const monthExpenses = monthTotals.expense
+  const monthRevenue = monthTotals.income
+  const monthProfit = profitFromTotals(monthTotals)
+  const previousMonthProfit = profitFromTotals(previousMonthTotals)
+  const yearExpenses = yearTotals.expense
+  const yearRevenue = yearTotals.income
+  const yearProfit = profitFromTotals(yearTotals)
+  const monthTotal = monthExpenses
+  const yearTotal = yearExpenses
+  const _diag = {
+    rowsWritten: rows.length,
+    yesterdayRows: yesterdayTotals.rowsLive,
+    monthRows: monthTotals.rowsLive,
+    previousMonthRows: previousMonthTotals.rowsLive,
+    yearRows: yearTotals.rowsLive,
+  }
 
   // ── Phase 2: Haiku insight ──
   let insight = ''
@@ -467,9 +557,13 @@ async function handle(req: NextRequest) {
       meta_ads_roas: metaSpend > 0 ? +(stripeDay.revenue / metaSpend).toFixed(2) : null,
       breakdown: rows.map((r) => ({ source: r.source, chf: chf(r.chf), type: r.type })),
     }
-    const result = await generateInsight(payload, anthropicKey)
-    insight = result.insight
-    anomalies = result.anomalies
+    if (anthropicKey) {
+      const result = await generateInsight(payload, anthropicKey)
+      insight = result.insight
+      anomalies = result.anomalies
+    } else {
+      insight = `Sync OK. Ingresos Stripe: ${stripeDay.revenue.toFixed(2)} CHF; gastos registrados: ${dayExpenses.toFixed(2)} CHF; beneficio estimado: ${dayProfit.toFixed(2)} CHF.`
+    }
   } catch (err: any) {
     insight = `Sync OK pero Haiku falló: ${err?.message?.slice(0, 200) || 'unknown'}`
   }
@@ -487,8 +581,10 @@ async function handle(req: NextRequest) {
         notion,
         totalsId,
         [
-          `Gasto del día (${date}): ${dayExpenses.toFixed(2)} CHF`,
-          `Para totales mes/año, abre las vistas 📆 Este mes / 🗓️ Este año abajo y activa Calculate → Sum en la columna CHF.`,
+          `Totales auto (${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC)`,
+          `Ayer (${date}): ingresos ${yesterdayTotals.income.toFixed(2)} CHF · gastos ${yesterdayTotals.expense.toFixed(2)} CHF · beneficio ${profitFromTotals(yesterdayTotals).toFixed(2)} CHF`,
+          `Mes (${today.slice(0, 7)}): ingresos ${monthRevenue.toFixed(2)} CHF · gastos ${monthExpenses.toFixed(2)} CHF · beneficio ${monthProfit.toFixed(2)} CHF`,
+          `Año (${today.slice(0, 4)}): ingresos ${yearRevenue.toFixed(2)} CHF · gastos ${yearExpenses.toFixed(2)} CHF · beneficio ${yearProfit.toFixed(2)} CHF`,
         ],
         'gray_background',
       )
@@ -499,11 +595,13 @@ async function handle(req: NextRequest) {
         notion,
         profitId,
         [
-          `Beneficio ayer (${date}): ${fmt(dayProfit)}`,
-          `Ingresos Stripe: ${dayRevenue.toFixed(2)} CHF · Gastos: ${dayExpenses.toFixed(2)} CHF`,
-          `Beneficio mes/año: ver totales abajo (Calculate → Sum en columna CHF de las vistas).`,
+          `Resumen financiero (auto, actualizado ${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC)`,
+          `Ayer (${date}): ingresos ${yesterdayTotals.income.toFixed(2)} CHF · gastos ${yesterdayTotals.expense.toFixed(2)} CHF · beneficio ${fmt(profitFromTotals(yesterdayTotals))}`,
+          `Este mes (${today.slice(0, 7)}): ingresos ${monthRevenue.toFixed(2)} CHF · gastos ${monthExpenses.toFixed(2)} CHF · beneficio ${fmt(monthProfit)}`,
+          `Mes anterior (${previousMonth.label}): ingresos ${previousMonthTotals.income.toFixed(2)} CHF · gastos ${previousMonthTotals.expense.toFixed(2)} CHF · beneficio ${fmt(previousMonthProfit)}`,
+          `Este año (${today.slice(0, 4)}): ingresos ${yearRevenue.toFixed(2)} CHF · gastos ${yearExpenses.toFixed(2)} CHF · beneficio ${fmt(yearProfit)}`,
         ],
-        dayProfit >= 0 ? 'green_background' : 'red_background',
+        yearProfit >= 0 ? 'green_background' : 'red_background',
       )
     }
   } catch (err: any) {
@@ -518,10 +616,10 @@ async function handle(req: NextRequest) {
     dayRevenue,
     dayProfit,
     monthExpenses,
-    monthRevenue: -monthRevenue,
+    monthRevenue,
     monthProfit,
     yearExpenses,
-    yearRevenue: -yearRevenue,
+    yearRevenue,
     yearProfit,
     metaSpend,
     stripeFees: stripeDay.fees,
