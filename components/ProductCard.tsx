@@ -204,11 +204,8 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             <button
                                 onClick={(e) => { e.preventDefault(); }}
                                 disabled={true}
-                                className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-70 cursor-not-allowed overflow-hidden mt-2"
+                                className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-80 cursor-not-allowed mt-2"
                             >
-                                <div className="absolute -top-1 -right-2 bg-[#651A1A] text-white text-[10px] font-bold px-3 py-1.5 rounded-bl-lg z-10 shadow-sm uppercase tracking-wider">
-                                    Ausverkauft
-                                </div>
                                 <div className="flex items-center gap-3 flex-1 min-w-0">
                                     <div className="relative w-12 h-12 flex-shrink-0 grayscale opacity-80">
                                         <Image
@@ -223,8 +220,11 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                             <p className="font-black text-sm text-gray-500">2–3 Personen</p>
                                             <p className="text-xs text-gray-400 line-through decoration-gray-300">Ø 14 cm</p>
                                         </div>
-                                        <div className="text-right flex flex-col items-end">
-                                            <div className="text-xs font-semibold text-[#651A1A]">
+                                        <div className="text-right flex flex-col items-end gap-1">
+                                            <span className="bg-[#651A1A] text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                                                Ausverkauft
+                                            </span>
+                                            <div className="text-[10px] sm:text-xs font-semibold text-[#651A1A]">
                                                 In 2 Wochen zurück
                                             </div>
                                         </div>

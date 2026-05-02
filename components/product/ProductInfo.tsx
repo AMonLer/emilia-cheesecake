@@ -74,11 +74,8 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     <button
                         onClick={(e) => { e.preventDefault(); }}
                         disabled={true}
-                        className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-70 cursor-not-allowed overflow-hidden"
+                        className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-80 cursor-not-allowed"
                     >
-                        <div className="absolute -top-1 -right-2 bg-[#651A1A] text-white text-[9px] font-bold px-3 py-1.5 rounded-bl-lg z-10 shadow-sm uppercase tracking-wider">
-                            Ausverkauft
-                        </div>
                         <div className="flex items-center gap-2">
                             <div className="relative w-10 h-10 flex-shrink-0 grayscale opacity-80">
                                 <Image
@@ -88,11 +85,14 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                     className="object-contain"
                                 />
                             </div>
-                            <div className="flex-1 min-w-0">
-                                <p className="font-black text-xs text-gray-500">2–3 Pers.</p>
+                            <div className="flex-1 min-w-0 flex flex-col justify-center">
+                                <div className="flex items-center justify-between mb-0.5">
+                                    <p className="font-black text-xs text-gray-500">2–3 Pers.</p>
+                                    <span className="bg-[#651A1A] text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">Ausverkauft</span>
+                                </div>
                                 <p className="text-[10px] text-gray-400 line-through decoration-gray-300">Ø 14 cm</p>
-                                <div className="text-[#651A1A] mt-0.5 text-[10px] font-semibold">
-                                    In 2 Wochen verfügbar
+                                <div className="text-[#651A1A] mt-1 text-[9px] font-semibold">
+                                    In 2 Wochen zurück
                                 </div>
                             </div>
                         </div>
@@ -202,11 +202,8 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     <button
                         onClick={(e) => { e.preventDefault(); }}
                         disabled={true}
-                        className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-70 cursor-not-allowed overflow-hidden"
+                        className="relative rounded-xl p-3 transition-all duration-200 border-2 text-left bg-gray-50 border-gray-100 opacity-80 cursor-not-allowed"
                     >
-                        <div className="absolute -top-1 -right-2 bg-[#651A1A] text-white text-[10px] sm:text-xs font-bold px-3 py-1.5 rounded-bl-lg z-10 shadow-sm uppercase tracking-wider">
-                            Ausverkauft
-                        </div>
                         <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                             <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0 grayscale opacity-80">
                                 <Image
@@ -217,12 +214,15 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 />
                             </div>
                             <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
-                                <div>
+                                <div className="flex flex-col">
                                     <p className="font-black text-xs sm:text-sm text-gray-500 truncate">2–3 Personen</p>
                                     <p className="text-xs text-gray-400 line-through decoration-gray-300">Ø 14 cm</p>
                                 </div>
-                                <div className="text-right flex flex-col items-end">
-                                    <div className="text-xs sm:text-sm font-semibold text-[#651A1A]">
+                                <div className="text-right flex flex-col items-end gap-1">
+                                    <span className="bg-[#651A1A] text-white text-[9px] sm:text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
+                                        Ausverkauft
+                                    </span>
+                                    <div className="text-[10px] sm:text-xs font-semibold text-[#651A1A]">
                                         In 2 Wochen zurück
                                     </div>
                                 </div>
