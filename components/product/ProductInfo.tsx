@@ -123,7 +123,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 </div>
                                 <p className="text-[10px] text-gray-400 line-through decoration-gray-300">Ø 14 cm</p>
                                 <div className="text-[#651A1A] mt-1 text-[9px] font-semibold">
-                                    In 1 Woche zurück
+                                    Ab 10.05. zurück
                                 </div>
                             </div>
                         </div>
@@ -223,7 +223,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                         Ausverkauft
                                     </span>
                                     <div className="text-[10px] sm:text-xs font-semibold text-[#651A1A]">
-                                        In 1 Woche zurück
+                                        Ab 10.05. zurück
                                     </div>
                                 </div>
                             </div>

@@ -225,7 +225,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                                 Ausverkauft
                                             </span>
                                             <div className="text-[10px] sm:text-xs font-semibold text-[#651A1A]">
-                                                In 1 Woche zurück
+                                                Ab 10.05. zurück
                                             </div>
                                         </div>
                                     </div>
