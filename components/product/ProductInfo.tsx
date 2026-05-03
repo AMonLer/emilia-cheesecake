@@ -287,6 +287,24 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     </li>
                 </ul>
             </div>
+
+            {/* Ingredients Accordion */}
+            {product.ingredients && (
+                <div className="mt-6 border-t border-black/10 pt-4">
+                    <details className="group">
+                        <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-sm text-black uppercase tracking-wide">
+                            Zutaten & Allergene
+                            <span className="transition group-open:rotate-180">
+                                <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                            </span>
+                        </summary>
+                        <div className="mt-3 text-sm text-black/70 leading-relaxed">
+                            <p dangerouslySetInnerHTML={{ __html: product.ingredients }} />
+                            <p className="mt-2 text-[10px] uppercase tracking-wider text-black/50">Allergene sind fett gedruckt.</p>
+                        </div>
+                    </details>
+                </div>
+            )}
         </div>
     )
 }
