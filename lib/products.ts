@@ -11,7 +11,7 @@ export const products: { [key: string]: any } = {
             "Pistazienkäsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Pistaziencreme (<strong>Schalenfrüchte</strong>, <strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Pistaziencreme (<strong>Schalenfrüchte</strong>, <strong>Milch</strong>), Pistazien (<strong>Schalenfrüchte</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
