@@ -11,7 +11,7 @@ export const products: { [key: string]: any } = {
             "Pistazienkäsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Pistaziencreme (<strong>Schalenfrüchte</strong>, <strong>Milch</strong>), <strong>Eier</strong>, Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Pistaziencreme (<strong>Schalenfrüchte</strong>, <strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -67,7 +67,7 @@ export const products: { [key: string]: any } = {
             "Schokoladenkäsekuchen mit Schweizer Schokolade",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Schweizer Schokolade (<strong>Milch</strong>, <strong>Soja</strong>), <strong>Eier</strong>, Weizenmehl (<strong>Gluten</strong>), Kakao, Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Schweizer Schokolade (<strong>Milch</strong>, <strong>Soja</strong>), <strong>Eier</strong>, Kakaokekse (<strong>Gluten</strong>, <strong>Soja</strong>), Weizenmehl (<strong>Gluten</strong>), Kakao, Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -95,7 +95,7 @@ export const products: { [key: string]: any } = {
             "Original Käsekuchen im baskischen Stil",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Käse (<strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -123,7 +123,7 @@ export const products: { [key: string]: any } = {
             "Dulce de Leche Käsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Dulce de Leche (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Dulce de Leche (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
