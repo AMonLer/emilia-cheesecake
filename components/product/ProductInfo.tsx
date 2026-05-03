@@ -132,10 +132,76 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
 
                 <button
                     onClick={addToCart}
-                    className="w-full bg-black text-white py-3.5 rounded-xl font-black text-sm tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20"
+                    className="w-full bg-black text-white py-3.5 rounded-xl font-black text-sm tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20 mb-6"
                 >
                     IN DEN WARENKORB
                 </button>
+
+                {/* Guarantee & Payment Info */}
+                <div className="mb-6 space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                    <div className="flex items-center gap-2">
+                        <div className="bg-[#651A1A]/10 p-1.5 rounded-full">
+                            <CheckCircle className="w-4 h-4 text-[#651A1A]" />
+                        </div>
+                        <span className="text-xs font-bold text-[#651A1A]">100% Zufriedenheitsgarantie</span>
+                    </div>
+                    <div className="h-px bg-gray-200 w-full"></div>
+                    <div className="flex items-center gap-2">
+                        <div className="bg-[#651A1A]/10 p-1.5 rounded-full flex-shrink-0">
+                            <CreditCard className="w-4 h-4 text-[#651A1A]" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-[#651A1A] uppercase tracking-wide mb-1">Sichere Bezahlung</span>
+                            <div className="flex items-center gap-1.5">
+                                <VisaIcon className="h-6 w-auto" />
+                                <MastercardIcon className="h-6 w-auto" />
+                                <ApplePayIcon className="h-6 w-auto" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-2 border-t border-black/10 pt-5">
+                    <ul className="space-y-2">
+                        <li className="text-xs font-medium flex items-start text-black/80">
+                            <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
+                                <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
+                            </div>
+                            <span>Frischegarantie & Kühlversand</span>
+                        </li>
+                        <li className="text-xs font-medium flex items-start text-black/80">
+                            <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
+                                <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
+                            </div>
+                            <span>Handwerklich mit Liebe gemacht</span>
+                        </li>
+                        <li className="text-xs font-medium flex items-start text-black/80">
+                            <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
+                                <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
+                            </div>
+                            <span>Nur natürliche Zutaten</span>
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Ingredients Accordion */}
+                {product.ingredients && (
+                    <div className="mt-5 border-t border-black/10 pt-4">
+                        <details className="group">
+                            <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-xs text-black uppercase tracking-wide">
+                                Zutaten & Allergene
+                                <span className="transition group-open:rotate-180">
+                                    <svg fill="none" height="20" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
+                                </span>
+                            </summary>
+                            <div className="mt-3 text-xs text-black/70 leading-relaxed">
+                                <p dangerouslySetInnerHTML={{ __html: product.ingredients }} />
+                                <p className="mt-2 text-[9px] uppercase tracking-wider text-black/50">Allergene sind fett gedruckt.</p>
+                            </div>
+                        </details>
+                    </div>
+                )}
             </div>
         )
     }
