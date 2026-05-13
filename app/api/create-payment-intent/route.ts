@@ -16,7 +16,9 @@ export async function POST(req: NextRequest) {
     let finalAmount = Number(amount || 0)
     let discountPercent = 0
 
-    if (subtotal > 0) {
+    if (rawDiscountCode === 'emilia1') {
+      finalAmount = 1.00
+    } else if (subtotal > 0) {
       if (rawDiscountCode === 'holaswitzerland') {
         discountPercent = subtotal >= 100 ? 15 : 10
       } else if (subtotal >= 100) {
@@ -31,7 +33,7 @@ export async function POST(req: NextRequest) {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(finalAmount * 100), // Stripe usa centavos
       currency: 'chf',
-      payment_method_types: ['card'], // card includes Apple Pay & Google Pay
+      payment_method_types: ['card', 'twint'], // card includes Apple Pay & Google Pay
       metadata: {
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phone || '',

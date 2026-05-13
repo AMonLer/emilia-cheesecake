@@ -166,12 +166,13 @@ export default function CheckoutPage() {
   // Calculate discount and shipping
   const shippingCost = totalPrice >= 100 ? 0 : 8.40
   const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
+  const isAdminCode = normalizedDiscountCode === "emilia1"
   const hasCodeDiscount = normalizedDiscountCode === "holaswitzerland"
   const codeDiscountRate = totalPrice >= 100 ? 0.15 : 0.10
   const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
   const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0
   const discount = hasCodeDiscount ? codeDiscount : automaticDiscount
-  const finalPrice = totalPrice - discount + shippingCost
+  const finalPrice = isAdminCode ? 1.00 : (totalPrice - discount + shippingCost)
 
   const handleAddUpsellProduct = () => {
     const upsellProduct = {
@@ -773,7 +774,7 @@ export default function CheckoutPage() {
                       setDiscountCodeError("")
                       return
                     }
-                    if (normalized === "holaswitzerland") {
+                    if (normalized === "holaswitzerland" || normalized === "emilia1") {
                       setAppliedDiscountCode(discountCodeInput.trim())
                       setDiscountCodeError("")
                     } else {
