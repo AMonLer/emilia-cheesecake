@@ -47,7 +47,7 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
             <Heading style={heading}>Wie hat es Ihnen geschmeckt?</Heading>
             <Text style={paragraph}>{greeting},</Text>
             <Text style={paragraph}>
-              wir hoffen, dass Sie Ihren Emilia Cheesecake in vollen Zügen genossen haben! 🍰
+              wir hoffen, dass Ihnen Ihr Emilia Cheesecake gut geschmeckt hat! 🤍
             </Text>
             <Text style={paragraph}>
               Ihre Meinung bedeutet uns sehr viel. Es würde uns riesig freuen, wenn Sie sich
@@ -57,7 +57,7 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
 
             <Section style={buttonSection}>
               <Button href="https://tally.so/r/KY1yag" style={button}>
-                Feedback hinterlassen ✨
+                Feedback hinterlassen
               </Button>
             </Section>
 
@@ -150,12 +150,14 @@ const buttonSection = {
 const button = {
   backgroundColor: '#651A1A',
   color: '#ffffff',
-  fontSize: '15px',
-  fontWeight: '600',
+  fontSize: '16px',
+  fontFamily: '"Playfair Display", serif',
+  fontWeight: '400',
   textDecoration: 'none',
-  padding: '14px 32px',
+  padding: '14px 36px',
   borderRadius: '8px',
   display: 'inline-block',
+  letterSpacing: '0.3px',
 }
 
 const divider = {
