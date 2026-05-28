@@ -47,7 +47,7 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
             <Heading style={heading}>Wie hat es Ihnen geschmeckt?</Heading>
             <Text style={paragraph}>{greeting},</Text>
             <Text style={paragraph}>
-              wir hoffen, dass Ihnen Ihr Emilia Cheesecake gut geschmeckt hat! 🤍
+              wir hoffen, dass Ihnen Ihr Emilia Cheesecake gut geschmeckt hat! ❤️
             </Text>
             <Text style={paragraph}>
               Ihre Meinung bedeutet uns sehr viel. Es würde uns riesig freuen, wenn Sie sich
