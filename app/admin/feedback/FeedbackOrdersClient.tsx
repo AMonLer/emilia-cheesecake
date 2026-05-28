@@ -9,8 +9,9 @@ export interface FeedbackRow {
   id: string
   dateIso: string
   customerName: string
+  firstName: string
+  gender: 'male' | 'female'
   customerEmail: string
-  greeting: string
   deliveryDate: string
   deliveryTime: string
   total: number
@@ -82,12 +83,8 @@ function TestEmailButton() {
           Sent to {TEST_EMAIL}
         </span>
       )}
-      {status === 'error' && (
-        <span className="text-xs text-red-500">{errMsg}</span>
-      )}
-      {status === 'idle' && (
-        <span className="text-xs text-stone-400">→ {TEST_EMAIL}</span>
-      )}
+      {status === 'error' && <span className="text-xs text-red-500">{errMsg}</span>}
+      {status === 'idle' && <span className="text-xs text-stone-400">→ {TEST_EMAIL}</span>}
     </div>
   )
 }
@@ -100,17 +97,38 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
     }
     return initial
   })
+
+  const [edits, setEdits] = useState<Record<string, { name: string; gender: 'male' | 'female' }>>(() => {
+    const initial: Record<string, { name: string; gender: 'male' | 'female' }> = {}
+    for (const r of rows) {
+      initial[r.id] = { name: r.firstName, gender: r.gender }
+    }
+    return initial
+  })
+
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [errorMap, setErrorMap] = useState<Record<string, string>>({})
+
+  function setName(id: string, name: string) {
+    setEdits((prev) => ({ ...prev, [id]: { ...prev[id], name } }))
+  }
+
+  function toggleGender(id: string) {
+    setEdits((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], gender: prev[id].gender === 'male' ? 'female' : 'male' },
+    }))
+  }
 
   async function handleSend(id: string) {
     setLoadingId(id)
     setErrorMap((prev) => ({ ...prev, [id]: '' }))
+    const { name, gender } = edits[id]
     try {
       const res = await fetch('/api/admin/send-feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paymentIntentId: id }),
+        body: JSON.stringify({ paymentIntentId: id, overrideName: name, gender }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Error')
@@ -122,12 +140,12 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
     }
   }
 
-  const sentCount = Object.values(sentMap).length
+  const sentCount = Object.keys(sentMap).length
   const pendingCount = rows.length - sentCount
 
   return (
     <>
-      {/* Test email banner */}
+      {/* Top bar: stats + test button */}
       <div className="px-6 py-4 border-b border-[#F5E6D3] bg-[#FFFCF8] flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-6 text-xs text-stone-500">
           <span>
@@ -152,6 +170,7 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
               <tr className="text-[10px] uppercase tracking-widest text-stone-500 border-b border-[#F5E6D3]">
                 <th className="text-left px-6 py-3 font-medium">Order date</th>
                 <th className="text-left px-6 py-3 font-medium">Customer</th>
+                <th className="text-left px-6 py-3 font-medium">Greeting</th>
                 <th className="text-left px-6 py-3 font-medium">Delivery</th>
                 <th className="text-right px-6 py-3 font-medium">Total</th>
                 <th className="text-center px-6 py-3 font-medium">Feedback</th>
@@ -162,17 +181,48 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
                 const isSent = !!sentMap[r.id]
                 const isLoading = loadingId === r.id
                 const errMsg = errorMap[r.id]
+                const edit = edits[r.id]
+                const greetingWord = edit.gender === 'female' ? 'Liebe' : 'Lieber'
 
                 return (
                   <tr key={r.id} className="hover:bg-[#FFFCF8] transition-colors align-middle">
                     <td className="px-6 py-4 text-stone-700 whitespace-nowrap">
                       {formatDate(r.dateIso)}
                     </td>
+
+                    {/* Customer */}
                     <td className="px-6 py-4">
                       <div className="font-medium text-[#1a1a1a]">{r.customerName}</div>
-                      <div className="text-xs text-[#651A1A]/70 italic">{r.greeting},</div>
                       <div className="text-xs text-stone-400">{r.customerEmail}</div>
                     </td>
+
+                    {/* Editable greeting */}
+                    <td className="px-6 py-4">
+                      {isSent ? (
+                        <span className="text-xs text-stone-500 italic">
+                          {greetingWord} {edit.name},
+                        </span>
+                      ) : (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => toggleGender(r.id)}
+                            className="text-xs font-medium text-[#651A1A] bg-[#F5E6D3] hover:bg-[#E6D5C0] px-2 py-1 rounded transition whitespace-nowrap"
+                            title="Click to switch Lieber/Liebe"
+                          >
+                            {greetingWord}
+                          </button>
+                          <input
+                            type="text"
+                            value={edit.name}
+                            onChange={(e) => setName(r.id, e.target.value)}
+                            className="w-24 text-xs border border-[#E6D5C0] rounded px-2 py-1 focus:outline-none focus:border-[#651A1A] bg-white"
+                          />
+                          <span className="text-xs text-stone-400">,</span>
+                        </div>
+                      )}
+                    </td>
+
+                    {/* Delivery */}
                     <td className="px-6 py-4 text-xs text-stone-600 whitespace-nowrap">
                       {r.deliveryDate && (
                         <div className="flex items-center gap-1">
@@ -184,9 +234,12 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
                         <div className="text-stone-400 mt-0.5">{r.deliveryTime}</div>
                       )}
                     </td>
+
                     <td className="px-6 py-4 text-right tabular-nums text-[#1a1a1a] whitespace-nowrap">
                       {formatCHF(r.total)}
                     </td>
+
+                    {/* Send button */}
                     <td className="px-6 py-4 text-center">
                       {isSent ? (
                         <div className="inline-flex flex-col items-center gap-0.5">
@@ -202,7 +255,7 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
                         <div className="flex flex-col items-center gap-1">
                           <button
                             onClick={() => handleSend(r.id)}
-                            disabled={isLoading || !r.customerEmail}
+                            disabled={isLoading || !r.customerEmail || !edit.name.trim()}
                             className="inline-flex items-center gap-1.5 bg-[#651A1A] hover:bg-[#8B3A3A] disabled:bg-stone-300 disabled:cursor-not-allowed text-white px-3 py-1.5 rounded-lg text-xs font-medium transition"
                           >
                             {isLoading ? (

@@ -8,7 +8,7 @@ import {
   monthLongLabel,
   previousMonth,
 } from '@/lib/sales'
-import { germanGreeting } from '@/lib/utils'
+import { detectFirstName, detectGender } from '@/lib/utils'
 import FeedbackOrdersClient, { type FeedbackRow } from './FeedbackOrdersClient'
 
 export const dynamic = 'force-dynamic'
@@ -37,8 +37,9 @@ export default async function FeedbackPage({
       id: r.id,
       dateIso: r.date.toISOString(),
       customerName: r.customerName,
+      firstName: detectFirstName(r.customerName),
+      gender: detectGender(r.customerName),
       customerEmail: r.customerEmail,
-      greeting: germanGreeting(r.customerName),
       deliveryDate: r.deliveryDate,
       deliveryTime: r.deliveryTime,
       total: r.total,

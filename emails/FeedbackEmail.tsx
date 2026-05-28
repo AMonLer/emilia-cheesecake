@@ -11,14 +11,16 @@ import {
   Hr,
   Font,
 } from '@react-email/components'
-import { germanGreeting } from '@/lib/utils'
+import { germanGreeting, detectGender } from '@/lib/utils'
 
 interface FeedbackEmailProps {
   customerName: string
+  gender?: 'male' | 'female'
 }
 
-export default function FeedbackEmail({ customerName = 'Kunde' }: FeedbackEmailProps) {
-  const greeting = germanGreeting(customerName)
+export default function FeedbackEmail({ customerName = 'Kunde', gender }: FeedbackEmailProps) {
+  const resolvedGender = gender ?? detectGender(customerName)
+  const greeting = germanGreeting(customerName, resolvedGender)
 
   return (
     <Html>

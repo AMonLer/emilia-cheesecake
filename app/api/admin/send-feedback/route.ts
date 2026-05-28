@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { paymentIntentId } = await req.json()
+  const { paymentIntentId, overrideName, gender } = await req.json()
   if (!paymentIntentId) {
     return NextResponse.json({ error: 'Missing paymentIntentId' }, { status: 400 })
   }
@@ -32,13 +32,16 @@ export async function POST(req: NextRequest) {
   }
 
   const email = pi.metadata?.customerEmail?.trim()
-  const name = pi.metadata?.customerName?.trim() || 'Kunde'
+  const name = overrideName?.trim() || pi.metadata?.customerName?.trim() || 'Kunde'
 
   if (!email) {
     return NextResponse.json({ error: 'No email for this order' }, { status: 400 })
   }
 
-  const html = await render(FeedbackEmail({ customerName: name }))
+  const html = await render(FeedbackEmail({
+    customerName: name,
+    gender: gender ?? undefined,
+  }))
 
   const { error: resendError } = await resend.emails.send({
     from: process.env.EMAIL_FROM || 'info@emilialab.com',
