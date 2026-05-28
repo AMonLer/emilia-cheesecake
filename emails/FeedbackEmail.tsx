@@ -11,13 +11,14 @@ import {
   Hr,
   Font,
 } from '@react-email/components'
+import { germanGreeting } from '@/lib/utils'
 
 interface FeedbackEmailProps {
   customerName: string
 }
 
 export default function FeedbackEmail({ customerName = 'Kunde' }: FeedbackEmailProps) {
-  const firstName = customerName.split(' ')[0]
+  const greeting = germanGreeting(customerName)
 
   return (
     <Html>
@@ -42,7 +43,7 @@ export default function FeedbackEmail({ customerName = 'Kunde' }: FeedbackEmailP
 
           <Section style={content}>
             <Heading style={heading}>Wie hat es Ihnen geschmeckt?</Heading>
-            <Text style={paragraph}>Liebe/r {firstName},</Text>
+            <Text style={paragraph}>{greeting},</Text>
             <Text style={paragraph}>
               wir hoffen, dass Sie Ihren Emilia Cheesecake in vollen Zügen genossen haben! 🍰
             </Text>

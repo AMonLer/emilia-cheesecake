@@ -10,6 +10,7 @@ export interface FeedbackRow {
   dateIso: string
   customerName: string
   customerEmail: string
+  greeting: string
   deliveryDate: string
   deliveryTime: string
   total: number
@@ -169,6 +170,7 @@ export default function FeedbackOrdersClient({ rows }: { rows: FeedbackRow[] }) 
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-medium text-[#1a1a1a]">{r.customerName}</div>
+                      <div className="text-xs text-[#651A1A]/70 italic">{r.greeting},</div>
                       <div className="text-xs text-stone-400">{r.customerEmail}</div>
                     </td>
                     <td className="px-6 py-4 text-xs text-stone-600 whitespace-nowrap">
