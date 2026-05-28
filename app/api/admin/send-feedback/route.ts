@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     from: process.env.EMAIL_FROM || 'info@emilialab.com',
     to: email,
     replyTo: 'info@emilialab.com',
-    subject: 'Wie hat es Ihnen geschmeckt? 🍰',
+    subject: 'Wie hat es Ihnen geschmeckt? ❤️',
     html,
   })
 

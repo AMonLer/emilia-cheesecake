@@ -18,7 +18,7 @@ export async function POST() {
     from: process.env.EMAIL_FROM || 'info@emilialab.com',
     to: 'adrianmonjelerin@gmail.com',
     replyTo: 'info@emilialab.com',
-    subject: '[TEST] Wie hat es Ihnen geschmeckt? 🍰',
+    subject: '[TEST] Wie hat es Ihnen geschmeckt? ❤️',
     html,
   })
 
