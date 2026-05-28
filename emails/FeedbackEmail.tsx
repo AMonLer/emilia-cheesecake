@@ -62,7 +62,7 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
             </Section>
 
             <Text style={paragraphSmall}>
-              Es dauert nur 1 Minute — und wir sind für jede Rückmeldung sehr dankbar!
+              Es dauert nur 1 Minute – und wir freuen uns sehr über Ihr Feedback.
             </Text>
 
             <Hr style={divider} />
