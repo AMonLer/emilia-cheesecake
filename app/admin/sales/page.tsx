@@ -116,15 +116,24 @@ export default async function SalesPage({
               </p>
             </div>
           </div>
-          <form method="POST" action="/api/admin/logout">
-            <button
-              type="submit"
-              className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-[#651A1A] transition-colors"
+          <div className="flex items-center gap-3">
+            <a
+              href="/admin/feedback"
+              className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-[#651A1A] transition-colors"
             >
-              <LogOut className="w-4 h-4" />
-              Sign out
-            </button>
-          </form>
+              <Mail className="w-4 h-4" />
+              Feedback
+            </a>
+            <form method="POST" action="/api/admin/logout">
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 text-sm text-stone-600 hover:text-[#651A1A] transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Sign out
+              </button>
+            </form>
+          </div>
         </div>
       </header>
 

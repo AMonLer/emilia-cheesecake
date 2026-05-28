@@ -28,6 +28,7 @@ export interface SaleRow {
   deliveryDate: string
   deliveryTime: string
   items: SaleItem[]
+  feedbackSentAt?: string
 }
 
 export interface SalesSummary {
@@ -185,6 +186,7 @@ export async function fetchSalesForMonth(monthStr: string): Promise<SalesSummary
         deliveryDate: pi.metadata?.deliveryDate?.trim() || '',
         deliveryTime: pi.metadata?.deliveryTime?.trim() || '',
         items,
+        feedbackSentAt: pi.metadata?.feedbackSentAt || undefined,
       })
     }
 
