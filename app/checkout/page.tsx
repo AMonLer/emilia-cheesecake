@@ -152,17 +152,17 @@ export default function CheckoutPage() {
     // Block April 30, 2026
     const thisThursday = new Date(2026, 3, 30)
 
-    // Block June 5-7, 2026
-    const june5 = new Date(2026, 5, 5)
-    const june7 = new Date(2026, 5, 7)
-    const june5to7 = eachDayOfInterval({ start: june5, end: june7 })
+    // Block June 4-8, 2026
+    const june4 = new Date(2026, 5, 4)
+    const june8 = new Date(2026, 5, 8)
+    const june4to8 = eachDayOfInterval({ start: june4, end: june8 })
 
-    // Block June 15-27, 2026
-    const june15 = new Date(2026, 5, 15)
-    const june27 = new Date(2026, 5, 27)
-    const june15to27 = eachDayOfInterval({ start: june15, end: june27 })
+    // Block June 12-24, 2026
+    const june12 = new Date(2026, 5, 12)
+    const june24 = new Date(2026, 5, 24)
+    const june12to24 = eachDayOfInterval({ start: june12, end: june24 })
 
-    return [...decemberDates, ...januaryDates, thisThursday, ...june5to7, ...june15to27]
+    return [...decemberDates, ...januaryDates, thisThursday, ...june4to8, ...june12to24]
   }, [])
 
   // Generate time slots
