@@ -67,8 +67,7 @@
       "Bash(rm:*)",
       "Bash(mv \"The best Basque cheesecake has arrived in Zurich!!! And it is DELICIOUS 😍 \\(giveaway below!!\\)Wit.mp4\" \"zurich_roamer.mp4\")",
       "Bash(mv \"1776361983501.publer.com.mp4\" \"laviedechloee.mp4\")",
-      "Bash(STRIPE_SECRET_KEY=\"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\" node *)",
-      "mcp__notion__notion-search",
+"mcp__notion__notion-search",
       "mcp__notion__notion-fetch",
       "mcp__notion__notion-create-database",
       "WebFetch(domain:raw.githubusercontent.com)",
@@ -128,7 +127,8 @@
       "mcp__claude_ai_Pipeboard_Meta_Ads__get_insights",
       "mcp__claude_ai_Pipeboard_Meta_Ads__get_campaigns",
       "Bash(npm show *)",
-      "Bash(npm i *)"
+      "Bash(npm i *)",
+      "Bash(npx next *)"
     ],
     "deny": [],
     "ask": []
