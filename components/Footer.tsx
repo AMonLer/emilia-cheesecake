@@ -3,9 +3,12 @@
 import Link from "next/link"
 import { useState } from "react"
 import ContactModal from "./ContactModal"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function Footer() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+  const { t } = useLanguage()
+  const f = t.footer
 
   return (
     <>
@@ -19,41 +22,41 @@ export default function Footer() {
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">EMILIA</h2>
             <p className="text-gray-400 text-sm max-w-md mx-auto">
-              Authentische baskische Käsekuchen, handgefertigt in Zürich
+              {f.tagline}
             </p>
           </div>
 
           {/* Links */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-16 text-center md:text-left">
             <div>
-              <h4 className="font-black mb-6 tracking-tight text-sm">SHOP</h4>
+              <h4 className="font-black mb-6 tracking-tight text-sm">{f.colShop}</h4>
               <ul className="space-y-3 text-sm">
                 <li>
                   <Link href="/bestellen" className="text-gray-400 hover:text-white transition-colors">
-                    Käsekuchen
+                    {f.cheesecakes}
                   </Link>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Geschenksets
+                    {f.giftSets}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-black mb-6 tracking-tight text-sm">HILFE</h4>
+              <h4 className="font-black mb-6 tracking-tight text-sm">{f.colHelp}</h4>
               <ul className="space-y-3 text-sm">
                 <li>
                   <button
                     onClick={() => setIsContactModalOpen(true)}
                     className="text-gray-400 hover:text-white transition-colors cursor-pointer"
                   >
-                    Kontakt
+                    {f.contact}
                   </button>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Versand
+                    {f.shipping}
                   </a>
                 </li>
                 <li>
@@ -64,22 +67,22 @@ export default function Footer() {
               </ul>
             </div>
             <div>
-              <h4 className="font-black mb-6 tracking-tight text-sm">EMILIA</h4>
+              <h4 className="font-black mb-6 tracking-tight text-sm">{f.colEmilia}</h4>
               <ul className="space-y-3 text-sm">
                 <li>
                   <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Über uns
+                    {f.aboutUs}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    Standort
+                    {f.location}
                   </a>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-black mb-6 tracking-tight text-sm">FOLGE UNS</h4>
+              <h4 className="font-black mb-6 tracking-tight text-sm">{f.colFollow}</h4>
               <div className="flex gap-4 justify-center md:justify-start">
                 <a
                   href="https://www.instagram.com/emilia.cheesecake/"
@@ -99,11 +102,11 @@ export default function Footer() {
           {/* Divider y copyright */}
           <div className="border-t border-gray-800 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-              <p>© 2025 Emilia. Alle Käsekuchen mit Liebe gemacht.</p>
+              <p>{f.copyright}</p>
               <div className="flex gap-6 text-xs">
-                <a href="#" className="hover:text-white transition-colors">Datenschutz</a>
-                <a href="#" className="hover:text-white transition-colors">AGB</a>
-                <Link href="/impressum" className="hover:text-white transition-colors">Impressum</Link>
+                <a href="#" className="hover:text-white transition-colors">{f.privacy}</a>
+                <a href="#" className="hover:text-white transition-colors">{f.terms}</a>
+                <Link href="/impressum" className="hover:text-white transition-colors">{f.imprint}</Link>
               </div>
             </div>
           </div>

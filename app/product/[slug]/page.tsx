@@ -7,6 +7,7 @@ import { products } from "@/lib/products"
 import ProductGallery from "@/components/product/ProductGallery"
 import ProductInfo from "@/components/product/ProductInfo"
 import RelatedProducts from "@/components/product/RelatedProducts"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 declare global {
   interface Window {
@@ -16,6 +17,11 @@ declare global {
 
 export default function ProductPage({ params }: { params: { slug: string } }) {
   const product = products[params.slug]
+  const { t } = useLanguage()
+  const slug = params.slug as keyof typeof t.productDescriptions
+  const translatedProduct = product
+    ? { ...product, description: t.productDescriptions[slug] ?? product.description }
+    : product
 
   useEffect(() => {
     // Disable browser scroll restoration so it doesn't override our scroll
@@ -28,12 +34,12 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     const timer = setTimeout(() => window.scrollTo(0, 0), 100)
 
     // Meta Pixel: ViewContent
-    if (product && typeof window !== 'undefined' && window.fbq) {
+    if (translatedProduct && typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'ViewContent', {
-        content_name: product.name,
+        content_name: translatedProduct.name,
         content_ids: [params.slug],
         content_type: 'product',
-        value: product.prices['8-10'],
+        value: translatedProduct.prices['8-10'],
         currency: 'CHF',
       })
     }
@@ -48,8 +54,8 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-4xl font-black text-[#651A1A] mb-4">Produkt nicht gefunden</h1>
-          <p className="text-[#651A1A]/60">Das gesuchte Produkt existiert leider nicht.</p>
+          <h1 className="text-4xl font-black text-[#651A1A] mb-4">{t.productInfo.notFound}</h1>
+          <p className="text-[#651A1A]/60">{t.productInfo.notFoundDesc}</p>
         </div>
       </div>
     )
@@ -67,25 +73,25 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
               <div className="flex gap-3 mb-4">
                 {/* Left - Image */}
                 <div className="w-1/2 flex-shrink-0">
-                  <ProductGallery images={product.images} name={product.name} compact />
+                  <ProductGallery images={translatedProduct.images} name={translatedProduct.name} compact />
                 </div>
                 {/* Right - Name, description */}
                 <div className="flex-1 min-w-0">
-                  <ProductInfo product={product} slug={params.slug} compact="top" />
+                  <ProductInfo product={translatedProduct} slug={params.slug} compact="top" />
                 </div>
               </div>
               {/* Below - Size selector + Add to cart */}
-              <ProductInfo product={product} slug={params.slug} compact="bottom" />
+              <ProductInfo product={translatedProduct} slug={params.slug} compact="bottom" />
             </div>
 
             {/* Desktop: original 2-column layout */}
             <div className="hidden lg:grid grid-cols-2 gap-20 mb-20">
-              <ProductGallery images={product.images} name={product.name} />
-              <ProductInfo product={product} slug={params.slug} />
+              <ProductGallery images={translatedProduct.images} name={translatedProduct.name} />
+              <ProductInfo product={translatedProduct} slug={params.slug} />
             </div>
 
             {/* Related Products */}
-            <RelatedProducts products={product.frequentlyBought} />
+            <RelatedProducts products={translatedProduct.frequentlyBought} />
           </div>
         </div>
       </main>

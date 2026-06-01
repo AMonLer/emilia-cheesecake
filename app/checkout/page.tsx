@@ -5,16 +5,19 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ChevronRight, ChevronLeft, X } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
+import { enUS } from "date-fns/locale"
 import "react-datepicker/dist/react-datepicker.css"
 import { addHours, eachDayOfInterval } from "date-fns"
 
 registerLocale("de", de)
+registerLocale("en", enUS)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
@@ -24,6 +27,8 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string>("")
   const router = useRouter()
+  const { t } = useLanguage()
+  const c = t.checkout
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,11 +49,11 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
       })
 
       if (error) {
-        setErrorMessage(error.message || "Bei der Zahlungsabwicklung ist ein Fehler aufgetreten")
+        setErrorMessage(error.message || c.paymentError)
         setIsProcessing(false)
       }
     } catch (err: any) {
-      setErrorMessage(err.message || "Ein unerwarteter Fehler ist aufgetreten")
+      setErrorMessage(err.message || c.unexpectedError)
       setIsProcessing(false)
     }
   }
@@ -68,7 +73,7 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
         disabled={!stripe || isProcessing}
         className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
-        {isProcessing ? "Wird verarbeitet..." : "Jetzt bezahlen"}
+        {isProcessing ? c.processing : c.payNow}
       </button>
     </form>
   )
@@ -77,6 +82,8 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
 export default function CheckoutPage() {
   const router = useRouter()
   const { cartItems, totalPrice, removeItem, addToCart } = useCart()
+  const { locale, t } = useLanguage()
+  const c = t.checkout
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -210,7 +217,7 @@ export default function CheckoutPage() {
     setMissingFields(missing)
 
     if (missing.size > 0) {
-      setFormError("Bitte füllen Sie alle Pflichtfelder aus (rot markiert).")
+      setFormError(c.formError)
       // Scroll first missing field into view
       requestAnimationFrame(() => {
         const first = document.querySelector('[data-error="true"]') as HTMLElement | null
@@ -222,7 +229,7 @@ export default function CheckoutPage() {
 
     // Validate postal code is within delivery area
     if (!isPostalCodeValid(postalCode)) {
-      setPostalCodeError("Leider liefern wir nur im Umkreis von 10km um Zürich Zentrum. Ihre Postleitzahl liegt ausserhalb unseres Liefergebiets.")
+      setPostalCodeError(c.postalCodeError)
       setFormError("")
       return
     }
@@ -237,7 +244,7 @@ export default function CheckoutPage() {
     e.preventDefault()
 
     if (!deliveryDate || !deliveryTime) {
-      setDeliveryError("Bitte wählen Sie Lieferdatum und -zeit.")
+      setDeliveryError(c.deliveryError)
       return
     }
     setDeliveryError("")
@@ -283,11 +290,11 @@ export default function CheckoutPage() {
         setClientSecret(data.clientSecret)
         setShowPayment(true)
       } else {
-        setPaymentInitError("Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.")
+        setPaymentInitError(c.paymentInitError)
       }
     } catch (error) {
       console.error('Error:', error)
-      setPaymentInitError("Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.")
+      setPaymentInitError(c.paymentInitError)
     }
   }
 
@@ -296,9 +303,9 @@ export default function CheckoutPage() {
       <div className="min-h-screen bg-white">
         <Navbar />
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-3xl font-black mb-4">Ihr Warenkorb ist leer</h1>
+          <h1 className="text-3xl font-black mb-4">{c.emptyCart}</h1>
           <Link href="/" className="text-black underline font-bold">
-            Weiter einkaufen
+            {c.continueShopping}
           </Link>
         </div>
       </div>
@@ -312,11 +319,11 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Breadcrumb */}
         <div className="hidden md:flex items-center gap-2 text-sm mb-8">
-          <Link href="/" className="text-pink-500 hover:underline">Warenkorb</Link>
+          <Link href="/" className="text-pink-500 hover:underline">{c.breadcrumbCart}</Link>
           <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-900 font-medium">Informationen</span>
+          <span className="text-gray-900 font-medium">{c.breadcrumbInfo}</span>
           <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-400">Zahlung</span>
+          <span className="text-gray-400">{c.breadcrumbPayment}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
@@ -328,14 +335,14 @@ export default function CheckoutPage() {
               {/* Contact Section */}
               <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-black">Kontakt</h2>
+                  <h2 className="text-xl font-black">{c.contact}</h2>
                   <Link href="#" className="text-sm text-gray-600 hover:text-black">
-                    Anmelden
+                    {c.signIn}
                   </Link>
                 </div>
                 <input
                   type="email"
-                  placeholder="E-Mail"
+                  placeholder={c.emailPlaceholder}
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
                   data-error={missingFields.has('email')}
@@ -344,14 +351,14 @@ export default function CheckoutPage() {
                 />
                 <input
                   type="tel"
-                  placeholder="Handynummer (z.B. +41 79 123 45 67)"
+                  placeholder={c.phonePlaceholder}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
                 />
                 <label className="flex items-center gap-2 mt-3">
                   <input type="checkbox" className="w-4 h-4" />
-                  <span className="text-sm">Senden Sie mir Neuigkeiten und Angebote per E-Mail</span>
+                  <span className="text-sm">{c.newsletter}</span>
                 </label>
               </div>
 
@@ -359,7 +366,7 @@ export default function CheckoutPage() {
               {!showDeliveryStep && !showPayment && (
                 <div>
                   <div className="mb-8">
-                    <h2 className="text-xl font-black mb-4">Lieferadresse</h2>
+                    <h2 className="text-xl font-black mb-4">{c.deliveryAddress}</h2>
 
                     <div className="space-y-4">
                       <select
@@ -367,13 +374,13 @@ export default function CheckoutPage() {
                         onChange={(e) => setCountry(e.target.value)}
                         className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
                       >
-                        <option value="Switzerland">Schweiz</option>
+                        <option value="Switzerland">{c.country}</option>
                       </select>
 
                       <div className="grid grid-cols-2 gap-4">
                         <input
                           type="text"
-                          placeholder="Vorname"
+                          placeholder={c.firstNamePlaceholder}
                           value={firstName}
                           onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
                           data-error={missingFields.has('firstName')}
@@ -382,7 +389,7 @@ export default function CheckoutPage() {
                         />
                         <input
                           type="text"
-                          placeholder="Nachname"
+                          placeholder={c.lastNamePlaceholder}
                           value={lastName}
                           onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
                           data-error={missingFields.has('lastName')}
@@ -393,7 +400,7 @@ export default function CheckoutPage() {
 
                       <input
                         type="text"
-                        placeholder="Adresse"
+                        placeholder={c.addressPlaceholder}
                         value={address}
                         onChange={(e) => { setAddress(e.target.value); if (missingFields.has('address')) { const m = new Set(missingFields); m.delete('address'); setMissingFields(m) } }}
                         data-error={missingFields.has('address')}
@@ -404,7 +411,7 @@ export default function CheckoutPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <input
                           type="text"
-                          placeholder="Stadt"
+                          placeholder={c.cityPlaceholder}
                           value={city}
                           onChange={(e) => { setCity(e.target.value); if (missingFields.has('city')) { const m = new Set(missingFields); m.delete('city'); setMissingFields(m) } }}
                           data-error={missingFields.has('city')}
@@ -413,7 +420,7 @@ export default function CheckoutPage() {
                         />
                         <input
                           type="text"
-                          placeholder="Postleitzahl"
+                          placeholder={c.postalCodePlaceholder}
                           value={postalCode}
                           onChange={(e) => {
                             setPostalCode(e.target.value)
@@ -454,7 +461,7 @@ export default function CheckoutPage() {
                     onClick={handleContinueToDelivery}
                     className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
                   >
-                    Weiter zur Lieferzeit
+                    {c.continueToDelivery}
                   </button>
                 </div>
               )}
@@ -467,21 +474,21 @@ export default function CheckoutPage() {
                     className="text-sm text-gray-600 hover:text-black mb-4 flex items-center gap-2"
                   >
                     <ChevronRight className="w-4 h-4 rotate-180" />
-                    Zurück zur Adresse
+                    {c.backToAddress}
                   </button>
 
-                  <h2 className="text-xl font-black mb-2">Lieferung</h2>
+                  <h2 className="text-xl font-black mb-2">{c.deliveryTitle}</h2>
                   <p className="text-sm text-gray-600 mb-6 flex items-start gap-2">
                     <svg className="w-5 h-5 text-[#651A1A] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span>Bestellungen benötigen mindestens 36 Stunden Vorlaufzeit. Alle Käsekuchen werden frisch für Sie gebacken.</span>
+                    <span>{c.deliveryNotice}</span>
                   </p>
 
                   <div className="space-y-4 mb-8">
                     {/* Date Picker */}
                     <div>
-                      <label className="block text-sm font-bold mb-4">Lieferdatum wählen</label>
+                      <label className="block text-sm font-bold mb-4">{c.chooseDateLabel}</label>
                       <style>{`
                         .custom-datepicker {
                           font-family: var(--font-playfair), serif;
@@ -580,7 +587,7 @@ export default function CheckoutPage() {
                             onChange={(date) => setDeliveryDate(date)}
                             minDate={minDeliveryDate}
                             excludeDates={blockedDates}
-                            locale="de"
+                            locale={locale === 'en' ? 'en' : 'de'}
                             inline
                             calendarClassName="custom-datepicker"
                             renderCustomHeader={({
@@ -627,7 +634,7 @@ export default function CheckoutPage() {
                         <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start justify-center text-center lg:text-left">
                           {deliveryDate ? (
                             <>
-                              <p className="text-xs uppercase tracking-widest text-[#651A1A] font-bold mb-2">Lieferdatum</p>
+                              <p className="text-xs uppercase tracking-widest text-[#651A1A] font-bold mb-2">{c.deliveryDateLabel}</p>
                               <p className="text-4xl lg:text-5xl font-black font-serif text-[#1a1a1a] mb-2">
                                 {deliveryDate.getDate()}
                               </p>
@@ -643,7 +650,7 @@ export default function CheckoutPage() {
                             </>
                           ) : (
                             <div className="text-gray-400 flex flex-col items-center lg:items-start">
-                              <p className="mb-2">Bitte wählen Sie ein Datum</p>
+                              <p className="mb-2">{c.selectDatePlaceholder}</p>
                               <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
                             </div>
                           )}
@@ -653,7 +660,7 @@ export default function CheckoutPage() {
 
                     {/* Time Slot Picker */}
                     <div>
-                      <label className="block text-sm font-bold mb-3">Gewünschte Lieferzeit</label>
+                      <label className="block text-sm font-bold mb-3">{c.chooseTimeLabel}</label>
                       <div className="grid grid-cols-2 gap-3">
                         {timeSlots.map((slot) => (
                           <button
@@ -695,7 +702,7 @@ export default function CheckoutPage() {
                     onClick={handleContinueToPayment}
                     className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
                   >
-                    Weiter zur Zahlung
+                    {c.continueToPayment}
                   </button>
                 </div>
               )}
@@ -711,10 +718,10 @@ export default function CheckoutPage() {
                     className="text-sm text-gray-600 hover:text-black mb-4 flex items-center gap-2"
                   >
                     <ChevronRight className="w-4 h-4 rotate-180" />
-                    Zurück zur Lieferzeit
+                    {c.backToDelivery}
                   </button>
 
-                  <h2 className="text-xl font-black mb-4">Zahlung</h2>
+                  <h2 className="text-xl font-black mb-4">{c.paymentTitle}</h2>
                   <Elements
                     stripe={stripePromise}
                     options={{
@@ -736,7 +743,7 @@ export default function CheckoutPage() {
 
           {/* Right Side - Order Summary */}
           <div className="lg:border-l lg:pl-12">
-            <h2 className="text-xl font-black mb-6">Bestellübersicht</h2>
+            <h2 className="text-xl font-black mb-6">{c.orderSummary}</h2>
 
             {/* Cart Items */}
             <div className="space-y-4 mb-6">
@@ -751,8 +758,8 @@ export default function CheckoutPage() {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-bold text-sm">{item.name}</h3>
-                      <p className="text-xs text-gray-600">{item.size} Personen</p>
-                      <p className="text-xs text-gray-900 font-bold mt-1">Menge: {item.quantity}</p>
+                      <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
+                      <p className="text-xs text-gray-900 font-bold mt-1">{c.qty} {item.quantity}</p>
                     </div>
                     <div className="font-bold">
                       <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
@@ -767,7 +774,7 @@ export default function CheckoutPage() {
               <div className="flex gap-2">
                 <input
                   type="text"
-                  placeholder="Rabattcode oder Geschenkkarte"
+                  placeholder={c.discountCodePlaceholder}
                   value={discountCodeInput}
                   onChange={(e) => {
                     setDiscountCodeInput(e.target.value)
@@ -789,12 +796,12 @@ export default function CheckoutPage() {
                       setDiscountCodeError("")
                     } else {
                       setAppliedDiscountCode("")
-                      setDiscountCodeError("Rabattcode ungültig")
+                      setDiscountCodeError(c.invalidCode)
                     }
                   }}
                   className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors"
                 >
-                  Anwenden
+                  {c.applyCode}
                 </button>
               </div>
               {discountCodeError && (
@@ -805,7 +812,7 @@ export default function CheckoutPage() {
             {/* Totals */}
             <div className="space-y-3 border-t pt-6">
               <div className="flex justify-between text-sm">
-                <span>Zwischensumme</span>
+                <span>{c.subtotal}</span>
                 <span className={discount > 0 ? "text-gray-500 line-through" : "font-bold"}>
                   <PriceDisplay amount={totalPrice} className="text-base font-bold" currencyClassName="text-[0.6em] opacity-80" />
                 </span>
@@ -823,15 +830,15 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span>Versand</span>
+                <span>{c.shipping}</span>
                 {shippingCost === 0 ? (
-                  <span className="text-green-600 font-bold">Gratis</span>
+                  <span className="text-green-600 font-bold">{c.free}</span>
                 ) : (
                   <PriceDisplay amount={shippingCost} className="text-sm" />
                 )}
               </div>
               <div className="flex justify-between text-lg font-black border-t pt-3">
-                <span>Gesamt</span>
+                <span>{c.total}</span>
                 <span className={discount > 0 ? "text-green-600" : ""}>
                   <PriceDisplay amount={finalPrice} className="text-xl font-black" currencyClassName="text-[0.5em] opacity-100" />
                 </span>
@@ -841,7 +848,7 @@ export default function CheckoutPage() {
             {/* Limited Offer */}
             {!upsellAdded && (
               <div className="mt-6 p-4 bg-pink-50 rounded-lg">
-                <h3 className="font-bold text-sm mb-2">Zeitlich begrenztes Angebot! Füge mehr hinzu und spare</h3>
+                <h3 className="font-bold text-sm mb-2">{c.upsellTitle}</h3>
                 <div className="flex gap-3 items-center">
                   <img
                     src="/original3.png"
@@ -860,7 +867,7 @@ export default function CheckoutPage() {
                     onClick={handleAddUpsellProduct}
                     className="px-4 py-2 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-900 transition-colors"
                   >
-                    Hinzufügen
+                    {c.upsellAdd}
                   </button>
                 </div>
               </div>

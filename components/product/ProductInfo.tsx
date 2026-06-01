@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
 import { Check, CheckCircle, CreditCard } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
@@ -22,6 +23,8 @@ interface ProductInfoProps {
 export default function ProductInfo({ product, slug, compact = false }: ProductInfoProps) {
     const [selectedSize, setSelectedSize] = useState<string>("8-10")
     const { addToCart: addToCartContext } = useCart()
+    const { t } = useLanguage()
+    const pi = t.productInfo
 
     const addToCart = () => {
         if (!selectedSize) return
@@ -41,7 +44,6 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
 
         addToCartContext(newItem)
 
-        // Meta Pixel: AddToCart
         if (typeof window !== 'undefined' && window.fbq) {
             window.fbq('track', 'AddToCart', {
                 content_name: product.name,
@@ -69,7 +71,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
     if (compact === "bottom") {
         return (
             <div>
-                <h3 className="font-black text-xs text-black mb-3 tracking-wide uppercase">Größe wählen</h3>
+                <h3 className="font-black text-xs text-black mb-3 tracking-wide uppercase">{pi.chooseSize}</h3>
                 <div className="grid grid-cols-2 gap-2 mb-4">
                     <button
                         onClick={() => setSelectedSize("8-10")}
@@ -88,7 +90,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-black text-xs text-black">8–10 Pers.</p>
+                                <p className="font-black text-xs text-black">8–10 {pi.persons23.replace('2–3 ', '')}</p>
                                 <p className="text-[10px] text-black/60">Ø 24 cm</p>
                                 <div className="text-[#651A1A] mt-0.5">
                                     <PriceDisplay amount={product.prices["8-10"]} className="text-sm" />
@@ -119,7 +121,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <p className="font-black text-xs text-black">2–3 Pers.</p>
+                                <p className="font-black text-xs text-black">{pi.persons23}</p>
                                 <p className="text-[10px] text-black/60">Ø 14 cm</p>
                                 <div className="text-[#651A1A] mt-0.5">
                                     <PriceDisplay amount={product.prices["2-3"]} className="text-sm" />
@@ -138,16 +140,15 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     onClick={addToCart}
                     className="w-full bg-black text-white py-3.5 rounded-xl font-black text-sm tracking-wide hover:bg-gray-900 transition-colors shadow-lg shadow-black/20 mb-6"
                 >
-                    IN DEN WARENKORB
+                    {pi.addToCart}
                 </button>
 
-                {/* Guarantee & Payment Info */}
                 <div className="mb-6 space-y-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
                     <div className="flex items-center gap-2">
                         <div className="bg-[#651A1A]/10 p-1.5 rounded-full">
                             <CheckCircle className="w-4 h-4 text-[#651A1A]" />
                         </div>
-                        <span className="text-xs font-bold text-[#651A1A]">100% Zufriedenheitsgarantie</span>
+                        <span className="text-xs font-bold text-[#651A1A]">{pi.guarantee}</span>
                     </div>
                     <div className="h-px bg-gray-200 w-full"></div>
                     <div className="flex items-center gap-2">
@@ -155,7 +156,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             <CreditCard className="w-4 h-4 text-[#651A1A]" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-[#651A1A] uppercase tracking-wide mb-1">Sichere Bezahlung</span>
+                            <span className="text-[10px] font-bold text-[#651A1A] uppercase tracking-wide mb-1">{pi.securePayment}</span>
                             <div className="flex items-center gap-1.5">
                                 <VisaIcon className="h-6 w-auto" />
                                 <MastercardIcon className="h-6 w-auto" />
@@ -165,43 +166,41 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     </div>
                 </div>
 
-                {/* Features List */}
                 <div className="space-y-2 border-t border-black/10 pt-5">
                     <ul className="space-y-2">
                         <li className="text-xs font-medium flex items-start text-black/80">
                             <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
                                 <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
                             </div>
-                            <span>Frischegarantie & Kühlversand</span>
+                            <span>{pi.freshness}</span>
                         </li>
                         <li className="text-xs font-medium flex items-start text-black/80">
                             <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
                                 <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
                             </div>
-                            <span>Handwerklich mit Liebe gemacht</span>
+                            <span>{pi.handcrafted}</span>
                         </li>
                         <li className="text-xs font-medium flex items-start text-black/80">
                             <div className="mr-2 mt-0.5 bg-black/10 p-1 rounded-full">
                                 <Check className="w-2.5 h-2.5 text-black" strokeWidth={3} />
                             </div>
-                            <span>Nur natürliche Zutaten</span>
+                            <span>{pi.naturalIngredients}</span>
                         </li>
                     </ul>
                 </div>
 
-                {/* Ingredients Accordion */}
                 {product.ingredients && (
                     <div className="mt-5 border-t border-black/10 pt-4">
                         <details className="group">
                             <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-xs text-black uppercase tracking-wide">
-                                Zutaten & Allergene
+                                {pi.ingredients}
                                 <span className="transition group-open:rotate-180">
                                     <svg fill="none" height="20" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="20"><path d="M6 9l6 6 6-6"></path></svg>
                                 </span>
                             </summary>
                             <div className="mt-3 text-xs text-black/70 leading-relaxed">
                                 <p dangerouslySetInnerHTML={{ __html: product.ingredients }} />
-                                <p className="mt-2 text-[9px] uppercase tracking-wider text-black/50">Allergene sind fett gedruckt.</p>
+                                <p className="mt-2 text-[9px] uppercase tracking-wider text-black/50">{pi.allergenNote}</p>
                             </div>
                         </details>
                     </div>
@@ -212,23 +211,19 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
 
     return (
         <div className="flex flex-col h-full justify-center">
-            {/* Title */}
             <div className="mb-4">
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-black">
                     {product.name}
                 </h1>
             </div>
 
-            {/* Description */}
             <p className="text-base text-black/80 mb-8 leading-relaxed">
                 {product.description}
             </p>
 
-            {/* Size Selector */}
             <div className="mb-8">
-                <h3 className="font-black text-sm text-black mb-4 tracking-wide uppercase">Größe wählen</h3>
+                <h3 className="font-black text-sm text-black mb-4 tracking-wide uppercase">{pi.chooseSize}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {/* 8-10 Personas */}
                     <button
                         onClick={() => setSelectedSize("8-10")}
                         className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "8-10"
@@ -247,7 +242,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             </div>
                             <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
                                 <div>
-                                    <p className="font-black text-xs sm:text-sm text-black truncate">8–10 Personen</p>
+                                    <p className="font-black text-xs sm:text-sm text-black truncate">{pi.persons810.replace('8–10', '8–10')}</p>
                                     <p className="text-xs text-black/60">Ø 24 cm</p>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
@@ -268,7 +263,6 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                         )}
                     </button>
 
-                    {/* 2-3 Personas */}
                     <button
                         onClick={() => setSelectedSize("2-3")}
                         className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
@@ -287,7 +281,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             </div>
                             <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
                                 <div>
-                                    <p className="font-black text-xs sm:text-sm text-black truncate">2–3 Personen</p>
+                                    <p className="font-black text-xs sm:text-sm text-black truncate">{pi.persons23}</p>
                                     <p className="text-xs text-black/60">Ø 14 cm</p>
                                 </div>
                                 <div className="text-right flex flex-col items-end">
@@ -310,21 +304,19 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                 </div>
             </div>
 
-            {/* Add to Cart Button */}
             <button
                 onClick={addToCart}
                 className="w-full bg-black text-white py-4 rounded-xl font-black text-base tracking-wide hover:bg-gray-900 transition-colors mb-8 shadow-lg shadow-black/20"
             >
-                IN DEN WARENKORB LEGEN
+                {pi.addToCartLong}
             </button>
 
-            {/* Guarantee & Payment Info */}
             <div className="mb-8 space-y-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
                 <div className="flex items-center gap-3">
                     <div className="bg-[#651A1A]/10 p-2 rounded-full">
                         <CheckCircle className="w-5 h-5 text-[#651A1A]" />
                     </div>
-                    <span className="text-sm font-bold text-[#651A1A]">100% Zufriedenheitsgarantie</span>
+                    <span className="text-sm font-bold text-[#651A1A]">{pi.guarantee}</span>
                 </div>
                 <div className="h-px bg-gray-200 w-full"></div>
                 <div className="flex items-center gap-3">
@@ -332,7 +324,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                         <CreditCard className="w-5 h-5 text-[#651A1A]" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-xs font-bold text-[#651A1A] uppercase tracking-wide mb-2">Sichere Bezahlung</span>
+                        <span className="text-xs font-bold text-[#651A1A] uppercase tracking-wide mb-2">{pi.securePayment}</span>
                         <div className="flex items-center gap-2">
                             <VisaIcon className="h-8 w-auto" />
                             <MastercardIcon className="h-8 w-auto" />
@@ -342,43 +334,41 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                 </div>
             </div>
 
-            {/* Features List */}
             <div className="space-y-3 border-t border-black/10 pt-6">
                 <ul className="space-y-3">
                     <li className="text-sm font-medium flex items-start text-black/80">
                         <div className="mr-3 mt-0.5 bg-black/10 p-1 rounded-full">
                             <Check className="w-3 h-3 text-black" strokeWidth={3} />
                         </div>
-                        <span>Frischegarantie & Kühlversand</span>
+                        <span>{pi.freshness}</span>
                     </li>
                     <li className="text-sm font-medium flex items-start text-black/80">
                         <div className="mr-3 mt-0.5 bg-black/10 p-1 rounded-full">
                             <Check className="w-3 h-3 text-black" strokeWidth={3} />
                         </div>
-                        <span>Handwerklich mit Liebe gemacht</span>
+                        <span>{pi.handcrafted}</span>
                     </li>
                     <li className="text-sm font-medium flex items-start text-black/80">
                         <div className="mr-3 mt-0.5 bg-black/10 p-1 rounded-full">
                             <Check className="w-3 h-3 text-black" strokeWidth={3} />
                         </div>
-                        <span>Nur natürliche Zutaten</span>
+                        <span>{pi.naturalIngredients}</span>
                     </li>
                 </ul>
             </div>
 
-            {/* Ingredients Accordion */}
             {product.ingredients && (
                 <div className="mt-6 border-t border-black/10 pt-4">
                     <details className="group">
                         <summary className="flex items-center justify-between cursor-pointer list-none font-bold text-sm text-black uppercase tracking-wide">
-                            Zutaten & Allergene
+                            {pi.ingredients}
                             <span className="transition group-open:rotate-180">
                                 <svg fill="none" height="24" shapeRendering="geometricPrecision" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
                             </span>
                         </summary>
                         <div className="mt-3 text-sm text-black/70 leading-relaxed">
                             <p dangerouslySetInnerHTML={{ __html: product.ingredients }} />
-                            <p className="mt-2 text-[10px] uppercase tracking-wider text-black/50">Allergene sind fett gedruckt.</p>
+                            <p className="mt-2 text-[10px] uppercase tracking-wider text-black/50">{pi.allergenNote}</p>
                         </div>
                     </details>
                 </div>

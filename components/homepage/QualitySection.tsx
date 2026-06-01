@@ -1,7 +1,13 @@
+'use client'
+
 import Link from "next/link"
 import Image from "next/image"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function QualitySection() {
+    const { t } = useLanguage()
+    const q = t.quality
+
     return (
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
@@ -9,17 +15,17 @@ export default function QualitySection() {
                     {/* Lado izquierdo - Texto */}
                     <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10 w-full mb-6">
                         <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
-                            DEIN <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1 py-1">Cheesecake</span>,
+                            {q.title1} <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1 py-1">Cheesecake</span>,
                             <br />
-                            WIE ER SEIN SOLL
+                            {q.title2}
                         </h2>
                         <p className="text-base md:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 text-[#651A1A]/80">
-                            Überrasche deine Freunde, Familie oder Kollegen mit unseren frisch gebackenen Käsekuchen. Ab 100 CHF bekommst du 10% Rabatt und Gratisversand!
+                            {q.desc}
                         </p>
                         <div className="pt-4">
                             <Link href="/bestellen">
                                 <button className="bg-[#651A1A] text-white px-10 py-4 rounded-full font-black text-sm tracking-widest uppercase hover:bg-[#4A1313] transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1">
-                                    JETZT BESTELLEN
+                                    {q.cta}
                                 </button>
                             </Link>
                         </div>
@@ -36,7 +42,6 @@ export default function QualitySection() {
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />
                         </div>
-                        {/* Decorative element */}
                         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
                         <div className="absolute -top-6 -right-6 w-32 h-32 border-4 border-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
                     </div>

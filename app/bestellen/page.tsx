@@ -4,8 +4,12 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import OrderHero from "@/components/order/OrderHero"
 import ProductCard from "@/components/ProductCard"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function BestellenPage() {
+  const { t } = useLanguage()
+  const p = t.products
+
   const products = [
     {
       id: "verdalia",
@@ -15,7 +19,7 @@ export default function BestellenPage() {
       image2: "/pistacho2.png",
       priceSmall: 18.90,
       priceLarge: 49.90,
-      description: "Köstlicher Pistazienkäsekuchen, cremig und mit einem einzigartigen, unwiderstehlichen Geschmack."
+      description: p.pistachio
     },
     {
       id: "clasica",
@@ -25,7 +29,7 @@ export default function BestellenPage() {
       image2: "/original2.png",
       priceSmall: 15.90,
       priceLarge: 42.90,
-      description: "Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack."
+      description: p.classic
     },
     {
       id: "emilia3",
@@ -35,7 +39,7 @@ export default function BestellenPage() {
       image2: "/lotus2.png",
       priceSmall: 16.90,
       priceLarge: 44.90,
-      description: "Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack."
+      description: p.lotus
     },
     {
       id: "schoggi",
@@ -45,7 +49,7 @@ export default function BestellenPage() {
       image2: "/chocolate2.png",
       priceSmall: 16.90,
       priceLarge: 44.90,
-      description: "Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber."
+      description: p.schoggi
     },
     {
       id: "manjar",
@@ -55,7 +59,7 @@ export default function BestellenPage() {
       image2: "/cafe2.png",
       priceSmall: 17.40,
       priceLarge: 45.90,
-      description: "Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell."
+      description: p.dulceDeLeche
     }
   ]
 

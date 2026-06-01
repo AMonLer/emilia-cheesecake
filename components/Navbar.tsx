@@ -4,14 +4,16 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, X, Search, ShoppingBag } from 'lucide-react'
+import { Menu, X, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
+import { useLanguage } from '@/contexts/LanguageContext'
 import PriceDisplay from '@/components/PriceDisplay'
 
 export default function Navbar() {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const { locale, setLocale, t } = useLanguage()
   const {
     cartItems,
     isCartOpen,
@@ -38,7 +40,7 @@ export default function Navbar() {
                 href="/uber-uns"
                 className="group relative text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
               >
-                Über Uns
+                {t.nav.aboutUs}
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />
               </Link>
             </div>
@@ -56,7 +58,24 @@ export default function Navbar() {
             </Link>
 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-6 flex-1 justify-end">
+            <div className="flex items-center gap-4 flex-1 justify-end">
+              {/* Language Switcher */}
+              <div className="flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
+                <button
+                  onClick={() => setLocale('de')}
+                  className={`px-1 transition-opacity duration-200 ${locale === 'de' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                >
+                  DE
+                </button>
+                <span className="opacity-30 mx-0.5">|</span>
+                <button
+                  onClick={() => setLocale('en')}
+                  className={`px-1 transition-opacity duration-200 ${locale === 'en' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                >
+                  EN
+                </button>
+              </div>
+
               {/* Shopping Bag */}
               <Button
                 variant="ghost"
@@ -92,8 +111,8 @@ export default function Navbar() {
             <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 p-6 z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-xl font-medium tracking-wide text-black uppercase">Warenkorb</h2>
-                  <p className="text-xs text-gray-500 mt-1 font-light tracking-wider">{cartItemCount} {cartItemCount === 1 ? 'ARTIKEL' : 'ARTIKEL'}</p>
+                  <h2 className="text-xl font-medium tracking-wide text-black uppercase">{t.cart.title}</h2>
+                  <p className="text-xs text-gray-500 mt-1 font-light tracking-wider">{cartItemCount} {t.cart.items}</p>
                 </div>
                 <button
                   onClick={() => setIsCartOpen(false)}
@@ -109,14 +128,14 @@ export default function Navbar() {
               {cartItems.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-[50vh] text-center">
                   <ShoppingBag className="w-12 h-12 text-gray-200 mb-4" strokeWidth={1} />
-                  <h3 className="text-lg font-medium text-black mb-2 tracking-wide">Ihr Warenkorb ist leer</h3>
-                  <p className="text-sm text-gray-500 mb-8 font-light">Entdecken Sie unsere handgemachten Käsekuchen.</p>
+                  <h3 className="text-lg font-medium text-black mb-2 tracking-wide">{t.cart.empty}</h3>
+                  <p className="text-sm text-gray-500 mb-8 font-light">{t.cart.emptyDesc}</p>
                   <Link href="/">
                     <button
                       onClick={() => setIsCartOpen(false)}
                       className="bg-black text-white px-8 py-3 text-sm tracking-widest uppercase hover:bg-gray-900 transition-colors duration-300"
                     >
-                      Einkaufen
+                      {t.cart.shop}
                     </button>
                   </Link>
                 </div>
@@ -141,11 +160,11 @@ export default function Navbar() {
                               <h3 className="font-medium text-base text-black tracking-wide uppercase">{item.name}</h3>
                               {item.price === 13.5 && (
                                 <span className="bg-[#651A1A] text-[#F5E6D3] text-[9px] px-1.5 py-0.5 rounded-sm tracking-widest font-bold">
-                                  ANGEBOT
+                                  {t.cart.offer}
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 font-light">{item.size} Personen</p>
+                            <p className="text-xs text-gray-500 mt-1 font-light">{item.size} {t.cart.persons}</p>
                           </div>
                           <button
                             onClick={() => removeItem(item.id)}
@@ -186,7 +205,7 @@ export default function Navbar() {
                 <div className="space-y-3">
                     {totalPrice >= 100 ? (
                       <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
-                        <span className="text-xs font-bold tracking-widest uppercase">10% Rabatt aktiviert</span>
+                        <span className="text-xs font-bold tracking-widest uppercase">{t.cart.discountActivated}</span>
                         <span className="text-xs font-bold font-serif flex items-center">
                           -<PriceDisplay
                             amount={totalPrice * 0.10}
@@ -198,8 +217,8 @@ export default function Navbar() {
                     ) : (
                       <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
                         <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
-                          <span>Bis 10% Rabatt</span>
-                          <span>Noch {(100 - totalPrice).toFixed(2)} CHF</span>
+                          <span>{t.cart.untilDiscount}</span>
+                          <span>{t.cart.remaining((100 - totalPrice).toFixed(2))}</span>
                         </div>
                         <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
                           <div
@@ -214,20 +233,20 @@ export default function Navbar() {
                 {/* Totals */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm font-light text-gray-500">
-                    <span>Zwischensumme</span>
+                    <span>{t.cart.subtotal}</span>
                     <PriceDisplay amount={totalPrice} className="text-sm font-bold text-black" />
                   </div>
                   <div className="flex items-center justify-between text-sm font-light text-gray-500">
-                    <span>Versand</span>
+                    <span>{t.cart.shipping}</span>
                     {totalPrice >= 100 ? (
-                      <span className="text-sm font-bold text-green-600">Gratis</span>
+                      <span className="text-sm font-bold text-green-600">{t.cart.free}</span>
                     ) : (
                       <PriceDisplay amount={8.40} className="text-sm font-bold text-black" />
                     )}
                   </div>
                   {totalPrice >= 100 && (
                     <div className="flex items-center justify-between text-sm font-black text-[#651A1A]">
-                      <span>Rabatt (10%)</span>
+                      <span>{t.cart.discount}</span>
                       <span className="flex items-center">
                         -<PriceDisplay
                           amount={totalPrice * 0.10}
@@ -238,7 +257,7 @@ export default function Navbar() {
                     </div>
                   )}
                   <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
-                    <span>Gesamt</span>
+                    <span>{t.cart.total}</span>
                     <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + (totalPrice >= 100 ? 0 : 8.40))} className="text-2xl font-black" />
                   </div>
                 </div>
@@ -247,7 +266,7 @@ export default function Navbar() {
                   onClick={handleCheckout}
                   className="w-full bg-black text-white py-4 text-sm font-medium tracking-[0.2em] uppercase hover:bg-[#651A1A] transition-colors duration-300"
                 >
-                  Zur Kasse
+                  {t.cart.checkout}
                 </button>
               </div>
             )}

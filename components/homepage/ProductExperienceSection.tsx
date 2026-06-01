@@ -1,7 +1,13 @@
+'use client'
+
 import Image from "next/image"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function ProductExperienceSection() {
+    const { t } = useLanguage()
+    const e = t.experience
+
     return (
         <section className="py-16 md:py-24 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
@@ -17,7 +23,6 @@ export default function ProductExperienceSection() {
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />
                         </div>
-                        {/* Decorative elements matching QualitySection style */}
                         <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-[#F5E6D3] rounded-full -z-10 hidden lg:block opacity-60"></div>
                         <div className="absolute -top-6 -left-6 w-24 h-24 border-4 border-[#651A1A]/10 rounded-full -z-10 hidden lg:block"></div>
                     </Link>
@@ -28,17 +33,17 @@ export default function ProductExperienceSection() {
                             <h2 className="flex flex-col items-center justify-center font-black tracking-tighter text-[#651A1A] leading-[0.9] group-hover:opacity-90 transition-opacity">
                                 <span className="text-4xl md:text-5xl lg:text-7xl uppercase">SAN SEBASTIAN</span>
                                 <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal py-1">Cheesecake</span>
-                                <span className="text-3xl md:text-4xl lg:text-5xl uppercase tracking-widest text-[#651A1A]/80 mt-1">AUS ZÜRICH</span>
+                                <span className="text-3xl md:text-4xl lg:text-5xl uppercase tracking-widest text-[#651A1A]/80 mt-1">{e.locationLabel}</span>
                             </h2>
                             <div className="w-24 h-5 bg-[#dec181] mx-auto rounded-full -mt-2 opacity-30 transform -rotate-1"></div>
                         </div>
 
                         <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium max-w-lg mx-auto">
-                            Der erste San Sebastian Cheesecake in Zürich — handgemacht mit den besten Zutaten, frisch auf Bestellung.
+                            {e.desc}
                         </p>
                     </Link>
                 </div>
             </div>
-        </section >
+        </section>
     )
 }

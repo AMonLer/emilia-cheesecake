@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Inter, Playfair_Display, Roboto } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/CartContext"
+import { LanguageProvider } from "@/contexts/LanguageContext"
 import Script from "next/script"
 import "./globals.css"
 
@@ -75,10 +76,12 @@ export default function RootLayout({
         </Script>
       </head>
       <body className={`${inter.variable} ${playfair.variable} ${roboto.variable} font-sans antialiased`}>
-        <CartProvider>
-          {children}
-          <Analytics />
-        </CartProvider>
+        <LanguageProvider>
+          <CartProvider>
+            {children}
+            <Analytics />
+          </CartProvider>
+        </LanguageProvider>
       </body>
     </html>
   )
