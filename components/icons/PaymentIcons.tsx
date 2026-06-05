@@ -29,9 +29,23 @@ export const ApplePayIcon = ({ className }: { className?: string }) => (
 )
 
 export const TwintIcon = ({ className }: { className?: string }) => (
-    <svg viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-        <rect width="60" height="40" rx="4" fill="#000000"/>
-        <text x="30" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">TWINT</text>
+    <svg viewBox="-1.74 -1.74 156.48 61.48" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <defs>
+            <radialGradient id="twint-a" cx="13.39" cy="1.79" r="21.41" fx="13.39" fy="1.79" gradientTransform="matrix(.958 0 0 1.044 14 20)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#fc0"/>
+                <stop offset=".582" stopColor="#f00"/>
+                <stop offset="1" stopColor="#f00"/>
+            </radialGradient>
+            <radialGradient id="twint-b" cx=".57" cy="2.48" r="22.78" fx=".57" fy="2.48" gradientTransform="matrix(.825 0 0 1.212 14 20)" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stopColor="#00b4e6"/>
+                <stop offset="1" stopColor="#054696"/>
+            </radialGradient>
+        </defs>
+        <path d="M150.9 58H2.12A2.12 2.12 0 010 55.88V2.12C0 .94.94 0 2.12 0h148.75c1.18 0 2.12.94 2.12 2.12v53.75c.03 1.19-.94 2.13-2.1 2.13z" fill="#000"/>
+        <path d="M48 39.39c0 .56-.4 1.25-.88 1.52l-17.23 9.87c-.48.3-1.29.3-1.77 0l-17.23-9.87c-.48-.27-.89-.96-.89-1.52V19.61c0-.56.4-1.25.88-1.52l17.23-9.87c.48-.29 1.29-.29 1.77 0l17.23 9.87c.48.29.89.96.89 1.52z" fill="#fff"/>
+        <path d="M117.33 20.08c-4.86 0-7.58 3.05-7.58 7.45v12.24h4.33V27.42c0-1.92 1.16-3.4 3.3-3.4 2.13 0 3.28 1.74 3.28 3.4v12.34h4.33V27.53c0-4.4-2.8-7.45-7.66-7.45zm-60.28.6v3.61h5.56v15.47h4.38V24.29h5.54v-3.6zm17.74 0l5.54 19.08h1.77l4.06-10.66.14-.84.16.84 4.06 10.66h1.77l5.54-19.08h-4.27l-2.66 10.03-.13 1.08-.22-1.08-3.55-10.03h-1.34l-3.52 10.03-.21 1.08-.16-1.08-2.63-10.03zm26.18 0v19.08h4.35V20.68zm26.39 0v3.61h5.54v15.47h4.38V24.29h5.56v-3.6z" fill="#fff"/>
+        <path d="M37 29.13l-4.42 6.3-2.28-3.38 2.62-3.8c.48-.66 1.54-2.53.32-5.07-.98-2.05-3.1-3.05-4.95-3.05s-3.89.92-4.95 3.05c-1.22 2.44-.16 4.36.29 5l2.67 3.82 1.99 2.77 2.96 4.38c.03.03.5.72 1.33.72.79 0 1.27-.7 1.35-.77l6.96-9.97zm-8.7.15s-1.17-1.72-1.91-2.9c-.82-1.28.1-3.18 1.9-3.18 1.83 0 2.73 1.9 1.91 3.18-.74 1.2-1.9 2.9-1.9 2.9z" fill="url(#twint-a)"/>
+        <path d="M24 35.23l-4.37-5.92s-1.16-1.72-1.9-2.9c-.82-1.28.1-3.18 1.9-3.18.24 0 .45.03.64.08l1.53-2.72c-.71-.28-1.45-.44-2.17-.44-1.85 0-3.89.92-4.95 3.05-1.22 2.44-.16 4.36.3 5l7.62 10.95c.05.1.56.8 1.35.8.82 0 1.27-.67 1.35-.77l2.3-3.39-1.98-2.82z" fill="url(#twint-b)"/>
     </svg>
 )
 
