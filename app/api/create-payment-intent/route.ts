@@ -31,9 +31,9 @@ export async function POST(req: NextRequest) {
 
     // Crear Payment Intent con metadata del pedido
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(finalAmount * 100), // Stripe usa centavos
+      amount: Math.round(finalAmount * 100),
       currency: 'chf',
-      payment_method_types: ['card'], // card includes Apple Pay & Google Pay
+      automatic_payment_methods: { enabled: true },
       metadata: {
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phone || '',
