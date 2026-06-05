@@ -28,6 +28,13 @@ export const ApplePayIcon = ({ className }: { className?: string }) => (
     </svg>
 )
 
+export const TwintIcon = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        <rect width="60" height="40" rx="4" fill="#000000"/>
+        <text x="30" y="26" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="Arial, sans-serif">TWINT</text>
+    </svg>
+)
+
 export const GooglePayIcon = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         <rect width="60" height="40" rx="4" fill="#F7F7F7"/>

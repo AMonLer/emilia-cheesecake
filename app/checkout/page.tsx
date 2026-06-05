@@ -6,6 +6,7 @@ import Link from "next/link"
 import { ChevronRight, ChevronLeft, X } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
 import { loadStripe } from "@stripe/stripe-js"
@@ -843,6 +844,14 @@ export default function CheckoutPage() {
                   <PriceDisplay amount={finalPrice} className="text-xl font-black" currencyClassName="text-[0.5em] opacity-100" />
                 </span>
               </div>
+            </div>
+
+            {/* Accepted payment methods */}
+            <div className="mt-4 flex items-center gap-2 flex-wrap">
+              <VisaIcon className="h-7 w-auto" />
+              <MastercardIcon className="h-7 w-auto" />
+              <ApplePayIcon className="h-7 w-auto" />
+              <TwintIcon className="h-7 w-auto" />
             </div>
 
             {/* Limited Offer */}
