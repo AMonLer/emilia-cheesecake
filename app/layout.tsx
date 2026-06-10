@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es">
+    <html lang="de">
       <head>
         <meta name="facebook-domain-verification" content="4jyvx65rk5n9vu0w54te5prj9kdalu" />
         {/* Google Analytics + Google Ads */}

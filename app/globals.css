@@ -79,20 +79,23 @@
 }
 
 @layer utilities {
-  @media (max-width: 768px) {
-    .custom-scrollbar::-webkit-scrollbar {
-      height: 4px;
-      width: 4px;
-      background: transparent;
-    }
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #D4AF85 transparent;
+  }
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-    }
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+    background: transparent;
+  }
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #D4AF85;
-      border-radius: 20px;
-    }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #D4AF85;
+    border-radius: 20px;
   }
 }

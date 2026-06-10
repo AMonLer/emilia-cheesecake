@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState } from "react"
 import ContactModal from "./ContactModal"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
 
 export default function Footer() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
@@ -16,12 +17,12 @@ export default function Footer() {
         isOpen={isContactModalOpen}
         onClose={() => setIsContactModalOpen(false)}
       />
-      <footer className="bg-black text-white py-20">
+      <footer className="bg-[#3E0F0F] text-white py-20">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Logo y descripción */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-black mb-4 tracking-tight">EMILIA</h2>
-            <p className="text-gray-400 text-sm max-w-md mx-auto">
+            <p className="text-[#F5E6D3]/60 text-sm max-w-md mx-auto">
               {f.tagline}
             </p>
           </div>
@@ -32,14 +33,9 @@ export default function Footer() {
               <h4 className="font-black mb-6 tracking-tight text-sm">{f.colShop}</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <Link href="/bestellen" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/bestellen" className="text-[#F5E6D3]/60 hover:text-white transition-colors">
                     {f.cheesecakes}
                   </Link>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    {f.giftSets}
-                  </a>
                 </li>
               </ul>
             </div>
@@ -49,20 +45,20 @@ export default function Footer() {
                 <li>
                   <button
                     onClick={() => setIsContactModalOpen(true)}
-                    className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+                    className="text-[#F5E6D3]/60 hover:text-white transition-colors cursor-pointer"
                   >
                     {f.contact}
                   </button>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/versand" className="text-[#F5E6D3]/60 hover:text-white transition-colors">
                     {f.shipping}
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    FAQ
-                  </a>
+                  <Link href="/faq" className="text-[#F5E6D3]/60 hover:text-white transition-colors">
+                    {f.faq}
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -70,14 +66,9 @@ export default function Footer() {
               <h4 className="font-black mb-6 tracking-tight text-sm">{f.colEmilia}</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <Link href="/uber-uns" className="text-[#F5E6D3]/60 hover:text-white transition-colors">
                     {f.aboutUs}
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                    {f.location}
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -99,13 +90,21 @@ export default function Footer() {
             </div>
           </div>
 
+          {/* Payment methods */}
+          <div className="flex justify-center items-center gap-3 mb-10">
+            <VisaIcon className="h-7 w-auto rounded" />
+            <MastercardIcon className="h-7 w-auto rounded" />
+            <TwintIcon className="h-7 w-auto rounded" />
+            <ApplePayIcon className="h-7 w-auto rounded" />
+          </div>
+
           {/* Divider y copyright */}
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
+          <div className="border-t border-white/10 pt-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#F5E6D3]/40">
               <p>{f.copyright}</p>
               <div className="flex gap-6 text-xs">
-                <a href="#" className="hover:text-white transition-colors">{f.privacy}</a>
-                <a href="#" className="hover:text-white transition-colors">{f.terms}</a>
+                <Link href="/datenschutz" className="hover:text-white transition-colors">{f.privacy}</Link>
+                <Link href="/agb" className="hover:text-white transition-colors">{f.terms}</Link>
                 <Link href="/impressum" className="hover:text-white transition-colors">{f.imprint}</Link>
               </div>
             </div>

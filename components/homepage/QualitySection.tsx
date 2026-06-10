@@ -9,7 +9,7 @@ export default function QualitySection() {
     const q = t.quality
 
     return (
-        <section className="py-16 bg-white">
+        <section className="py-16 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
                     {/* Lado izquierdo - Texto */}
@@ -37,7 +37,7 @@ export default function QualitySection() {
                         <div className="relative w-full h-full transform transition-transform duration-700 group-hover:-translate-y-2">
                             <Image
                                 src="/Generated Image January 31, 2026 - 12_00AM.jpeg"
-                                alt="Fall Party Desserts"
+                                alt="San Sebastian Cheesecake von Emilia"
                                 fill
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />

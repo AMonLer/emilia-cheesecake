@@ -1,7 +1,13 @@
+'use client'
+
 import Link from "next/link"
 import Image from "next/image"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function HeroSection() {
+  const { t } = useLanguage()
+  const h = t.hero
+
   return (
     <section className="relative">
       {/* Mobile Layout - Image with button overlaid at bottom */}
@@ -10,16 +16,16 @@ export default function HeroSection() {
         <div className="relative h-[600px] w-full">
           <Image
             src="/Generated Image November 30, 2025 - 9_03PM.jpeg"
-            alt="Cookies Box"
+            alt="San Sebastian Cheesecake von Emilia"
             fill
             className="object-cover"
             priority
           />
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10"></div>
 
           {/* Content positioned at bottom of image */}
-          <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-12 px-6 z-20 text-center">
+          <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-10 px-6 z-20 text-center">
             <h1 className="text-4xl font-black text-white leading-[0.95] mb-8 drop-shadow-lg">
               WHERE
               <br />
@@ -29,9 +35,12 @@ export default function HeroSection() {
             </h1>
             <Link href="/bestellen">
               <button className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                ORDER & DELIVER
+                {h.cta}
               </button>
             </Link>
+            <p className="text-[11px] text-white/80 tracking-wide mt-4">
+              {h.trust}
+            </p>
           </div>
         </div>
       </div>
@@ -40,6 +49,9 @@ export default function HeroSection() {
       <div className="hidden lg:grid grid-cols-[1.2fr_1fr] min-h-[600px]">
         <div className="bg-[#F5E6D3] flex items-center justify-center px-8 lg:px-16 py-16">
           <div className="max-w-lg">
+            <span className="block text-xs font-bold tracking-[0.3em] uppercase text-[#651A1A]/70 mb-6">
+              {h.eyebrow}
+            </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-[#651A1A] leading-[0.95] mb-8">
               WHERE
               <br />
@@ -48,17 +60,20 @@ export default function HeroSection() {
               ARE BAKED
             </h1>
             <Link href="/bestellen">
-              <button className="bg-white text-[#651A1A] border-2 border-[#651A1A] font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#651A1A] hover:text-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
-                ORDER & DELIVER
+              <button className="bg-[#651A1A] text-white font-black px-14 py-4 text-base tracking-wide rounded-full hover:bg-[#4A1313] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                {h.cta}
               </button>
             </Link>
+            <p className="text-xs text-[#651A1A]/60 tracking-wide mt-5">
+              {h.trust}
+            </p>
           </div>
         </div>
 
         <div className="relative h-[400px] lg:h-auto">
           <Image
             src="/Portada1.jpg"
-            alt="Cookies Box"
+            alt="San Sebastian Cheesecake von Emilia"
             fill
             className="object-cover"
             priority

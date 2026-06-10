@@ -6,6 +6,7 @@ import Image from "next/image"
 import PriceDisplay from "@/components/PriceDisplay"
 import { ShoppingCart, X, Check } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface ProductCardProps {
     href: string
@@ -30,6 +31,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const imageContainerRef = useRef<HTMLDivElement>(null)
     const { addToCart } = useCart()
+    const { t } = useLanguage()
 
     const handleTouchStart = (e: TouchEvent) => {
         setShowSecondImage(true)
@@ -128,9 +130,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
                         <div className="md:hidden mt-1">
                             <button
                                 onClick={handleCartClick}
-                                className="w-full bg-black text-white py-2 rounded-lg shadow-sm flex items-center justify-center active:scale-95 transition-transform"
+                                className="w-full bg-black text-white py-2 rounded-lg shadow-sm flex items-center justify-center gap-1.5 active:scale-95 transition-transform"
                             >
                                 <ShoppingCart className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold tracking-wider uppercase">{t.productInfo.addToCart}</span>
                             </button>
                         </div>
                     )}
@@ -148,7 +151,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-5">
-                            <h3 className="font-black text-sm tracking-wide uppercase">Größe wählen</h3>
+                            <h3 className="font-black text-sm tracking-wide uppercase">{t.productInfo.chooseSize}</h3>
                             <button
                                 onClick={() => setShowSizePopup(false)}
                                 className="p-1 text-gray-400"
@@ -179,7 +182,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                     </div>
                                     <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
                                         <div>
-                                            <p className="font-black text-sm text-black">8–10 Personen</p>
+                                            <p className="font-black text-sm text-black">8–10 {t.cart.persons}</p>
                                             <p className="text-xs text-black/60">Ø 24 cm</p>
                                         </div>
                                         <div className="text-[#651A1A]">
@@ -217,7 +220,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                     </div>
                                     <div className="min-w-0 flex-1 flex items-center justify-between gap-2">
                                         <div>
-                                            <p className="font-black text-sm text-black">2–3 Personen</p>
+                                            <p className="font-black text-sm text-black">2–3 {t.cart.persons}</p>
                                             <p className="text-xs text-black/60">Ø 14 cm</p>
                                         </div>
                                         <div className="text-[#651A1A]">

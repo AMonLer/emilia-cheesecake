@@ -34,11 +34,18 @@ export default function Navbar() {
       <nav className="bg-[#651A1A] border-b border-[#8B3A3A] z-30 transition-all duration-300">
         <div className="container mx-auto px-6">
           <div className="flex items-center justify-between h-20">
-            {/* Left Side - About */}
-            <div className="flex-1 flex items-center gap-8">
+            {/* Left Side - Order & About */}
+            <div className="flex-1 flex items-center gap-4 md:gap-8">
+              <Link
+                href="/bestellen"
+                className="group relative text-white hover:text-white transition-colors duration-300 text-xs font-bold tracking-[0.2em] uppercase"
+              >
+                {t.nav.order}
+                <span className="absolute -bottom-1 left-0 w-full h-px bg-[#D4AF85] transition-all duration-300" />
+              </Link>
               <Link
                 href="/uber-uns"
-                className="group relative text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
+                className="group relative hidden sm:block text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
               >
                 {t.nav.aboutUs}
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />

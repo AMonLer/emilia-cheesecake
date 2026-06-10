@@ -3,6 +3,12 @@ export type Locale = 'de' | 'en'
 export type Translations = {
   nav: {
     aboutUs: string
+    order: string
+  }
+  hero: {
+    eyebrow: string
+    cta: string
+    trust: string
   }
   cart: {
     title: string
@@ -45,6 +51,7 @@ export type Translations = {
   influencer: {
     eyebrow: string
     eyebrowItalic: string
+    heading: string
   }
   gallery: {
     heading: string
@@ -58,11 +65,10 @@ export type Translations = {
     colEmilia: string
     colFollow: string
     cheesecakes: string
-    giftSets: string
     contact: string
     shipping: string
+    faq: string
     aboutUs: string
-    location: string
     copyright: string
     privacy: string
     terms: string
@@ -169,6 +175,12 @@ export const translations: Record<Locale, Translations> = {
   de: {
     nav: {
       aboutUs: 'Über Uns',
+      order: 'Bestellen',
+    },
+    hero: {
+      eyebrow: 'San Sebastian Cheesecake · Zürich',
+      cta: 'JETZT BESTELLEN',
+      trust: 'Frisch auf Bestellung gebacken · Lieferung in Zürich & Umgebung',
     },
     cart: {
       title: 'Warenkorb',
@@ -211,6 +223,7 @@ export const translations: Record<Locale, Translations> = {
     influencer: {
       eyebrow: 'Was andere',
       eyebrowItalic: 'sagen',
+      heading: 'GESEHEN AUF',
     },
     gallery: {
       heading: 'Unsere',
@@ -224,12 +237,11 @@ export const translations: Record<Locale, Translations> = {
       colEmilia: 'EMILIA',
       colFollow: 'FOLGE UNS',
       cheesecakes: 'Käsekuchen',
-      giftSets: 'Geschenksets',
       contact: 'Kontakt',
       shipping: 'Versand',
+      faq: 'FAQ',
       aboutUs: 'Über uns',
-      location: 'Standort',
-      copyright: '© 2025 Emilia. Alle Käsekuchen mit Liebe gemacht.',
+      copyright: '© 2026 Emilia. Alle Käsekuchen mit Liebe gemacht.',
       privacy: 'Datenschutz',
       terms: 'AGB',
       imprint: 'Impressum',
@@ -333,6 +345,12 @@ export const translations: Record<Locale, Translations> = {
   en: {
     nav: {
       aboutUs: 'About Us',
+      order: 'Order',
+    },
+    hero: {
+      eyebrow: 'San Sebastian Cheesecake · Zurich',
+      cta: 'ORDER NOW',
+      trust: 'Freshly baked to order · Delivery in Zurich & surroundings',
     },
     cart: {
       title: 'Cart',
@@ -375,6 +393,7 @@ export const translations: Record<Locale, Translations> = {
     influencer: {
       eyebrow: 'What others',
       eyebrowItalic: 'say',
+      heading: 'SEEN ON',
     },
     gallery: {
       heading: 'Our',
@@ -388,12 +407,11 @@ export const translations: Record<Locale, Translations> = {
       colEmilia: 'EMILIA',
       colFollow: 'FOLLOW US',
       cheesecakes: 'Cheesecakes',
-      giftSets: 'Gift Sets',
       contact: 'Contact',
       shipping: 'Shipping',
+      faq: 'FAQ',
       aboutUs: 'About us',
-      location: 'Location',
-      copyright: '© 2025 Emilia. All cheesecakes made with love.',
+      copyright: '© 2026 Emilia. All cheesecakes made with love.',
       privacy: 'Privacy Policy',
       terms: 'Terms',
       imprint: 'Legal Notice',
