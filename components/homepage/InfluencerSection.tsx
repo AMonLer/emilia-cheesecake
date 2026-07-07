@@ -2,6 +2,7 @@
 
 import { Instagram } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
+import Reveal from "@/components/ui/Reveal"
 
 export default function InfluencerSection() {
     const { t } = useLanguage()
@@ -24,21 +25,22 @@ export default function InfluencerSection() {
 
     return (
         <section className="py-20 md:py-32 px-4 bg-[#F5E6D3] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-[80px] md:blur-[120px] opacity-70 animate-pulse pointer-events-none" />
+            <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-[80px] md:blur-[120px] opacity-70 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-[350px] md:w-[600px] h-[350px] md:h-[600px] bg-[#E3D3C1] rounded-full mix-blend-multiply filter blur-[100px] md:blur-[150px] opacity-60 pointer-events-none" />
 
             <div className="container mx-auto max-w-6xl relative z-10">
-                <div className="text-center mb-16 md:mb-32">
+                <Reveal className="text-center mb-16 md:mb-32">
                     <span className="text-sm tracking-[0.3em] text-[#651A1A]/80 font-bold uppercase mb-4 md:mb-6 block">
                         {inf.eyebrow} <span className="font-serif italic capitalize text-base">{inf.eyebrowItalic}</span>
                     </span>
-                    <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-[#651A1A] tracking-tighter leading-[0.95]">
+                    <h2 className="text-4xl md:text-5xl lg:text-7xl font-black text-[#651A1A] tracking-tighter leading-[0.95] uppercase">
                         {inf.heading} <br className="md:hidden" />
-                        <span className="font-serif font-medium italic text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 ml-2 md:ml-3 py-1">Instagram</span>
+                        <span className="text-[#651A1A]">Instagram</span>
                     </h2>
-                </div>
+                    <div className="w-24 h-1.5 bg-[#D4AF85] mx-auto rounded-full mt-6 opacity-80" />
+                </Reveal>
 
-                <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-12 md:gap-24 relative">
+                <Reveal delay={120} className="flex flex-col md:flex-row justify-center items-center md:items-start gap-12 md:gap-24 relative">
                     {influencers.map((item) => (
                         <div key={item.handle} className={`group flex flex-col items-center relative transition-transform duration-700 hover:-translate-y-4 ${item.align}`}>
                             <div className="absolute inset-0 bg-[#651A1A]/10 rounded-3xl filter blur-2xl transform scale-105 group-hover:bg-[#651A1A]/20 transition-all duration-500 ease-out" />
@@ -70,7 +72,7 @@ export default function InfluencerSection() {
                             </a>
                         </div>
                     ))}
-                </div>
+                </Reveal>
             </div>
         </section>
     )

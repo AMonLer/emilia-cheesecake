@@ -13,7 +13,7 @@ export default function HeroSection() {
       {/* Mobile Layout - Image with button overlaid at bottom */}
       <div className="lg:hidden">
         {/* Image - Full width with button positioned at bottom */}
-        <div className="relative h-[600px] w-full">
+        <div className="relative h-[85dvh] min-h-[540px] w-full">
           <Image
             src="/Generated Image November 30, 2025 - 9_03PM.jpeg"
             alt="San Sebastian Cheesecake von Emilia"
@@ -27,9 +27,7 @@ export default function HeroSection() {
           {/* Content positioned at bottom of image */}
           <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-10 px-6 z-20 text-center">
             <h1 className="text-4xl font-black text-white leading-[0.95] mb-8 drop-shadow-lg">
-              WHERE
-              <br />
-              MEMORIES
+              WHERE MEMORIES
               <br />
               ARE BAKED
             </h1>
@@ -53,9 +51,7 @@ export default function HeroSection() {
               {h.eyebrow}
             </span>
             <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-[#651A1A] leading-[0.95] mb-8">
-              WHERE
-              <br />
-              MEMORIES
+              WHERE MEMORIES
               <br />
               ARE BAKED
             </h1>

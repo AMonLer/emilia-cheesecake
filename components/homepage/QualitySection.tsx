@@ -3,6 +3,7 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useLanguage } from "@/contexts/LanguageContext"
+import Reveal from "@/components/ui/Reveal"
 
 export default function QualitySection() {
     const { t } = useLanguage()
@@ -11,7 +12,7 @@ export default function QualitySection() {
     return (
         <section className="py-16 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
                     {/* Lado izquierdo - Texto */}
                     <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10 w-full mb-6">
                         <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
@@ -42,10 +43,10 @@ export default function QualitySection() {
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />
                         </div>
-                        <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
-                        <div className="absolute -top-6 -right-6 w-32 h-32 border-4 border-[#F5E6D3] rounded-full -z-10 hidden lg:block"></div>
+                        <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#D4AF85]/40 rounded-full -z-10 hidden lg:block"></div>
+                        <div className="absolute -top-6 -right-6 w-32 h-32 border-4 border-[#D4AF85]/40 rounded-full -z-10 hidden lg:block"></div>
                     </div>
-                </div>
+                </Reveal>
             </div>
         </section>
     )

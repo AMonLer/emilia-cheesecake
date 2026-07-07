@@ -2,6 +2,7 @@
 
 import ProductCard from "@/components/ProductCard"
 import { useLanguage } from "@/contexts/LanguageContext"
+import Reveal from "@/components/ui/Reveal"
 
 export default function FeaturedProducts() {
     const { t } = useLanguage()
@@ -10,7 +11,7 @@ export default function FeaturedProducts() {
     return (
         <section className="py-16 bg-white">
             <div className="container mx-auto px-4">
-                <div className="text-center mb-12 max-w-3xl mx-auto">
+                <Reveal className="text-center mb-12 max-w-3xl mx-auto">
                     <h2 className="text-4xl md:text-5xl lg:text-7xl font-black mb-6 tracking-tighter leading-[0.95] text-[#651A1A]">
                         {p.heading} <br className="md:hidden" />
                         <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal md:ml-1 mt-2 md:mt-0 inline-block py-1">Cheesecakes</span>
@@ -18,10 +19,10 @@ export default function FeaturedProducts() {
                     <p className="text-lg md:text-xl leading-relaxed text-[#651A1A]/80 font-medium">
                         {p.subtitle}
                     </p>
-                </div>
+                </Reveal>
 
                 {/* Mobile: 2-column vertical grid */}
-                <div className="md:hidden grid grid-cols-2 gap-2">
+                <Reveal delay={100} className="md:hidden grid grid-cols-2 gap-2">
                     <ProductCard
                         className="w-full"
                         href="/product/pistacho"
@@ -77,10 +78,10 @@ export default function FeaturedProducts() {
                         priceLarge={45.90}
                         description=""
                     />
-                </div>
+                </Reveal>
 
                 {/* Desktop: Horizontal scroll */}
-                <div className="hidden md:block overflow-x-auto pb-4 -mx-4 px-4 custom-scrollbar">
+                <Reveal delay={100} className="hidden md:block overflow-x-auto pb-4 -mx-4 px-4 custom-scrollbar">
                     <div className="flex gap-4 min-w-min">
                         <ProductCard
                             className="w-80 flex-shrink-0"
@@ -137,7 +138,7 @@ export default function FeaturedProducts() {
                             description={p.dulceDeLeche}
                         />
                     </div>
-                </div>
+                </Reveal>
             </div>
         </section>
     )

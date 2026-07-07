@@ -3,6 +3,7 @@
 import Image from "next/image"
 import Link from "next/link"
 import { useLanguage } from "@/contexts/LanguageContext"
+import Reveal from "@/components/ui/Reveal"
 
 export default function ProductExperienceSection() {
     const { t } = useLanguage()
@@ -11,7 +12,7 @@ export default function ProductExperienceSection() {
     return (
         <section className="py-16 md:py-24 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
                     {/* Image Side (Left on Desktop) */}
                     <Link href="/product/original" className="relative order-1 group block cursor-pointer">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none -z-10" />
@@ -42,7 +43,7 @@ export default function ProductExperienceSection() {
                             {e.desc}
                         </p>
                     </Link>
-                </div>
+                </Reveal>
             </div>
         </section>
     )
