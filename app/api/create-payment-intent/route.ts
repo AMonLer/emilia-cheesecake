@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { generateForYouCode } from '@/lib/foryou-code'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -29,12 +30,19 @@ export async function POST(req: NextRequest) {
       finalAmount = subtotal - discountValue + shippingCost
     }
 
+    // Código para el mensaje personal "For You": solo se genera si es un regalo,
+    // así solo imprimimos la tarjeta con QR para los pedidos que lo necesitan.
+    const isGift = Boolean(orderData?.isGift)
+    const foryouCode = isGift ? generateForYouCode() : ''
+
     // Crear Payment Intent con metadata del pedido
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(finalAmount * 100),
       currency: 'chf',
       automatic_payment_methods: { enabled: true },
       metadata: {
+        foryouCode,
+        isGift: isGift ? 'yes' : 'no',
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phone || '',
         customerName: `${orderData?.firstName || ''} ${orderData?.lastName || ''}`,
