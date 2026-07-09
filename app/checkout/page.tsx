@@ -22,6 +22,9 @@ registerLocale("en", enUS)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
+// Ocultar la opción de regalo "For You" hasta que se lance la funcionalidad
+const SHOW_GIFT_OPTION = false
+
 function PaymentForm({ clientSecret }: { clientSecret: string }) {
   const stripe = useStripe()
   const elements = useElements()
@@ -407,7 +410,7 @@ function CheckoutContent() {
           <div className="space-y-8">
             <div>
               {/* Gift option */}
-              {!showPayment && (
+              {SHOW_GIFT_OPTION && !showPayment && (
                 <div className="mb-8">
                   <button
                     type="button"
