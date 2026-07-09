@@ -5,8 +5,6 @@ const notion = process.env.NOTION_TOKEN
   : null
 // NOTION_DATABASE_ID holds the data_source_id (Notion API 2025+)
 const dataSourceId = process.env.NOTION_DATABASE_ID
-// Separate database for "For You" personal messages (its own data_source_id)
-const foryouDataSourceId = process.env.NOTION_FORYOU_DB_ID
 
 export type OrderForNotion = {
   paymentIntentId: string
@@ -99,86 +97,5 @@ export async function createOrderInNotion(order: OrderForNotion) {
     console.log('✅ Pedido creado en Notion')
   } catch (err) {
     console.error('Error creando pedido en Notion:', err)
-  }
-}
-
-// --- "For You" personal messages -----------------------------------------
-
-export type ForYouMessage = {
-  code: string
-  message: string
-  videoUrl?: string
-  fileUrl?: string
-  fileName?: string
-}
-
-async function findForYouPageId(code: string): Promise<string | null> {
-  if (!notion || !foryouDataSourceId) return null
-  const res = await (notion as any).dataSources.query({
-    data_source_id: foryouDataSourceId,
-    filter: { property: 'Code', title: { equals: code } },
-    page_size: 1,
-  })
-  return res.results[0]?.id ?? null
-}
-
-/**
- * Creates or updates the personal message for a code. Re-submitting from the
- * same code overwrites the previous record instead of creating duplicates.
- */
-export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
-  if (!notion || !foryouDataSourceId) {
-    console.warn('Notion For You no configurado, saltando')
-    return false
-  }
-
-  const properties: Record<string, any> = {
-    Code: { title: [{ text: { content: rec.code } }] },
-    Message: { rich_text: [{ text: { content: rec.message || '' } }] },
-    'Video URL': { url: rec.videoUrl || null },
-    'File URL': { url: rec.fileUrl || null },
-    'File Name': { rich_text: [{ text: { content: rec.fileName || '' } }] },
-    Status: { select: { name: 'New' } },
-  }
-
-  try {
-    const existingId = await findForYouPageId(rec.code)
-    if (existingId) {
-      await notion.pages.update({ page_id: existingId, properties })
-    } else {
-      await notion.pages.create({
-        parent: { type: 'data_source_id', data_source_id: foryouDataSourceId } as any,
-        properties,
-      })
-    }
-    console.log('✅ Mensaje For You guardado en Notion')
-    return true
-  } catch (err) {
-    console.error('Error guardando mensaje For You en Notion:', err)
-    return false
-  }
-}
-
-export async function getForYouMessage(code: string): Promise<ForYouMessage | null> {
-  if (!notion || !foryouDataSourceId) return null
-  try {
-    const res = await (notion as any).dataSources.query({
-      data_source_id: foryouDataSourceId,
-      filter: { property: 'Code', title: { equals: code } },
-      page_size: 1,
-    })
-    const page = res.results[0]
-    if (!page) return null
-    const props = page.properties
-    return {
-      code,
-      message: props.Message?.rich_text?.[0]?.plain_text || '',
-      videoUrl: props['Video URL']?.url || '',
-      fileUrl: props['File URL']?.url || '',
-      fileName: props['File Name']?.rich_text?.[0]?.plain_text || '',
-    }
-  } catch (err) {
-    console.error('Error leyendo mensaje For You de Notion:', err)
-    return null
   }
 }

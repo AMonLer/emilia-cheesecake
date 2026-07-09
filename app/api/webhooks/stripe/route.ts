@@ -135,17 +135,10 @@ export async function POST(req: NextRequest) {
         console.error('Error parseando items:', e)
       }
 
-      // Regalo: si el cliente lo marcó, hay que imprimir la tarjeta con el código
-      const isGift = metadata.isGift === 'yes'
-      const foryouCode = metadata.foryouCode || ''
-      const giftBlock = isGift
-        ? `\n🎁 <b>MENSAJE PERSONAL</b>\n👉 Imprimir tarjeta con QR/código: <code>${foryouCode}</code>\n`
-        : ''
-
       // Enviar notificación por Telegram
       const telegramMessage = `
 🎉 <b>NUEVO PEDIDO RECIBIDO</b>
-${giftBlock}
+
 💰 <b>Total:</b> CHF ${amount.toFixed(2)}
 
 👤 <b>Cliente:</b>
