@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState, useMemo, useEffect, useRef, Suspense } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, ChevronLeft, X } from "lucide-react"
+import { ChevronRight, ChevronLeft, X, Gift } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
@@ -15,7 +15,7 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
 import { enUS } from "date-fns/locale"
 import "react-datepicker/dist/react-datepicker.css"
-import { addHours, eachDayOfInterval } from "date-fns"
+import { addHours, eachDayOfInterval, isSameDay, startOfDay } from "date-fns"
 
 registerLocale("de", de)
 registerLocale("en", enUS)
@@ -80,8 +80,9 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
   )
 }
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { cartItems, totalPrice, removeItem, addToCart } = useCart()
   const { locale, t } = useLanguage()
   const c = t.checkout
@@ -99,6 +100,7 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string>("")
   const [showPayment, setShowPayment] = useState(false)
   const [showDeliveryStep, setShowDeliveryStep] = useState(false)
+  const [isGift, setIsGift] = useState(false)
   const [upsellAdded, setUpsellAdded] = useState(false)
   const [postalCodeError, setPostalCodeError] = useState("")
   const [discountCodeInput, setDiscountCodeInput] = useState("")
@@ -108,6 +110,8 @@ export default function CheckoutPage() {
   const [missingFields, setMissingFields] = useState<Set<string>>(new Set())
   const [deliveryError, setDeliveryError] = useState("")
   const [paymentInitError, setPaymentInitError] = useState("")
+  const [paymentFailed, setPaymentFailed] = useState(false)
+  const formRestoredRef = useRef(false)
 
   // Allowed postal codes: Zürich agglomeration + Baden (AG)
   const allowedPostalCodes = new Set([
@@ -180,6 +184,75 @@ export default function CheckoutPage() {
     "15:00 - 18:00",
     "18:00 - 21:00"
   ]
+
+  // Un tramo solo es válido si su inicio respeta las 36h de antelación
+  const slotStartFor = (date: Date, slot: string) => {
+    const start = new Date(date)
+    start.setHours(parseInt(slot, 10), 0, 0, 0)
+    return start
+  }
+
+  const isSlotAvailable = (slot: string, date: Date | null = deliveryDate) => {
+    if (!date) return true
+    return slotStartFor(date, slot) >= minDeliveryDate
+  }
+
+  // Restaurar el formulario guardado (p. ej. al volver de un pago TWINT cancelado)
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('emilia-checkout-form')
+      if (raw) {
+        const d = JSON.parse(raw)
+        if (d.email) setEmail(d.email)
+        if (d.phone) setPhone(d.phone)
+        if (d.firstName) setFirstName(d.firstName)
+        if (d.lastName) setLastName(d.lastName)
+        if (d.address) setAddress(d.address)
+        if (d.city) setCity(d.city)
+        if (d.postalCode) setPostalCode(d.postalCode)
+        if (d.kanton) setKanton(d.kanton)
+        if (typeof d.isGift === 'boolean') setIsGift(d.isGift)
+        if (d.appliedDiscountCode) {
+          setAppliedDiscountCode(d.appliedDiscountCode)
+          setDiscountCodeInput(d.appliedDiscountCode)
+        }
+        if (d.deliveryDate) {
+          const date = new Date(d.deliveryDate)
+          const isValid = !isNaN(date.getTime())
+            && date >= startOfDay(minDeliveryDate)
+            && !blockedDates.some((b) => isSameDay(b, date))
+          if (isValid) {
+            setDeliveryDate(date)
+            if (d.deliveryTime && isSlotAvailable(d.deliveryTime, date)) {
+              setDeliveryTime(d.deliveryTime)
+            }
+          }
+        }
+      }
+    } catch { }
+
+    if (searchParams.get('payment') === 'failed') {
+      setPaymentFailed(true)
+      setShowDeliveryStep(true)
+      router.replace('/checkout', { scroll: false })
+    }
+
+    formRestoredRef.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Guardar el formulario para que sobreviva a la redirección de TWINT
+  useEffect(() => {
+    if (!formRestoredRef.current) return
+    try {
+      sessionStorage.setItem('emilia-checkout-form', JSON.stringify({
+        email, phone, firstName, lastName, address, city, postalCode, kanton,
+        isGift, appliedDiscountCode,
+        deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
+        deliveryTime,
+      }))
+    } catch { }
+  }, [email, phone, firstName, lastName, address, city, postalCode, kanton, isGift, appliedDiscountCode, deliveryDate, deliveryTime])
 
   // Calculate discount and shipping
   const shippingCost = totalPrice >= 100 ? 0 : 8.40
@@ -268,6 +341,7 @@ export default function CheckoutPage() {
             city,
             postalCode,
             kanton,
+            isGift,
             deliveryDate: deliveryDate?.toLocaleDateString('de-CH'),
             deliveryTime,
             discountCode: appliedDiscountCode,
@@ -290,6 +364,7 @@ export default function CheckoutPage() {
         localStorage.setItem('emilia-order-value', finalPrice.toString())
         setClientSecret(data.clientSecret)
         setShowPayment(true)
+        setPaymentFailed(false)
       } else {
         setPaymentInitError(c.paymentInitError)
       }
@@ -331,7 +406,43 @@ export default function CheckoutPage() {
           {/* Left Side - Form */}
           <div className="space-y-8">
             <div>
-              <h1 className="hidden md:block text-3xl font-black mb-8">Emilia</h1>
+              {/* Gift option */}
+              {!showPayment && (
+                <div className="mb-8">
+                  <button
+                    type="button"
+                    onClick={() => setIsGift(!isGift)}
+                    aria-pressed={isGift}
+                    className={`w-full text-left rounded-2xl border-2 p-5 transition-all duration-300 ${isGift ? "border-[#651A1A] bg-[#F5E6D3] shadow-[0_8px_24px_-14px_rgba(101,26,26,0.4)]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${isGift ? "border-[#651A1A] bg-[#651A1A] text-white" : "border-[#651A1A]/20 bg-[#FBF6EF] text-[#651A1A]"}`}>
+                        <Gift className="h-5 w-5" strokeWidth={1.5} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-black text-base tracking-tight transition-colors duration-300 ${isGift ? "text-[#651A1A]" : "text-[#1a1a1a]"}`}>
+                          {locale === 'de' ? 'Mach es persönlich. Sende eine Nachricht mit dem Kuchen.' : 'Make it personal. Send a message with the cake.'}
+                        </p>
+                        <p className={`text-sm leading-snug transition-colors duration-300 ${isGift ? "text-[#651A1A]/70" : "text-gray-600"}`}>
+                          {locale === 'de'
+                            ? 'Video, Foto oder Nachricht. Wir fügen einen QR-Code hinzu, um deine Überraschung zu sehen.'
+                            : 'Video, photo or message. We will add a QR to see your surprise.'}
+                        </p>
+                      </div>
+                      <div className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-300 ${isGift ? "bg-[#651A1A]" : "bg-gray-300"}`}>
+                        <div className={`absolute top-1 h-5 w-5 rounded-full shadow transition-all duration-300 ${isGift ? "left-6 bg-white" : "left-1 bg-white"}`} />
+                      </div>
+                    </div>
+                    {isGift && (
+                      <div className="mt-4 rounded-xl bg-white/60 px-4 py-3 text-sm text-[#651A1A] leading-relaxed">
+                        {locale === 'de'
+                          ? 'Nach der Bezahlung kannst du dein Video, Foto oder deine Nachricht hinzufügen. Wir fügen deinen persönlichen QR-Code hinzu. Zum Geburtstag, als Dankeschön, eine Reise-Überraschung oder einfach so. Einfach scannen und alles auf unserer Seite ansehen.'
+                          : 'After payment you can add your video, photo or message. We add your personal QR code. For a birthday, a thank you, a trip surprise, or just because. They scan it to see everything on our page.'}
+                      </div>
+                    )}
+                  </button>
+                </div>
+              )}
 
               {/* Contact Section */}
               <div className="mb-8">
@@ -478,6 +589,13 @@ export default function CheckoutPage() {
                     {c.backToAddress}
                   </button>
 
+                  {paymentFailed && (
+                    <div role="alert" aria-live="polite" className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg text-sm flex items-start gap-2 mb-6">
+                      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      <span>{c.paymentFailedNotice}</span>
+                    </div>
+                  )}
+
                   <h2 className="text-xl font-black mb-2">{c.deliveryTitle}</h2>
                   <p className="text-sm text-gray-600 mb-6 flex items-start gap-2">
                     <svg className="w-5 h-5 text-[#651A1A] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -547,10 +665,14 @@ export default function CheckoutPage() {
                           background-color: #E6D5C0;
                           color: #651A1A;
                         }
-                        .react-datepicker__day--selected,
-                        .react-datepicker__day--keyboard-selected {
+                        .react-datepicker__day--selected {
                           background-color: #651A1A !important;
                           color: white !important;
+                        }
+                        /* Sin fecha elegida no debe verse ningún día "seleccionado" */
+                        .react-datepicker__day--keyboard-selected {
+                          background-color: transparent;
+                          color: #1a1a1a;
                         }
                         .react-datepicker__day--disabled {
                           color: #ccc;
@@ -585,7 +707,12 @@ export default function CheckoutPage() {
                         <div className="flex-1 w-full max-w-[360px] lg:max-w-none">
                           <DatePicker
                             selected={deliveryDate}
-                            onChange={(date) => setDeliveryDate(date)}
+                            onChange={(date) => {
+                              setDeliveryDate(date)
+                              if (date && deliveryTime && !isSlotAvailable(deliveryTime, date)) {
+                                setDeliveryTime("")
+                              }
+                            }}
                             minDate={minDeliveryDate}
                             excludeDates={blockedDates}
                             locale={locale === 'en' ? 'en' : 'de'}
@@ -609,7 +736,7 @@ export default function CheckoutPage() {
                                 </button>
 
                                 <h3 className="text-xl font-black text-[#1a1a1a] font-serif capitalize">
-                                  {date.toLocaleDateString("de-CH", {
+                                  {date.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', {
                                     month: "long",
                                     year: "numeric",
                                   })}
@@ -640,10 +767,10 @@ export default function CheckoutPage() {
                                 {deliveryDate.getDate()}
                               </p>
                               <p className="text-xl lg:text-2xl font-serif text-[#1a1a1a] mb-1 capitalize">
-                                {deliveryDate.toLocaleDateString('de-CH', { month: 'long' })}
+                                {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', { month: 'long' })}
                               </p>
                               <p className="text-lg text-gray-600 font-medium capitalize">
-                                {deliveryDate.toLocaleDateString('de-CH', { weekday: 'long' })}
+                                {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', { weekday: 'long' })}
                               </p>
                               <p className="text-sm text-gray-400 mt-2">
                                 {deliveryDate.getFullYear()}
@@ -663,31 +790,40 @@ export default function CheckoutPage() {
                     <div>
                       <label className="block text-sm font-bold mb-3">{c.chooseTimeLabel}</label>
                       <div className="grid grid-cols-2 gap-3">
-                        {timeSlots.map((slot) => (
-                          <button
-                            key={slot}
-                            type="button"
-                            onClick={() => setDeliveryTime(slot)}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-200 hover:scale-105 ${deliveryTime === slot
-                              ? "border-[#651A1A] bg-[#F5E6D3] shadow-md"
-                              : "border-gray-300 bg-white hover:border-gray-400"
-                              }`}
-                          >
-                            <div className="flex items-center justify-center gap-2">
-                              <svg className="w-5 h-5 text-[#651A1A]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <span className="font-bold text-sm">{slot}</span>
-                            </div>
-                            {deliveryTime === slot && (
-                              <div className="absolute top-2 right-2 bg-[#651A1A] rounded-full w-5 h-5 flex items-center justify-center">
-                                <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        {timeSlots.map((slot) => {
+                          const available = isSlotAvailable(slot)
+                          return (
+                            <button
+                              key={slot}
+                              type="button"
+                              disabled={!available}
+                              onClick={() => setDeliveryTime(slot)}
+                              className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${!available
+                                ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
+                                : deliveryTime === slot
+                                  ? "border-[#651A1A] bg-[#F5E6D3] shadow-md hover:scale-105"
+                                  : "border-gray-300 bg-white hover:border-gray-400 hover:scale-105"
+                                }`}
+                            >
+                              <div className="flex items-center justify-center gap-2">
+                                <svg className={`w-5 h-5 ${available ? "text-[#651A1A]" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
+                                <span className={`font-bold text-sm ${available ? "" : "text-gray-400 line-through"}`}>{slot}</span>
                               </div>
-                            )}
-                          </button>
-                        ))}
+                              {!available && (
+                                <p className="text-[0.65rem] text-gray-400 mt-1">{c.slotUnavailable}</p>
+                              )}
+                              {available && deliveryTime === slot && (
+                                <div className="absolute top-2 right-2 bg-[#651A1A] rounded-full w-5 h-5 flex items-center justify-center">
+                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                  </svg>
+                                </div>
+                              )}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
                   </div>
@@ -885,5 +1021,13 @@ export default function CheckoutPage() {
         </div>
       </div >
     </div >
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <CheckoutContent />
+    </Suspense>
   )
 }

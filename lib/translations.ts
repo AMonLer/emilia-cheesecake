@@ -159,11 +159,15 @@ export type Translations = {
     paymentError: string
     unexpectedError: string
     paymentInitError: string
+    paymentFailedNotice: string
+    slotUnavailable: string
     persons: string
   }
   paymentSuccess: {
     title: string
     message: string
+    pendingTitle: string
+    pendingMessage: string
     backHome: string
     questions: string
     contactUs: string
@@ -331,11 +335,15 @@ export const translations: Record<Locale, Translations> = {
       paymentError: 'Bei der Zahlungsabwicklung ist ein Fehler aufgetreten',
       unexpectedError: 'Ein unerwarteter Fehler ist aufgetreten',
       paymentInitError: 'Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.',
+      paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – Ihre Angaben sind gespeichert. Bitte versuchen Sie es erneut.',
+      slotUnavailable: 'Für dieses Datum nicht verfügbar',
       persons: 'Personen',
     },
     paymentSuccess: {
       title: 'Vielen Dank',
       message: 'Wir haben Ihre Bestellung erhalten und bereiten alles mit größter Sorgfalt in unserer Backstube vor.',
+      pendingTitle: 'Zahlung wird bestätigt',
+      pendingMessage: 'Ihre Zahlung wird gerade verarbeitet. Das dauert in der Regel nur einen Moment – diese Seite aktualisiert sich automatisch.',
       backHome: 'Zurück zur Startseite',
       questions: 'Fragen?',
       contactUs: 'Kontaktieren Sie uns',
@@ -501,11 +509,15 @@ export const translations: Record<Locale, Translations> = {
       paymentError: 'An error occurred during payment processing',
       unexpectedError: 'An unexpected error occurred',
       paymentInitError: 'Error starting payment. Please try again.',
+      paymentFailedNotice: 'Your payment was not completed. Don\'t worry – your details are saved. Please try again.',
+      slotUnavailable: 'Not available for this date',
       persons: 'persons',
     },
     paymentSuccess: {
       title: 'Thank You',
       message: 'We have received your order and are preparing everything with the greatest care in our bakery.',
+      pendingTitle: 'Confirming your payment',
+      pendingMessage: 'Your payment is being processed. This usually only takes a moment – this page will update automatically.',
       backHome: 'Back to Home',
       questions: 'Questions?',
       contactUs: 'Contact us',
