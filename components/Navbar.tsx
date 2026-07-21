@@ -32,13 +32,13 @@ export default function Navbar() {
   return (
     <>
       <nav className="bg-[#651A1A] border-b border-[#8B3A3A] z-30 transition-all duration-300">
-        <div className="container mx-auto px-6">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-20">
             {/* Left Side - Order & About */}
-            <div className="flex-1 flex items-center gap-4 md:gap-8">
+            <div className="flex-1 flex items-center gap-3 md:gap-8">
               <Link
                 href="/bestellen"
-                className="group relative text-white hover:text-white transition-colors duration-300 text-xs font-bold tracking-[0.2em] uppercase"
+                className="group relative text-white hover:text-white transition-colors duration-300 text-xs font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase whitespace-nowrap"
               >
                 {t.nav.order}
                 <span className="absolute -bottom-1 left-0 w-full h-px bg-[#D4AF85] transition-all duration-300" />
@@ -59,13 +59,13 @@ export default function Navbar() {
                 alt="Emilia"
                 width={180}
                 height={50}
-                className="object-contain max-w-[120px] md:max-w-[170px]"
+                className="object-contain max-w-[100px] sm:max-w-[120px] md:max-w-[170px]"
                 priority
               />
             </Link>
 
             {/* Right Side Actions */}
-            <div className="flex items-center gap-4 flex-1 justify-end">
+            <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
               {/* Language Switcher */}
               <div className="flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
                 <button
