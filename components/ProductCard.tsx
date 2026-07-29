@@ -84,7 +84,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
             name,
             price: size === "2-3" ? priceSmall : priceLarge,
             size,
-            image: image1,
+            // Same rule as the product page: the small size has its own photo of
+            // the cake in its box. Passing image1 here regardless of size meant the
+            // cart showed the whole cake for a 2-3, depending on where you added it.
+            image: size === "2-3" ? `/${slug}3.jpeg` : image1,
             quantity: 1,
         })
         setTimeout(() => {

@@ -24,6 +24,18 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
+// The 2-3 photos moved from .png to .jpeg. Carts live in localStorage for 48h,
+// so a cart saved before that change still points at files that no longer exist.
+// Rewrite those paths on load instead of leaving people with broken thumbnails.
+const LEGACY_SMALL_PHOTO = /^\/(pistacho|original|cafe|chocolate|lotus)3\.png$/
+
+function migrateItem(item: CartItem): CartItem {
+  if (typeof item?.image === 'string' && LEGACY_SMALL_PHOTO.test(item.image)) {
+    return { ...item, image: item.image.replace(/\.png$/, '.jpeg') }
+  }
+  return item
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cartItems, setCartItems] = useState<CartItem[]>([])
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -37,7 +49,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const hoursElapsed = (Date.now() - Number(savedTimestamp)) / (1000 * 60 * 60)
       if (hoursElapsed < 48) {
         try {
-          setCartItems(JSON.parse(savedCart))
+          const parsed = JSON.parse(savedCart)
+          setCartItems(Array.isArray(parsed) ? parsed.map(migrateItem) : [])
         } catch (e) {
           console.error('Error loading cart from localStorage:', e)
         }
