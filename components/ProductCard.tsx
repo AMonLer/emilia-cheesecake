@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef, TouchEvent } from "react"
+import { useState, useRef, useEffect, TouchEvent } from "react"
+import { createPortal } from "react-dom"
 import Link from "next/link"
 import Image from "next/image"
 import PriceDisplay from "@/components/PriceDisplay"
@@ -34,6 +35,34 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const { t } = useLanguage()
 
     const touchStart = useRef<{ x: number; y: number } | null>(null)
+    // The sheet is portalled to <body>, so it needs to wait for the client.
+    const [mounted, setMounted] = useState(false)
+    useEffect(() => setMounted(true), [])
+
+    // Close on Escape and stop the page behind the sheet from scrolling.
+    useEffect(() => {
+        if (!showSizePopup) return
+        const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowSizePopup(false) }
+        document.addEventListener('keydown', onKey)
+        const previous = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
+        return () => {
+            document.removeEventListener('keydown', onKey)
+            document.body.style.overflow = previous
+        }
+    }, [showSizePopup])
+
+    // Swipe the sheet down to dismiss it.
+    const sheetTouchStartY = useRef<number | null>(null)
+    const handleSheetTouchStart = (e: TouchEvent) => {
+        sheetTouchStartY.current = e.touches[0].clientY
+    }
+    const handleSheetTouchEnd = (e: TouchEvent) => {
+        if (sheetTouchStartY.current === null) return
+        const delta = e.changedTouches[0].clientY - sheetTouchStartY.current
+        sheetTouchStartY.current = null
+        if (delta > 80) setShowSizePopup(false)
+    }
 
     const handleTouchStart = (e: TouchEvent) => {
         touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -162,27 +191,42 @@ export default function ProductCard({ href, image1, image2, name, description, p
                 </div>
             </Link>
 
-            {/* Size selector popup - Mobile only */}
-            {showSizePopup && (
+            {/* Size selector sheet - mobile only.
+                Portalled to <body>: any ancestor with a transform (e.g. the Reveal
+                wrapper on the homepage) would otherwise become the containing block
+                for position:fixed and strand the sheet far below the viewport. */}
+            {showSizePopup && mounted && createPortal(
                 <div
-                    className="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-end justify-center animate-in fade-in duration-200"
+                    className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-end justify-center animate-in fade-in duration-200"
                     onClick={() => setShowSizePopup(false)}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label={t.productInfo.chooseSize}
                 >
                     <div
-                        className="bg-white w-full rounded-t-3xl p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-in slide-in-from-bottom duration-300"
+                        className="bg-white w-full rounded-t-3xl px-5 pt-2 pb-[calc(1.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_40px_-12px_rgba(0,0,0,0.3)] animate-in slide-in-from-bottom duration-300"
                         onClick={(e) => e.stopPropagation()}
+                        onTouchStart={handleSheetTouchStart}
+                        onTouchEnd={handleSheetTouchEnd}
                     >
-                        <div className="flex items-center justify-between mb-5">
-                            <h3 className="font-black text-sm tracking-wide uppercase">{t.productInfo.chooseSize}</h3>
+                        {/* Grab handle - signals the sheet can be swiped away */}
+                        <div className="flex justify-center pb-3">
+                            <span className="block h-1 w-10 rounded-full bg-gray-300" />
+                        </div>
+
+                        <div className="flex items-start justify-between mb-4">
+                            <div className="min-w-0">
+                                <h3 className="font-black text-base tracking-wide uppercase">{t.productInfo.chooseSize}</h3>
+                                <p className="text-xs text-gray-500 mt-0.5 truncate">{name}</p>
+                            </div>
                             <button
                                 onClick={() => setShowSizePopup(false)}
-                                className="p-1 text-gray-400"
+                                aria-label="Close"
+                                className="-mr-2 -mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center text-gray-400 active:text-black"
                             >
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-
-                        <p className="text-xs text-gray-500 mb-4">{name}</p>
 
                         <div className="grid grid-cols-1 gap-3">
                             {/* 8-10 Personen */}
@@ -264,7 +308,8 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             </button>
                         </div>
                     </div>
-                </div>
+                </div>,
+                document.body
             )}
         </>
     )
