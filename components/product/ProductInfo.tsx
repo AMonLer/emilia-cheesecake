@@ -29,8 +29,9 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
     const addToCart = () => {
         if (!selectedSize) return
 
+        // The 2-3 size has its own photo of the cake in its box, named by slug.
         const imageForSize = selectedSize === "2-3"
-            ? `/${slug}3.png`
+            ? `/${slug}3.jpeg`
             : product.images[0]
 
         const newItem = {

@@ -277,7 +277,7 @@ function CheckoutContent() {
       name: "CLASSIC",
       price: 14.31, // Discounted upsell price (10% off 15.90)
       size: "2-3",
-      image: "/original3.png",
+      image: "/original3.jpeg",
       quantity: 1
     }
     addToCart(upsellProduct)
@@ -1084,7 +1084,7 @@ function CheckoutContent() {
                 <h3 className="font-bold text-sm mb-2">{c.upsellTitle}</h3>
                 <div className="flex gap-3 items-center">
                   <img
-                    src="/original3.png"
+                    src="/original3.jpeg"
                     alt="Angebot"
                     className="w-16 h-16 rounded-lg object-cover"
                   />
