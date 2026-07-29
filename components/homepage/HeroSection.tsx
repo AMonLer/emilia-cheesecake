@@ -46,14 +46,18 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Desktop Layout - Text left, Image right */}
-      <div className="hidden lg:grid grid-cols-[1.2fr_1fr] min-h-[600px]">
-        <div className="bg-[#F5E6D3] flex items-center justify-center px-8 lg:px-16 py-16">
+      {/* Desktop Layout - Text left, Image right.
+          The panel is the same beige as the photo's background so the two halves
+          read as one scene with no seam down the middle. */}
+      {/* The whole slice only fits if the photo column is at least ~1.05x wider
+          than it is tall, so narrow desktops get a wider column and a shorter hero. */}
+      <div className="hidden lg:grid grid-cols-[1fr_1.3fr] xl:grid-cols-[1fr_1.15fr] min-h-[500px] xl:min-h-[620px] 2xl:min-h-[740px] bg-gradient-to-b from-[#F3DFCC] to-[#F8DFCA]">
+        <div className="flex items-center justify-center px-8 lg:px-12 xl:px-16 py-12">
           <div className="max-w-lg">
             <span className="block text-xs font-bold tracking-[0.3em] uppercase text-[#651A1A]/70 mb-6">
               {h.eyebrow}
             </span>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-[#651A1A] leading-[0.95] mb-8">
+            <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#651A1A] leading-[0.95] mb-6 xl:mb-8">
               WHERE MEMORIES
               <br />
               ARE BAKED
@@ -69,13 +73,21 @@ export default function HeroSection() {
           </div>
         </div>
 
+        {/* object-right: the slice runs to the very edge of the photo, so any
+            crop has to come off the left, where there is only empty beige. */}
         <div className="relative h-[400px] lg:h-auto">
           <Image
-            src="/Portada1.jpg"
-            alt="San Sebastian Cheesecake von Emilia"
+            src="/hero-slice.jpeg"
+            alt="Ein Stück San Sebastian Cheesecake von Emilia"
             fill
-            sizes="(max-width: 1024px) 100vw, 45vw"
-            className="object-cover"
+            // Deliberately over-declared: object-cover here is driven by height,
+            // so the browser needs a wider candidate than the column to fill it
+            // without upscaling.
+            sizes="(max-width: 1024px) 100vw, 90vw"
+            // The background is a wide, smooth gradient - the default q75 bands
+            // across it badly. Lossless source in, high quality out.
+            quality={92}
+            className="object-cover object-right"
             priority
           />
         </div>
