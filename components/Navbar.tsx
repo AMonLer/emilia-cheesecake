@@ -93,7 +93,17 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
-              {/* Language Switcher - lives in the mobile menu below the sm breakpoint */}
+              {/* Mobile: one compact button showing the language you'd switch TO,
+                  so it stays reachable without the "DE | EN" pair eating the header. */}
+              <button
+                onClick={() => setLocale(locale === 'de' ? 'en' : 'de')}
+                aria-label={locale === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
+                className="sm:hidden flex h-10 items-center justify-center rounded-md px-1.5 text-[#F5E6D3]/80 text-xs font-bold tracking-widest active:bg-white/15 active:text-white transition-colors"
+              >
+                {locale === 'de' ? 'EN' : 'DE'}
+              </button>
+
+              {/* Desktop keeps the explicit pair */}
               <div className="hidden sm:flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
                 <button
                   onClick={() => setLocale('de')}
