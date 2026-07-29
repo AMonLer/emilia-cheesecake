@@ -18,8 +18,8 @@ export default function ProductExperienceSection() {
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[#EEC8B7] rounded-full mix-blend-multiply filter blur-[80px] opacity-40 group-hover:opacity-60 transition-opacity duration-700 pointer-events-none -z-10" />
                         <div className="relative h-[400px] lg:h-[600px] w-full transform transition-transform duration-700 group-hover:-translate-y-2">
                             <Image
-                                src="/emilia-boxes.jpeg"
-                                alt="Liebe zum Detail"
+                                src="/emilia-box-spoon.jpeg"
+                                alt="San Sebastian Cheesecake von Emilia in der Verpackung, mit einem Löffel"
                                 fill
                                 sizes="(max-width: 1024px) 100vw, 50vw"
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
