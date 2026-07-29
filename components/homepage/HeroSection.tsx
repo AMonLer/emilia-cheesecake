@@ -53,11 +53,14 @@ export default function HeroSection() {
           than it is tall, so narrow desktops get a wider column and a shorter hero. */}
       <div className="hidden lg:grid grid-cols-[1fr_1.3fr] xl:grid-cols-[1fr_1.15fr] min-h-[500px] xl:min-h-[620px] 2xl:min-h-[740px] bg-gradient-to-b from-[#F3DFCC] to-[#F8DFCA]">
         <div className="flex items-center justify-center px-8 lg:px-12 xl:px-16 py-12">
-          <div className="max-w-lg">
+          <div className="max-w-lg xl:max-w-xl 2xl:max-w-2xl">
             <span className="block text-xs font-bold tracking-[0.3em] uppercase text-[#651A1A]/70 mb-6">
               {h.eyebrow}
             </span>
-            <h1 className="text-5xl xl:text-6xl 2xl:text-7xl font-black text-[#651A1A] leading-[0.95] mb-6 xl:mb-8">
+            {/* Fluid rather than stepped: the text column scales with the viewport,
+                so the heading should too. Stepping at breakpoints left it 25% smaller
+                than it needed to be for most of each range. */}
+            <h1 className="text-[clamp(2.75rem,5.2vw,6.5rem)] font-black text-[#651A1A] leading-[0.95] mb-6 xl:mb-8">
               WHERE MEMORIES
               <br />
               ARE BAKED
