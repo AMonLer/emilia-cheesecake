@@ -10,7 +10,12 @@ module.exports = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      // 2rem was applied at every breakpoint, so the handful of call sites that omit
+      // px-4 ended up with 32px gutters on phones while the rest had 16px.
+      padding: {
+        DEFAULT: "1rem",
+        sm: "2rem",
+      },
       screens: {
         "2xl": "1400px",
       },

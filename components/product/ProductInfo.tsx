@@ -86,6 +86,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                     src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
                                     alt="Complete cheesecake"
                                     fill
+                                    sizes="40px"
                                     className="object-contain"
                                 />
                             </div>
@@ -117,6 +118,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
                                     alt="Small cheesecake box"
                                     fill
+                                    sizes="40px"
                                     className="object-contain"
                                 />
                             </div>
@@ -237,6 +239,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                     src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
                                     alt="Complete cheesecake"
                                     fill
+                                    sizes="48px"
                                     className="object-contain"
                                 />
                             </div>
@@ -276,6 +279,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
                                     alt="Small cheesecake box"
                                     fill
+                                    sizes="48px"
                                     className="object-contain"
                                 />
                             </div>

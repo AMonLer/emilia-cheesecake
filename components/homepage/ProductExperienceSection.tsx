@@ -21,6 +21,7 @@ export default function ProductExperienceSection() {
                                 src="/emilia-boxes.jpeg"
                                 alt="Liebe zum Detail"
                                 fill
+                                sizes="(max-width: 1024px) 100vw, 50vw"
                                 className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />
                         </div>

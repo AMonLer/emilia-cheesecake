@@ -38,27 +38,8 @@ export default function PhotoGallerySection() {
             </Reveal>
 
             {/* Scrolling Banners */}
+            {/* Marquee keyframes live in globals.css so prefers-reduced-motion can disable them */}
             <div className="relative w-full overflow-hidden py-4 z-20 flex flex-col gap-6 md:gap-10">
-                <style jsx>{`
-                    @keyframes scrollLeft {
-                        0% { transform: translateX(0); }
-                        100% { transform: translateX(-50%); }
-                    }
-                    @keyframes scrollRight {
-                        0% { transform: translateX(-50%); }
-                        100% { transform: translateX(0); }
-                    }
-                    .animate-scroll-left {
-                        animation: scrollLeft 45s linear infinite;
-                    }
-                    .animate-scroll-right {
-                        animation: scrollRight 45s linear infinite;
-                    }
-                    .scroll-container:hover > div {
-                        animation-play-state: paused;
-                    }
-                `}</style>
-
                 {/* Row 1 - Left */}
                 <div className="scroll-container w-full overflow-hidden">
                     <div className="flex w-max animate-scroll-left">
@@ -72,6 +53,7 @@ export default function PhotoGallerySection() {
                                         src={item.src}
                                         alt={item.alt}
                                         fill
+                                        sizes="(max-width: 768px) 260px, 320px"
                                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">
@@ -99,6 +81,7 @@ export default function PhotoGallerySection() {
                                         src={item.src}
                                         alt={item.alt}
                                         fill
+                                        sizes="(max-width: 768px) 260px, 320px"
                                         className="object-cover transition-transform duration-1000 group-hover:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">

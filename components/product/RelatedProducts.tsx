@@ -25,6 +25,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                                 src={item.image}
                                 alt={item.name}
                                 fill
+                                sizes="(max-width: 1024px) 200px, 25vw"
                                 className="object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                         </div>

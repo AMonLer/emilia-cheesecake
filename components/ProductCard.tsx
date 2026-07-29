@@ -33,11 +33,27 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const { addToCart } = useCart()
     const { t } = useLanguage()
 
+    const touchStart = useRef<{ x: number; y: number } | null>(null)
+
     const handleTouchStart = (e: TouchEvent) => {
+        touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
         setShowSecondImage(true)
     }
 
+    // Once the finger starts travelling the user is scrolling, not peeking at the
+    // second photo - drop back to the primary image instead of flickering.
+    const handleTouchMove = (e: TouchEvent) => {
+        if (!touchStart.current) return
+        const dx = Math.abs(e.touches[0].clientX - touchStart.current.x)
+        const dy = Math.abs(e.touches[0].clientY - touchStart.current.y)
+        if (dx > 10 || dy > 10) {
+            touchStart.current = null
+            setShowSecondImage(false)
+        }
+    }
+
     const handleTouchEnd = () => {
+        touchStart.current = null
         setShowSecondImage(false)
     }
 
@@ -72,7 +88,9 @@ export default function ProductCard({ href, image1, image2, name, description, p
                     className="relative h-48 md:h-80"
                     ref={imageContainerRef}
                     onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
+                    onTouchCancel={handleTouchEnd}
                 >
                     {tag && (
                         <div className={`absolute top-0 left-4 h-24 w-8 ${tag.bgColor} rounded-b-lg flex items-center justify-center z-10`}>
@@ -88,12 +106,14 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             src={image1}
                             alt={name}
                             fill
+                            sizes="320px"
                             className="object-cover absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
                         />
                         <Image
                             src={image2}
                             alt={name}
                             fill
+                            sizes="320px"
                             className="object-cover absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         />
                     </div>
@@ -104,12 +124,14 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             src={image1}
                             alt={name}
                             fill
+                            sizes="50vw"
                             className={`object-cover absolute inset-0 transition-opacity duration-200 ${showSecondImage ? 'opacity-0' : 'opacity-100'}`}
                         />
                         <Image
                             src={image2}
                             alt={name}
                             fill
+                            sizes="50vw"
                             className={`object-cover absolute inset-0 transition-opacity duration-200 ${showSecondImage ? 'opacity-100' : 'opacity-0'}`}
                         />
                         <span className="absolute bottom-2 left-2 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full z-10">+ info</span>
@@ -147,7 +169,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                     onClick={() => setShowSizePopup(false)}
                 >
                     <div
-                        className="bg-white w-full rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom duration-300"
+                        className="bg-white w-full rounded-t-3xl p-6 pb-[calc(2rem+env(safe-area-inset-bottom))] animate-in slide-in-from-bottom duration-300"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="flex items-center justify-between mb-5">
@@ -177,6 +199,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                             src={selectedSize === "8-10" ? "/completa1.png" : "/completa.png"}
                                             alt="Complete cheesecake"
                                             fill
+                                            sizes="48px"
                                             className="object-contain"
                                         />
                                     </div>
@@ -215,6 +238,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                             src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
                                             alt="Small cheesecake box"
                                             fill
+                                            sizes="48px"
                                             className="object-contain"
                                         />
                                     </div>

@@ -1,5 +1,5 @@
 import type React from "react"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter, Playfair_Display, Roboto } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/CartContext"
@@ -11,13 +11,45 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-playfair" })
 const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-roboto" })
 
+const siteTitle = "Emilia - Artisan Cheesecakes | Lieferung in Zürich"
+const siteDescription = "Die besten handgemachten Käsekuchen. Lieferung in Zürich und Umgebung."
+
 export const metadata: Metadata = {
-  title: "Emilia - Artisan Cheesecakes | Lieferung in Zürich",
-  description: "Die besten handgemachten Käsekuchen. Lieferung in Zürich und Umgebung.",
+  title: siteTitle,
+  description: siteDescription,
   generator: "v0.app",
   icons: {
     icon: "/Emilia (7).png",
+    apple: "/Emilia (7).png",
   },
+  // Most traffic arrives from Instagram/WhatsApp, so link previews matter.
+  openGraph: {
+    type: "website",
+    siteName: "Emilia",
+    title: siteTitle,
+    description: siteDescription,
+    locale: "de_CH",
+    images: [
+      {
+        url: "/Portada1.jpg",
+        width: 1200,
+        height: 630,
+        alt: "San Sebastian Cheesecake von Emilia",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteTitle,
+    description: siteDescription,
+    images: ["/Portada1.jpg"],
+  },
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#651A1A",
 }
 
 export default function RootLayout({
@@ -65,7 +97,7 @@ export default function RootLayout({
           />
         </noscript>
         {/* Microsoft Clarity */}
-        <Script id="microsoft-clarity" strategy="afterInteractive">
+        <Script id="microsoft-clarity" strategy="lazyOnload">
           {`
             (function(c,l,a,r,i,t,y){
               c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};

@@ -2,17 +2,19 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import PriceDisplay from '@/components/PriceDisplay'
+import ContactModal from '@/components/ContactModal'
 
 export default function Navbar() {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const { locale, setLocale, t } = useLanguage()
   const {
     cartItems,
@@ -29,16 +31,47 @@ export default function Navbar() {
     router.push('/checkout')
   }
 
+  // Stop the page behind the cart/menu from scrolling while an overlay is open.
+  useEffect(() => {
+    if (!isCartOpen && !isMobileMenuOpen) return
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = previous
+    }
+  }, [isCartOpen, isMobileMenuOpen])
+
+  const mobileLinks = [
+    { href: '/bestellen', label: t.nav.order },
+    { href: '/uber-uns', label: t.nav.aboutUs },
+    { href: '/versand', label: t.footer.shipping },
+    { href: '/faq', label: t.footer.faq },
+  ]
+
   return (
     <>
-      <nav className="bg-[#651A1A] border-b border-[#8B3A3A] z-30 transition-all duration-300">
+      <ContactModal
+        isOpen={isContactModalOpen}
+        onClose={() => setIsContactModalOpen(false)}
+      />
+      <nav className="sticky top-0 bg-[#651A1A] border-b border-[#8B3A3A] z-30 transition-all duration-300">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="flex items-center justify-between h-20">
             {/* Left Side - Order & About */}
-            <div className="flex-1 flex items-center gap-3 md:gap-8">
+            <div className="flex-1 flex items-center gap-2 md:gap-8">
+              {/* Mobile menu trigger */}
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(true)}
+                aria-label={locale === 'de' ? 'Menü öffnen' : 'Open menu'}
+                aria-expanded={isMobileMenuOpen}
+                className="sm:hidden -ml-2 flex h-11 w-11 items-center justify-center text-[#F5E6D3] hover:text-white transition-colors"
+              >
+                <Menu className="h-6 w-6" strokeWidth={1.5} />
+              </button>
               <Link
                 href="/bestellen"
-                className="group relative text-white hover:text-white transition-colors duration-300 text-xs font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase whitespace-nowrap"
+                className="group relative hidden sm:block text-white hover:text-white transition-colors duration-300 text-xs font-bold tracking-[0.12em] sm:tracking-[0.2em] uppercase whitespace-nowrap"
               >
                 {t.nav.order}
                 <span className="absolute -bottom-1 left-0 w-full h-px bg-[#D4AF85] transition-all duration-300" />
@@ -66,18 +99,18 @@ export default function Navbar() {
 
             {/* Right Side Actions */}
             <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
-              {/* Language Switcher */}
-              <div className="flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
+              {/* Language Switcher - lives in the mobile menu below the sm breakpoint */}
+              <div className="hidden sm:flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
                 <button
                   onClick={() => setLocale('de')}
-                  className={`px-1 transition-opacity duration-200 ${locale === 'de' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                  className={`px-2 py-2 transition-opacity duration-200 ${locale === 'de' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
                 >
                   DE
                 </button>
-                <span className="opacity-30 mx-0.5">|</span>
+                <span className="opacity-30">|</span>
                 <button
                   onClick={() => setLocale('en')}
-                  className={`px-1 transition-opacity duration-200 ${locale === 'en' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                  className={`px-2 py-2 transition-opacity duration-200 ${locale === 'en' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
                 >
                   EN
                 </button>
@@ -102,6 +135,82 @@ export default function Navbar() {
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <>
+          <div
+            className="sm:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 animate-in fade-in duration-200"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+
+          <div className="sm:hidden fixed left-0 top-0 h-full w-[82%] max-w-xs bg-[#651A1A] z-50 shadow-2xl flex flex-col animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between px-6 h-20 border-b border-white/10">
+              <Image
+                src="/Emilia (6).png"
+                alt="Emilia"
+                width={180}
+                height={50}
+                className="object-contain max-w-[110px]"
+              />
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={locale === 'de' ? 'Menü schliessen' : 'Close menu'}
+                className="-mr-2 flex h-11 w-11 items-center justify-center text-[#F5E6D3] hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto px-6 py-4">
+              <ul>
+                {mobileLinks.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center py-4 text-[#F5E6D3] text-sm font-bold tracking-[0.15em] uppercase border-b border-white/10 active:text-white"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false)
+                      setIsContactModalOpen(true)
+                    }}
+                    className="w-full flex items-center py-4 text-[#F5E6D3] text-sm font-bold tracking-[0.15em] uppercase border-b border-white/10 active:text-white"
+                  >
+                    {t.footer.contact}
+                  </button>
+                </li>
+              </ul>
+            </nav>
+
+            {/* Language switcher - full size targets now that there is room */}
+            <div className="px-6 pt-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] border-t border-white/10">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setLocale('de')}
+                  className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest transition-colors ${locale === 'de' ? 'bg-[#D4AF85] text-[#651A1A]' : 'bg-white/10 text-[#F5E6D3]'}`}
+                >
+                  DE
+                </button>
+                <button
+                  onClick={() => setLocale('en')}
+                  className={`flex-1 py-3 rounded-lg text-xs font-bold tracking-widest transition-colors ${locale === 'en' ? 'bg-[#D4AF85] text-[#651A1A]' : 'bg-white/10 text-[#F5E6D3]'}`}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Shopping Cart Sidebar */}
       {isCartOpen && (
@@ -208,7 +317,7 @@ export default function Navbar() {
 
             {/* Checkout Section */}
             {cartItems.length > 0 && (
-              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 space-y-5">
+              <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] space-y-5">
                 <div className="space-y-3">
                     {totalPrice >= 100 ? (
                       <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">

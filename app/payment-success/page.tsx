@@ -141,6 +141,7 @@ function PaymentSuccessContent() {
                 src="/logo1.png"
                 alt="Emilia Cheesecake"
                 fill
+                sizes="208px"
                 className="object-contain"
                 priority
               />

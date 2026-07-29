@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, ChevronLeft, X, Gift } from "lucide-react"
+import { ChevronRight, ChevronLeft, ChevronDown, X, Gift, ShoppingBag } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
@@ -113,6 +113,9 @@ function CheckoutContent() {
   const [missingFields, setMissingFields] = useState<Set<string>>(new Set())
   const [deliveryError, setDeliveryError] = useState("")
   const [paymentInitError, setPaymentInitError] = useState("")
+  // Mobile-only: the order summary column sits below the form, so surface a collapsible
+  // recap above it instead of making people scroll past everything to see the total.
+  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false)
   const [paymentFailed, setPaymentFailed] = useState(false)
   const formRestoredRef = useRef(false)
 
@@ -405,6 +408,62 @@ function CheckoutContent() {
           <span className="text-gray-400">{c.breadcrumbPayment}</span>
         </div>
 
+        {/* Mobile order recap - the full summary column below is lg-only in practice */}
+        <div className="lg:hidden -mx-4 mb-6 border-y border-gray-200 bg-[#FDFBF7]">
+          <button
+            type="button"
+            onClick={() => setIsMobileSummaryOpen(!isMobileSummaryOpen)}
+            aria-expanded={isMobileSummaryOpen}
+            className="w-full flex items-center justify-between gap-3 px-4 py-4 text-left"
+          >
+            <span className="flex items-center gap-2 text-sm font-bold text-[#651A1A]">
+              <ShoppingBag className="w-4 h-4" strokeWidth={2} />
+              {c.orderSummary}
+              <ChevronDown
+                className={`w-4 h-4 transition-transform duration-200 ${isMobileSummaryOpen ? 'rotate-180' : ''}`}
+              />
+            </span>
+            <PriceDisplay amount={finalPrice} className="text-lg font-black" currencyClassName="text-[0.55em] opacity-80" />
+          </button>
+
+          {isMobileSummaryOpen && (
+            <div className="px-4 pb-4 space-y-3 border-t border-gray-200 pt-4">
+              {cartItems.map((item) => (
+                <div key={item.id} className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm truncate">{item.name}</p>
+                    <p className="text-xs text-gray-600">{item.size} {c.persons} · {c.qty} {item.quantity}</p>
+                  </div>
+                  <PriceDisplay amount={item.price * item.quantity} className="text-sm font-bold" currencyClassName="text-[0.6em] opacity-80" />
+                </div>
+              ))}
+              <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
+                <span>{c.subtotal}</span>
+                <PriceDisplay amount={totalPrice} className="text-sm font-bold" currencyClassName="text-[0.6em] opacity-80" />
+              </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-sm text-green-700 font-bold">
+                  <span>{hasCodeDiscount ? `${totalPrice >= 100 ? '15%' : '10%'} Rabatt` : '10% Rabatt'}</span>
+                  <span className="flex items-center">
+                    -<PriceDisplay amount={discount} className="text-sm font-bold" currencyClassName="text-[0.5em] opacity-80" />
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span>{c.shipping}</span>
+                {shippingCost === 0 ? (
+                  <span className="text-green-600 font-bold">{c.free}</span>
+                ) : (
+                  <PriceDisplay amount={shippingCost} className="text-sm" />
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
           {/* Left Side - Form */}
           <div className="space-y-8">
@@ -449,11 +508,8 @@ function CheckoutContent() {
 
               {/* Contact Section */}
               <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
+                <div className="mb-4">
                   <h2 className="text-xl font-black">{c.contact}</h2>
-                  <Link href="#" className="text-sm text-gray-600 hover:text-black">
-                    {c.signIn}
-                  </Link>
                 </div>
                 <input
                   type="email"
@@ -461,6 +517,10 @@ function CheckoutContent() {
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
                   data-error={missingFields.has('email')}
+                  autoComplete="email"
+                  inputMode="email"
+                  autoCapitalize="off"
+                  autoCorrect="off"
                   className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('email') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                   required
                 />
@@ -469,6 +529,8 @@ function CheckoutContent() {
                   placeholder={c.phonePlaceholder}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  autoComplete="tel"
+                  inputMode="tel"
                   className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
                 />
                 <label className="flex items-center gap-2 mt-3">
@@ -499,6 +561,8 @@ function CheckoutContent() {
                           value={firstName}
                           onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
                           data-error={missingFields.has('firstName')}
+                          autoComplete="given-name"
+                          autoCapitalize="words"
                           className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('firstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
@@ -508,6 +572,8 @@ function CheckoutContent() {
                           value={lastName}
                           onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
                           data-error={missingFields.has('lastName')}
+                          autoComplete="family-name"
+                          autoCapitalize="words"
                           className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('lastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
@@ -519,6 +585,8 @@ function CheckoutContent() {
                         value={address}
                         onChange={(e) => { setAddress(e.target.value); if (missingFields.has('address')) { const m = new Set(missingFields); m.delete('address'); setMissingFields(m) } }}
                         data-error={missingFields.has('address')}
+                        autoComplete="street-address"
+                        autoCapitalize="words"
                         className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('address') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                         required
                       />
@@ -530,6 +598,8 @@ function CheckoutContent() {
                           value={city}
                           onChange={(e) => { setCity(e.target.value); if (missingFields.has('city')) { const m = new Set(missingFields); m.delete('city'); setMissingFields(m) } }}
                           data-error={missingFields.has('city')}
+                          autoComplete="address-level2"
+                          autoCapitalize="words"
                           className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('city') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
                           required
                         />
@@ -543,6 +613,8 @@ function CheckoutContent() {
                             if (missingFields.has('postalCode')) { const m = new Set(missingFields); m.delete('postalCode'); setMissingFields(m) }
                           }}
                           data-error={missingFields.has('postalCode') || !!postalCodeError}
+                          autoComplete="postal-code"
+                          inputMode="numeric"
                           className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${postalCodeError || missingFields.has('postalCode') ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
                             }`}
                           required
@@ -571,13 +643,15 @@ function CheckoutContent() {
                       <span>{formError}</span>
                     </div>
                   )}
-                  <button
-                    type="button"
-                    onClick={handleContinueToDelivery}
-                    className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
-                  >
-                    {c.continueToDelivery}
-                  </button>
+                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0">
+                    <button
+                      type="button"
+                      onClick={handleContinueToDelivery}
+                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
+                    >
+                      {c.continueToDelivery}
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -641,11 +715,13 @@ function CheckoutContent() {
                           justify-content: space-between;
                           padding: 0;
                         }
+                        /* Percentage widths so the 7-column grid never overflows a 320px viewport */
                         .react-datepicker__day-name {
                           color: #651A1A;
                           font-family: var(--font-geist-sans), sans-serif;
                           font-weight: 600;
-                          width: 2.5rem;
+                          width: 14.28%;
+                          max-width: 2.5rem;
                           text-transform: uppercase;
                           font-size: 0.7rem;
                           letter-spacing: 0.1em;
@@ -653,9 +729,13 @@ function CheckoutContent() {
                           text-align: center;
                         }
                         .react-datepicker__day {
-                          width: 2.5rem;
-                          height: 2.5rem;
-                          line-height: 2.5rem;
+                          width: 14.28%;
+                          max-width: 2.5rem;
+                          aspect-ratio: 1;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          line-height: 1;
                           border-radius: 50%;
                           margin: 0;
                           font-family: var(--font-playfair), serif;
@@ -689,7 +769,7 @@ function CheckoutContent() {
                         .react-datepicker__day--today::after {
                           content: '';
                           position: absolute;
-                          bottom: 4px;
+                          bottom: 2px;
                           left: 50%;
                           transform: translateX(-50%);
                           width: 4px;
@@ -705,7 +785,7 @@ function CheckoutContent() {
                         }
                       `}</style>
 
-                      <div className="bg-[#FFFCF8] border border-[#E6D5C0] rounded-2xl p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-center mb-6">
+                      <div className="bg-[#FFFCF8] border border-[#E6D5C0] rounded-2xl p-4 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-center mb-6">
                         {/* Left Side: Calendar */}
                         <div className="flex-1 w-full max-w-[360px] lg:max-w-none">
                           <DatePicker
@@ -804,8 +884,8 @@ function CheckoutContent() {
                               className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${!available
                                 ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
                                 : deliveryTime === slot
-                                  ? "border-[#651A1A] bg-[#F5E6D3] shadow-md hover:scale-105"
-                                  : "border-gray-300 bg-white hover:border-gray-400 hover:scale-105"
+                                  ? "border-[#651A1A] bg-[#F5E6D3] shadow-md [@media(hover:hover)]:hover:scale-105"
+                                  : "border-gray-300 bg-white hover:border-gray-400 [@media(hover:hover)]:hover:scale-105"
                                 }`}
                             >
                               <div className="flex items-center justify-center gap-2">
@@ -837,13 +917,15 @@ function CheckoutContent() {
                       <span>{deliveryError || paymentInitError}</span>
                     </div>
                   )}
-                  <button
-                    type="button"
-                    onClick={handleContinueToPayment}
-                    className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
-                  >
-                    {c.continueToPayment}
-                  </button>
+                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0">
+                    <button
+                      type="button"
+                      onClick={handleContinueToPayment}
+                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
+                    >
+                      {c.continueToPayment}
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -920,7 +1002,10 @@ function CheckoutContent() {
                     setDiscountCodeInput(e.target.value)
                     setDiscountCodeError("")
                   }}
-                  className="flex-1 border border-gray-300 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-black"
+                  autoCapitalize="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  className="flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
                 />
                 <button
                   type="button"
@@ -939,7 +1024,7 @@ function CheckoutContent() {
                       setDiscountCodeError(c.invalidCode)
                     }
                   }}
-                  className="px-6 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors"
+                  className="shrink-0 whitespace-nowrap px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors"
                 >
                   {c.applyCode}
                 </button>
