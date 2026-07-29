@@ -144,21 +144,25 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             type="button"
                             onClick={(e) => stepImage(e, -1)}
                             aria-label={t.productInfo.previousImage}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center active:opacity-60 transition-opacity"
                         >
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/85 shadow-sm active:bg-white">
-                                <ChevronLeft className="w-4 h-4 text-[#651A1A]" strokeWidth={2.5} />
-                            </span>
+                            {/* No plate behind the chevron - a drop shadow keeps it legible
+                                over both the dark backdrop and the pale cakes. */}
+                            <ChevronLeft
+                                className="w-6 h-6 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                strokeWidth={2.5}
+                            />
                         </button>
                         <button
                             type="button"
                             onClick={(e) => stepImage(e, 1)}
                             aria-label={t.productInfo.nextImage}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center"
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center active:opacity-60 transition-opacity"
                         >
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/85 shadow-sm active:bg-white">
-                                <ChevronRight className="w-4 h-4 text-[#651A1A]" strokeWidth={2.5} />
-                            </span>
+                            <ChevronRight
+                                className="w-6 h-6 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                strokeWidth={2.5}
+                            />
                         </button>
 
                         {/* Which of the two photos you are on */}
