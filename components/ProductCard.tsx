@@ -156,7 +156,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                 {/* No plate behind the chevron - a drop shadow keeps it legible
                                     over both the dark backdrop and the pale cakes. */}
                                 <ChevronLeft
-                                    className="w-5 h-5 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                    className="w-4 h-4 text-white/70 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.55))_drop-shadow(0_0_5px_rgba(0,0,0,0.35))]"
                                     strokeWidth={2.5}
                                 />
                             </button>
@@ -177,7 +177,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                 className="flex h-10 w-10 items-center justify-center active:opacity-60 transition-opacity"
                             >
                                 <ChevronRight
-                                    className="w-5 h-5 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                    className="w-4 h-4 text-white/70 [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.55))_drop-shadow(0_0_5px_rgba(0,0,0,0.35))]"
                                     strokeWidth={2.5}
                                 />
                             </button>
