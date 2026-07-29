@@ -123,7 +123,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                         />
                     </div>
 
-                    {/* Mobile long press effect */}
+                    {/* Mobile: two photos with a control row underneath them */}
                     <div className="md:hidden w-full h-full relative">
                         <Image
                             src={image1}
@@ -140,39 +140,47 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             className={`object-cover absolute inset-0 transition-opacity duration-300 ${mobileImage === 1 ? 'opacity-100' : 'opacity-0'}`}
                         />
 
-                        <button
-                            type="button"
-                            onClick={(e) => stepImage(e, -1)}
-                            aria-label={t.productInfo.previousImage}
-                            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center active:opacity-60 transition-opacity"
-                        >
-                            {/* No plate behind the chevron - a drop shadow keeps it legible
-                                over both the dark backdrop and the pale cakes. */}
-                            <ChevronLeft
-                                className="w-6 h-6 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
-                                strokeWidth={2.5}
-                            />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={(e) => stepImage(e, 1)}
-                            aria-label={t.productInfo.nextImage}
-                            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center active:opacity-60 transition-opacity"
-                        >
-                            <ChevronRight
-                                className="w-6 h-6 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
-                                strokeWidth={2.5}
-                            />
-                        </button>
+                        <span className="absolute top-2 left-2 z-20 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full">
+                            + info
+                        </span>
 
-                        {/* Which of the two photos you are on */}
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
-                            {[0, 1].map((i) => (
-                                <span
-                                    key={i}
-                                    className={`block h-1.5 rounded-full transition-all duration-300 ${mobileImage === i ? 'w-3.5 bg-white' : 'w-1.5 bg-white/55'}`}
+                        {/* Arrows and dots share one row at the foot of the photo, so the
+                            middle of the image stays free to tap through to the product. */}
+                        <div className="absolute bottom-1 left-1/2 -translate-x-1/2 z-20 flex items-center">
+                            <button
+                                type="button"
+                                onClick={(e) => stepImage(e, -1)}
+                                aria-label={t.productInfo.previousImage}
+                                className="flex h-10 w-10 items-center justify-center active:opacity-60 transition-opacity"
+                            >
+                                {/* No plate behind the chevron - a drop shadow keeps it legible
+                                    over both the dark backdrop and the pale cakes. */}
+                                <ChevronLeft
+                                    className="w-5 h-5 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                    strokeWidth={2.5}
                                 />
-                            ))}
+                            </button>
+
+                            <div className="flex items-center gap-1.5">
+                                {[0, 1].map((i) => (
+                                    <span
+                                        key={i}
+                                        className={`block h-1.5 rounded-full transition-all duration-300 [filter:drop-shadow(0_1px_1px_rgba(0,0,0,0.5))] ${mobileImage === i ? 'w-3.5 bg-white' : 'w-1.5 bg-white/55'}`}
+                                    />
+                                ))}
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={(e) => stepImage(e, 1)}
+                                aria-label={t.productInfo.nextImage}
+                                className="flex h-10 w-10 items-center justify-center active:opacity-60 transition-opacity"
+                            >
+                                <ChevronRight
+                                    className="w-5 h-5 text-white [filter:drop-shadow(0_1px_2px_rgba(0,0,0,0.7))_drop-shadow(0_0_6px_rgba(0,0,0,0.4))]"
+                                    strokeWidth={2.5}
+                                />
+                            </button>
                         </div>
                     </div>
                 </div>
