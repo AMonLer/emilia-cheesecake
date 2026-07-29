@@ -5,7 +5,7 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import Image from "next/image"
 import PriceDisplay from "@/components/PriceDisplay"
-import { ShoppingCart, X, Check } from "lucide-react"
+import { ShoppingCart, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useScrollLock } from "@/lib/useScrollLock"
@@ -28,14 +28,13 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ href, image1, image2, name, description, priceSmall, priceLarge, slug, tag, className = "" }: ProductCardProps) {
-    const [showSecondImage, setShowSecondImage] = useState(false)
+    // Which of the two photos the mobile card is showing (0 = whole cake, 1 = slice).
+    const [mobileImage, setMobileImage] = useState(0)
     const [showSizePopup, setShowSizePopup] = useState(false)
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
-    const imageContainerRef = useRef<HTMLDivElement>(null)
     const { addToCart } = useCart()
     const { t } = useLanguage()
 
-    const touchStart = useRef<{ x: number; y: number } | null>(null)
     // The sheet is portalled to <body>, so it needs to wait for the client.
     const [mounted, setMounted] = useState(false)
     useEffect(() => setMounted(true), [])
@@ -63,26 +62,11 @@ export default function ProductCard({ href, image1, image2, name, description, p
         if (delta > 80) setShowSizePopup(false)
     }
 
-    const handleTouchStart = (e: TouchEvent) => {
-        touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
-        setShowSecondImage(true)
-    }
-
-    // Once the finger starts travelling the user is scrolling, not peeking at the
-    // second photo - drop back to the primary image instead of flickering.
-    const handleTouchMove = (e: TouchEvent) => {
-        if (!touchStart.current) return
-        const dx = Math.abs(e.touches[0].clientX - touchStart.current.x)
-        const dy = Math.abs(e.touches[0].clientY - touchStart.current.y)
-        if (dx > 10 || dy > 10) {
-            touchStart.current = null
-            setShowSecondImage(false)
-        }
-    }
-
-    const handleTouchEnd = () => {
-        touchStart.current = null
-        setShowSecondImage(false)
+    // The card is a <Link>, so the arrows have to swallow the tap or it navigates.
+    const stepImage = (e: React.MouseEvent, direction: 1 | -1) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setMobileImage((prev) => (prev + direction + 2) % 2)
     }
 
     const handleCartClick = (e: React.MouseEvent) => {
@@ -112,14 +96,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     return (
         <>
             <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex flex-col ${className}`}>
-                <div
-                    className="relative h-48 md:h-80"
-                    ref={imageContainerRef}
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    onTouchCancel={handleTouchEnd}
-                >
+                <div className="relative h-48 md:h-80">
                     {tag && (
                         <div className={`absolute top-0 left-4 h-24 w-8 ${tag.bgColor} rounded-b-lg flex items-center justify-center z-10`}>
                             <span className={`${tag.textColor} text-[10px] font-semibold tracking-wider uppercase [writing-mode:vertical-lr] rotate-180`}>
@@ -153,16 +130,46 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             alt={name}
                             fill
                             sizes="50vw"
-                            className={`object-cover absolute inset-0 transition-opacity duration-200 ${showSecondImage ? 'opacity-0' : 'opacity-100'}`}
+                            className={`object-cover absolute inset-0 transition-opacity duration-300 ${mobileImage === 0 ? 'opacity-100' : 'opacity-0'}`}
                         />
                         <Image
                             src={image2}
                             alt={name}
                             fill
                             sizes="50vw"
-                            className={`object-cover absolute inset-0 transition-opacity duration-200 ${showSecondImage ? 'opacity-100' : 'opacity-0'}`}
+                            className={`object-cover absolute inset-0 transition-opacity duration-300 ${mobileImage === 1 ? 'opacity-100' : 'opacity-0'}`}
                         />
-                        <span className="absolute bottom-2 left-2 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full z-10">+ info</span>
+
+                        <button
+                            type="button"
+                            onClick={(e) => stepImage(e, -1)}
+                            aria-label={t.productInfo.previousImage}
+                            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center"
+                        >
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/85 shadow-sm active:bg-white">
+                                <ChevronLeft className="w-4 h-4 text-[#651A1A]" strokeWidth={2.5} />
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={(e) => stepImage(e, 1)}
+                            aria-label={t.productInfo.nextImage}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 flex h-11 w-9 items-center justify-center"
+                        >
+                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/85 shadow-sm active:bg-white">
+                                <ChevronRight className="w-4 h-4 text-[#651A1A]" strokeWidth={2.5} />
+                            </span>
+                        </button>
+
+                        {/* Which of the two photos you are on */}
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+                            {[0, 1].map((i) => (
+                                <span
+                                    key={i}
+                                    className={`block h-1.5 rounded-full transition-all duration-300 ${mobileImage === i ? 'w-3.5 bg-white' : 'w-1.5 bg-white/55'}`}
+                                />
+                            ))}
+                        </div>
                     </div>
                 </div>
                 <div className="p-3 md:p-6 text-center flex flex-col flex-1">

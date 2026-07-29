@@ -99,6 +99,8 @@ export type Translations = {
     allergenNote: string
     notFound: string
     notFoundDesc: string
+    previousImage: string
+    nextImage: string
   }
   productDescriptions: {
     pistacho: string
@@ -275,6 +277,8 @@ export const translations: Record<Locale, Translations> = {
       allergenNote: 'Allergene sind fett gedruckt.',
       notFound: 'Produkt nicht gefunden',
       notFoundDesc: 'Das gesuchte Produkt existiert leider nicht.',
+      previousImage: 'Vorheriges Bild',
+      nextImage: 'Nächstes Bild',
     },
     productDescriptions: {
       pistacho: 'Unser Bestseller. Echte Pistaziencreme, zarte Textur und ein grüner, eleganter und ausgewogener Geschmack. Delikat, aromatisch und süchtig machend.',
@@ -449,6 +453,8 @@ export const translations: Record<Locale, Translations> = {
       allergenNote: 'Allergens are in bold.',
       notFound: 'Product not found',
       notFoundDesc: "The product you're looking for doesn't exist.",
+      previousImage: 'Previous image',
+      nextImage: 'Next image',
     },
     productDescriptions: {
       pistacho: 'Our bestseller. Real pistachio cream, delicate texture and a green, elegant and balanced flavour. Delicate, aromatic and utterly addictive.',
