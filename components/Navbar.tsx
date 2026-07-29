@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -10,6 +10,7 @@ import { useCart } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import PriceDisplay from '@/components/PriceDisplay'
 import ContactModal from '@/components/ContactModal'
+import { useScrollLock } from '@/lib/useScrollLock'
 
 export default function Navbar() {
   const router = useRouter()
@@ -32,14 +33,7 @@ export default function Navbar() {
   }
 
   // Stop the page behind the cart/menu from scrolling while an overlay is open.
-  useEffect(() => {
-    if (!isCartOpen && !isMobileMenuOpen) return
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.body.style.overflow = previous
-    }
-  }, [isCartOpen, isMobileMenuOpen])
+  useScrollLock(isCartOpen || isMobileMenuOpen)
 
   const mobileLinks = [
     { href: '/bestellen', label: t.nav.order },

@@ -8,6 +8,7 @@ import PriceDisplay from "@/components/PriceDisplay"
 import { ShoppingCart, X, Check } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { useScrollLock } from "@/lib/useScrollLock"
 
 interface ProductCardProps {
     href: string
@@ -39,17 +40,15 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const [mounted, setMounted] = useState(false)
     useEffect(() => setMounted(true), [])
 
-    // Close on Escape and stop the page behind the sheet from scrolling.
+    // Stop the page behind the sheet from scrolling. Shared counter, because
+    // picking a size opens the cart on top of this sheet.
+    useScrollLock(showSizePopup)
+
     useEffect(() => {
         if (!showSizePopup) return
         const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowSizePopup(false) }
         document.addEventListener('keydown', onKey)
-        const previous = document.body.style.overflow
-        document.body.style.overflow = 'hidden'
-        return () => {
-            document.removeEventListener('keydown', onKey)
-            document.body.style.overflow = previous
-        }
+        return () => document.removeEventListener('keydown', onKey)
     }, [showSizePopup])
 
     // Swipe the sheet down to dismiss it.
