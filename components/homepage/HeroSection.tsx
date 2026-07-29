@@ -13,7 +13,9 @@ export default function HeroSection() {
       {/* Mobile Layout - Image with button overlaid at bottom */}
       <div className="lg:hidden">
         {/* Image - Full width with button positioned at bottom */}
-        <div className="relative h-[85dvh] min-h-[480px] w-full">
+        {/* svh, not dvh: dvh grows when the mobile URL bar collapses mid-scroll,
+            which visibly stretches the hero and reflows the page under the user. */}
+        <div className="relative h-[85svh] min-h-[480px] w-full">
           <Image
             src="/Generated Image November 30, 2025 - 9_03PM.jpeg"
             alt="San Sebastian Cheesecake von Emilia"
