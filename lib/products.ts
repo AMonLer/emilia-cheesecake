@@ -5,7 +5,7 @@ export const products: { [key: string]: any } = {
             "8-10": 49.90,  // CHF for 8-10 people
             "2-3": 19.90    // CHF for 2-3 people
         },
-        description: "Unser Bestseller. Echte Pistaziencreme, zarte Textur und ein grüner, eleganter und ausgewogener Geschmack. Delikat, aromatisch und süchtig machend.",
+        description: "Wir verwenden reine Pistazienpaste aus Sizilien, sonst nichts. Kein Farbstoff, kein künstliches Aroma. Deshalb ist das Grün gedämpft statt grell. Unser meistverkaufter Kuchen.",
         images: ["/pistacho1.png", "/pistacho2.png"],
         includes: [
             "Pistazienkäsekuchen",
