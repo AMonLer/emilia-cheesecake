@@ -210,7 +210,7 @@ export const translations: Record<Locale, Translations> = {
     products: {
       heading: 'UNSERE',
       subtitle: 'Fünf Sorten, alle frisch auf Bestellung gebacken.',
-      pistachio: 'Mit reiner Pistazienpaste aus Sizilien. Kein Farbstoff, daher das gedämpfte Grün.',
+      pistachio: 'Mit reiner Pistazienpaste aus Sizilien. Kein Farbstoff, kein künstliches Aroma.',
       classic: 'Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack...',
       lotus: 'Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack...',
       schoggi: 'Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber...',
@@ -281,7 +281,7 @@ export const translations: Record<Locale, Translations> = {
       nextImage: 'Nächstes Bild',
     },
     productDescriptions: {
-      pistacho: 'Wir verwenden reine Pistazienpaste aus Sizilien, sonst nichts. Kein Farbstoff, kein künstliches Aroma. Deshalb ist das Grün gedämpft statt grell. Unser meistverkaufter Kuchen.',
+      pistacho: 'Wir verwenden reine Pistazienpaste aus Sizilien, sonst nichts. Kein Farbstoff, kein künstliches Aroma. Unser meistverkaufter Kuchen.',
       lotus: 'Die süßeste aus der Kollektion. Karamell, sanfte Gewürze und eine umhüllende Creme, die jeden Bissen in puren Komfort verwandelt.',
       chocolate: 'Cremige Schweizer Schokolade mit einem tiefen Geschmack, der umhüllt, ohne zu überwältigen. Eine perfekte Balance zwischen Intensität und Sanftheit.',
       original: 'Das Rezept, mit dem alles begann. Cremig, seidig und im baskischen Stil gebacken. Pure Emilia-Essenz: einfach, perfekt, unvergesslich.',
@@ -386,7 +386,7 @@ export const translations: Record<Locale, Translations> = {
     products: {
       heading: 'OUR',
       subtitle: 'Five varieties, all freshly baked to order.',
-      pistachio: 'Made with pure Sicilian pistachio paste. No colouring, which is why the green is muted.',
+      pistachio: 'Made with pure Sicilian pistachio paste. No colouring, no artificial flavouring.',
       classic: 'Our classic original recipe, creamy and delicate. The authentic traditional taste...',
       lotus: 'Cheesecake with Lotus Biscoff cookies, irresistible spiced caramel flavour...',
       schoggi: 'Intense cheesecake with Swiss chocolate, for true cocoa lovers...',
@@ -457,7 +457,7 @@ export const translations: Record<Locale, Translations> = {
       nextImage: 'Next image',
     },
     productDescriptions: {
-      pistacho: 'We use pure pistachio paste from Sicily, nothing else. No colouring, no artificial flavouring. That is why the green is muted rather than bright. Our best seller.',
+      pistacho: 'We use pure pistachio paste from Sicily, nothing else. No colouring, no artificial flavouring. Our best seller.',
       lotus: 'The sweetest of the collection. Caramel, gentle spices and an enveloping cream that turns every bite into pure comfort.',
       chocolate: 'Creamy Swiss chocolate with a deep flavour that envelops without overwhelming. A perfect balance between intensity and softness.',
       original: 'The recipe that started it all. Creamy, silky and baked in the Basque style. Pure Emilia essence: simple, perfect, unforgettable.',
