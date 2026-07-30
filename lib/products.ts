@@ -3,7 +3,7 @@ export const products: { [key: string]: any } = {
         name: "PISTACHIO",
         prices: {
             "8-10": 49.90,  // CHF for 8-10 people
-            "2-3": 18.90    // CHF for 2-3 people
+            "2-3": 19.90    // CHF for 2-3 people
         },
         description: "Unser Bestseller. Echte Pistaziencreme, zarte Textur und ein grüner, eleganter und ausgewogener Geschmack. Delikat, aromatisch und süchtig machend.",
         images: ["/pistacho1.png", "/pistacho2.png"],

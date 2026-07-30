@@ -17,7 +17,7 @@ export default function BestellenPage() {
       slug: "pistacho",
       image1: "/pistacho1.png",
       image2: "/pistacho2.png",
-      priceSmall: 18.90,
+      priceSmall: 19.90,
       priceLarge: 49.90,
       description: p.pistachio
     },
