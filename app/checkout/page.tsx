@@ -25,7 +25,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 // Ocultar la opción de regalo "For You" hasta que se lance la funcionalidad
 const SHOW_GIFT_OPTION = false
 
-function PaymentForm({ clientSecret }: { clientSecret: string }) {
+function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: number }) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
@@ -72,13 +72,28 @@ function PaymentForm({ clientSecret }: { clientSecret: string }) {
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={!stripe || isProcessing}
-        className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
-        {isProcessing ? c.processing : c.payNow}
-      </button>
+      {/* En móvil el botón vive pegado abajo: el PaymentElement es alto y el CTA
+          quedaba fuera de pantalla justo en el momento de pagar. */}
+      <div className="sticky bottom-0 -mx-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none">
+        <button
+          type="submit"
+          disabled={!stripe || isProcessing}
+          className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99] disabled:bg-gray-400 disabled:cursor-not-allowed disabled:active:scale-100"
+        >
+          {isProcessing ? (
+            <span className="inline-flex items-center justify-center gap-2">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              {c.processing}
+            </span>
+          ) : (
+            <span className="inline-flex items-center justify-center gap-2">
+              {c.payNow}
+              <span className="opacity-40">·</span>
+              <PriceDisplay amount={amount} className="text-base font-black" currencyClassName="text-[0.5em] opacity-90" />
+            </span>
+          )}
+        </button>
+      </div>
     </form>
   )
 }
@@ -410,6 +425,100 @@ function CheckoutContent() {
     }
   }
 
+  const currentStep = showPayment ? 3 : showDeliveryStep ? 2 : 1
+
+  // Al cambiar de paso el móvil se quedaba a media página: se pulsa el botón de abajo
+  // y el paso nuevo aparece por encima de donde está mirando el usuario.
+  const stepTopRef = useRef<HTMLDivElement>(null)
+  const previousStepRef = useRef(currentStep)
+  useEffect(() => {
+    if (previousStepRef.current === currentStep) return
+    previousStepRef.current = currentStep
+    stepTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [currentStep])
+
+  // El código de descuento y la oferta viven en la columna derecha, que en móvil se
+  // apila debajo y duplicaba todo el resumen. Los reutilizamos en los dos sitios.
+  const discountCodeBlock = (
+    <div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          placeholder={c.discountCodePlaceholder}
+          value={discountCodeInput}
+          onChange={(e) => {
+            setDiscountCodeInput(e.target.value)
+            setDiscountCodeError("")
+          }}
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck={false}
+          className="flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+        />
+        <button
+          type="button"
+          onClick={() => {
+            const normalized = discountCodeInput.trim().toLowerCase()
+            if (!normalized) {
+              setAppliedDiscountCode("")
+              setDiscountCodeError("")
+              return
+            }
+            if (normalized === "holaswitzerland" || normalized === "emilia1") {
+              setAppliedDiscountCode(discountCodeInput.trim())
+              setDiscountCodeError("")
+            } else {
+              setAppliedDiscountCode("")
+              setDiscountCodeError(c.invalidCode)
+            }
+          }}
+          className="shrink-0 whitespace-nowrap px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm transition-colors hover:bg-gray-200 active:bg-gray-300"
+        >
+          {c.applyCode}
+        </button>
+      </div>
+      {discountCodeError && (
+        <p className="text-sm text-red-600 mt-2">{discountCodeError}</p>
+      )}
+    </div>
+  )
+
+  const paymentIcons = (
+    <div className="flex items-center gap-2 flex-wrap">
+      <VisaIcon className="h-7 w-auto" />
+      <MastercardIcon className="h-7 w-auto" />
+      <ApplePayIcon className="h-7 w-auto" />
+      <TwintIcon className="h-7 w-auto" />
+    </div>
+  )
+
+  const upsellBlock = (
+    <div className="p-4 bg-pink-50 rounded-lg">
+      <h3 className="font-bold text-sm mb-2">{c.upsellTitle}</h3>
+      <div className="flex gap-3 items-center">
+        <img
+          src="/original3.jpeg"
+          alt="Angebot"
+          className="w-16 h-16 rounded-lg object-cover"
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold">CLASSIC (2-3 Personen)</p>
+          <p className="text-xs text-gray-600">(10% RABATT)</p>
+          <p className="text-sm">
+            <span className="font-bold"><PriceDisplay amount={14.31} showCurrency={false} className="text-sm" /> CHF</span>{" "}
+            <span className="text-gray-500 line-through"><PriceDisplay amount={15.90} showCurrency={false} className="text-sm" /> CHF</span>
+          </p>
+        </div>
+        <button
+          onClick={handleAddUpsellProduct}
+          className="shrink-0 px-4 py-2 bg-black text-white rounded-lg font-bold text-sm transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.97]"
+        >
+          {c.upsellAdd}
+        </button>
+      </div>
+    </div>
+  )
+
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-white">
@@ -429,6 +538,8 @@ function CheckoutContent() {
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
+        <div ref={stepTopRef} className="scroll-mt-24" />
+
         {/* Breadcrumb */}
         <div className="hidden md:flex items-center gap-2 text-sm mb-8">
           <Link href="/" className="text-pink-500 hover:underline">{c.breadcrumbCart}</Link>
@@ -438,13 +549,33 @@ function CheckoutContent() {
           <span className="text-gray-400">{c.breadcrumbPayment}</span>
         </div>
 
+        {/* En móvil no había breadcrumb: no se sabía cuánto quedaba para terminar */}
+        <div className="md:hidden mb-6 flex items-start gap-2">
+          {[c.breadcrumbInfo, c.deliveryTitle, c.breadcrumbPayment].map((label, i) => {
+            const step = i + 1
+            const reached = step <= currentStep
+            return (
+              <div key={label} className="flex-1">
+                <div
+                  className={`h-1 rounded-full transition-colors duration-300 ${reached ? 'bg-[#651A1A]' : 'bg-gray-200'}`}
+                />
+                <p
+                  className={`mt-2 text-[0.7rem] font-bold leading-tight tracking-wide transition-colors duration-300 ${step === currentStep ? 'text-[#651A1A]' : reached ? 'text-gray-500' : 'text-gray-300'}`}
+                >
+                  {label}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+
         {/* Mobile order recap - the full summary column below is lg-only in practice */}
         <div className="lg:hidden -mx-4 mb-6 border-y border-gray-200 bg-[#FDFBF7]">
           <button
             type="button"
             onClick={() => setIsMobileSummaryOpen(!isMobileSummaryOpen)}
             aria-expanded={isMobileSummaryOpen}
-            className="w-full flex items-center justify-between gap-3 px-4 py-4 text-left"
+            className="w-full flex items-center justify-between gap-3 px-4 py-4 text-left transition-colors active:bg-[#F7F1E8]"
           >
             <span className="flex items-center gap-2 text-sm font-bold text-[#651A1A]">
               <ShoppingBag className="w-4 h-4" strokeWidth={2} />
@@ -490,6 +621,15 @@ function CheckoutContent() {
                   <PriceDisplay amount={shippingCost} className="text-sm" />
                 )}
               </div>
+              <div className="flex justify-between text-base font-black border-t border-gray-200 pt-3">
+                <span>{c.total}</span>
+                <PriceDisplay
+                  amount={finalPrice}
+                  className={`text-lg font-black ${discount > 0 ? 'text-green-600' : ''}`}
+                  currencyClassName="text-[0.5em] opacity-100"
+                />
+              </div>
+              <div className="pt-1">{discountCodeBlock}</div>
             </div>
           )}
         </div>
@@ -536,8 +676,52 @@ function CheckoutContent() {
                 </div>
               )}
 
+              {/* Pasos ya completados: se colapsan en un resumen editable. Antes el
+                  bloque de contacto seguía entero en pantalla y en móvil había que
+                  cruzarlo entero para llegar al calendario. */}
+              {(showDeliveryStep || showPayment) && (
+                <div className="mb-8 rounded-xl border border-gray-200 divide-y divide-gray-200">
+                  <div className="flex items-start justify-between gap-3 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-[0.7rem] uppercase tracking-wide text-gray-400 font-bold">{c.contact}</p>
+                      <p className="text-sm truncate">{email}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPayment(false)
+                        setClientSecret("")
+                        setShowDeliveryStep(false)
+                      }}
+                      className="shrink-0 text-sm font-bold text-[#651A1A] underline underline-offset-2"
+                    >
+                      {c.change}
+                    </button>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-[0.7rem] uppercase tracking-wide text-gray-400 font-bold">{c.deliveryAddress}</p>
+                      <p className="text-sm">
+                        {firstName} {lastName} · {address}, {postalCode} {city}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowPayment(false)
+                        setClientSecret("")
+                        setShowDeliveryStep(false)
+                      }}
+                      className="shrink-0 text-sm font-bold text-[#651A1A] underline underline-offset-2"
+                    >
+                      {c.change}
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Contact Section */}
-              <div className="mb-8">
+              <div className={`mb-8 ${showDeliveryStep || showPayment ? 'hidden' : ''}`}>
                 <div className="mb-4">
                   <h2 className="text-xl font-black">{c.contact}</h2>
                 </div>
@@ -673,11 +857,24 @@ function CheckoutContent() {
                       <span>{formError}</span>
                     </div>
                   )}
-                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0">
+                  {/* En móvil la oferta y los métodos de pago vivían solo en la columna
+                      derecha, que ahora está oculta. Los traemos al punto de decisión. */}
+                  {!upsellAdded && <div className="lg:hidden mt-6">{upsellBlock}</div>}
+                  <div className="lg:hidden mt-4 flex justify-center">{paymentIcons}</div>
+
+                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:mt-4 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none">
+                    <div className="mb-2 flex items-center justify-between lg:hidden">
+                      <span className="text-sm text-gray-500">{c.total}</span>
+                      <PriceDisplay
+                        amount={finalPrice}
+                        className={`text-base font-black ${discount > 0 ? 'text-green-600' : ''}`}
+                        currencyClassName="text-[0.55em] opacity-80"
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={handleContinueToDelivery}
-                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
+                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99]"
                     >
                       {c.continueToDelivery}
                     </button>
@@ -688,14 +885,6 @@ function CheckoutContent() {
               {/* Delivery Date & Time Section */}
               {showDeliveryStep && !showPayment && (
                 <div>
-                  <button
-                    onClick={() => setShowDeliveryStep(false)}
-                    className="text-sm text-gray-600 hover:text-black mb-4 flex items-center gap-2"
-                  >
-                    <ChevronRight className="w-4 h-4 rotate-180" />
-                    {c.backToAddress}
-                  </button>
-
                   {paymentFailed && (
                     <div role="alert" aria-live="polite" className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg text-sm flex items-start gap-2 mb-6">
                       <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -751,7 +940,7 @@ function CheckoutContent() {
                           font-family: var(--font-geist-sans), sans-serif;
                           font-weight: 600;
                           width: 14.28%;
-                          max-width: 2.5rem;
+                          max-width: 2.75rem;
                           text-transform: uppercase;
                           font-size: 0.7rem;
                           letter-spacing: 0.1em;
@@ -760,7 +949,7 @@ function CheckoutContent() {
                         }
                         .react-datepicker__day {
                           width: 14.28%;
-                          max-width: 2.5rem;
+                          max-width: 2.75rem;
                           aspect-ratio: 1;
                           display: flex;
                           align-items: center;
@@ -771,12 +960,19 @@ function CheckoutContent() {
                           font-family: var(--font-playfair), serif;
                           font-size: 1rem;
                           color: #1a1a1a;
-                          transition: all 0.2s;
+                          transition: background-color 0.2s, color 0.2s, transform 0.12s;
                           text-align: center;
+                          /* Sin esto, tocar un día en Android deja un cuadrado gris */
+                          -webkit-tap-highlight-color: transparent;
                         }
                         .react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
                           background-color: #E6D5C0;
                           color: #651A1A;
+                        }
+                        .react-datepicker__day:active:not(.react-datepicker__day--disabled) {
+                          background-color: #E6D5C0;
+                          color: #651A1A;
+                          transform: scale(0.9);
                         }
                         .react-datepicker__day--selected {
                           background-color: #651A1A !important;
@@ -846,7 +1042,7 @@ function CheckoutContent() {
                                   onClick={decreaseMonth}
                                   disabled={prevMonthButtonDisabled}
                                   type="button"
-                                  className="p-2 hover:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent text-[#651A1A]"
+                                  className="p-2.5 hover:bg-[#E6D5C0] active:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:active:bg-transparent text-[#651A1A]"
                                 >
                                   <ChevronLeft className="w-5 h-5" />
                                 </button>
@@ -862,7 +1058,7 @@ function CheckoutContent() {
                                   onClick={increaseMonth}
                                   disabled={nextMonthButtonDisabled}
                                   type="button"
-                                  className="p-2 hover:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent text-[#651A1A]"
+                                  className="p-2.5 hover:bg-[#E6D5C0] active:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:active:bg-transparent text-[#651A1A]"
                                 >
                                   <ChevronRight className="w-5 h-5" />
                                 </button>
@@ -874,8 +1070,10 @@ function CheckoutContent() {
                         {/* Divider (Desktop) */}
                         <div className="hidden lg:block w-px h-64 bg-[#E6D5C0] opacity-50"></div>
 
-                        {/* Right Side: Date Info */}
-                        <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start justify-center text-center lg:text-left">
+                        {/* Right Side: Date Info. Oculto en móvil: el bloque de 4 líneas
+                            empujaba los tramos horarios fuera de pantalla. Debajo hay una
+                            confirmación de una línea. */}
+                        <div className="hidden lg:w-1/3 lg:flex flex-col items-center lg:items-start justify-center text-center lg:text-left">
                           {deliveryDate ? (
                             <>
                               <p className="text-xs uppercase tracking-widest text-[#651A1A] font-bold mb-2">{c.deliveryDateLabel}</p>
@@ -900,6 +1098,22 @@ function CheckoutContent() {
                           )}
                         </div>
                       </div>
+
+                      {/* Confirmación compacta de la fecha en móvil */}
+                      {deliveryDate && (
+                        <div className="lg:hidden -mt-3 mb-2 flex items-center gap-3 rounded-xl border border-[#E6D5C0] bg-[#FFFCF8] px-4 py-3">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#651A1A] text-sm font-black text-white">
+                            {deliveryDate.getDate()}
+                          </span>
+                          <p className="text-sm font-bold capitalize text-[#1a1a1a]">
+                            {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', {
+                              weekday: 'long',
+                              day: 'numeric',
+                              month: 'long',
+                            })}
+                          </p>
+                        </div>
+                      )}
                     </div>
 
                     {/* Time Slot Picker */}
@@ -924,21 +1138,25 @@ function CheckoutContent() {
                                   : "border-gray-300 bg-white hover:border-gray-400 [@media(hover:hover)]:hover:scale-105"
                                 }`}
                             >
+                              {/* El check iba en una insignia absoluta que en móvil caía
+                                  encima del propio texto de la hora. Ahora sustituye al
+                                  icono del reloj. */}
                               <div className="flex items-center justify-center gap-2">
-                                <svg className={`w-5 h-5 ${available ? "text-[#651A1A]" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                {available && deliveryTime === slot ? (
+                                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#651A1A]">
+                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                  </span>
+                                ) : (
+                                  <svg className={`w-5 h-5 shrink-0 ${available ? "text-[#651A1A]" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                )}
                                 <span className={`font-bold text-sm ${available ? "" : "text-gray-400 line-through"}`}>{slot}</span>
                               </div>
                               {!available && (
                                 <p className="text-[0.65rem] text-gray-400 mt-1">{c.slotUnavailable}</p>
-                              )}
-                              {available && deliveryTime === slot && (
-                                <div className="absolute top-2 right-2 bg-[#651A1A] rounded-full w-5 h-5 flex items-center justify-center">
-                                  <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                  </svg>
-                                </div>
                               )}
                             </button>
                           )
@@ -953,11 +1171,19 @@ function CheckoutContent() {
                       <span>{deliveryError || paymentInitError}</span>
                     </div>
                   )}
-                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0">
+                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none">
+                    <div className="mb-2 flex items-center justify-between lg:hidden">
+                      <span className="text-sm text-gray-500">{c.total}</span>
+                      <PriceDisplay
+                        amount={finalPrice}
+                        className={`text-base font-black ${discount > 0 ? 'text-green-600' : ''}`}
+                        currencyClassName="text-[0.55em] opacity-80"
+                      />
+                    </div>
                     <button
                       type="button"
                       onClick={handleContinueToPayment}
-                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight hover:bg-gray-900 transition-colors"
+                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99]"
                     >
                       {c.continueToPayment}
                     </button>
@@ -992,15 +1218,17 @@ function CheckoutContent() {
                       },
                     }}
                   >
-                    <PaymentForm clientSecret={clientSecret} />
+                    <PaymentForm clientSecret={clientSecret} amount={finalPrice} />
                   </Elements>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Right Side - Order Summary */}
-          <div className="lg:border-l lg:pl-12">
+          {/* Right Side - Order Summary. Oculta en móvil: se apilaba debajo del CTA y
+              repetía entero el resumen plegable de arriba (artículos, código, totales,
+              oferta), duplicando el largo de la página justo después de pagar. */}
+          <div className="hidden lg:block lg:border-l lg:pl-12">
             <h2 className="text-xl font-black mb-6">{c.orderSummary}</h2>
 
             {/* Cart Items */}
@@ -1028,47 +1256,7 @@ function CheckoutContent() {
             </div>
 
             {/* Discount Code */}
-            <div className="mb-6">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder={c.discountCodePlaceholder}
-                  value={discountCodeInput}
-                  onChange={(e) => {
-                    setDiscountCodeInput(e.target.value)
-                    setDiscountCodeError("")
-                  }}
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  className="flex-1 min-w-0 border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
-                />
-                <button
-                  type="button"
-                  onClick={() => {
-                    const normalized = discountCodeInput.trim().toLowerCase()
-                    if (!normalized) {
-                      setAppliedDiscountCode("")
-                      setDiscountCodeError("")
-                      return
-                    }
-                    if (normalized === "holaswitzerland" || normalized === "emilia1") {
-                      setAppliedDiscountCode(discountCodeInput.trim())
-                      setDiscountCodeError("")
-                    } else {
-                      setAppliedDiscountCode("")
-                      setDiscountCodeError(c.invalidCode)
-                    }
-                  }}
-                  className="shrink-0 whitespace-nowrap px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm hover:bg-gray-200 transition-colors"
-                >
-                  {c.applyCode}
-                </button>
-              </div>
-              {discountCodeError && (
-                <p className="text-sm text-red-600 mt-2">{discountCodeError}</p>
-              )}
-            </div>
+            <div className="mb-6">{discountCodeBlock}</div>
 
             {/* Totals */}
             <div className="space-y-3 border-t pt-6">
@@ -1107,40 +1295,10 @@ function CheckoutContent() {
             </div>
 
             {/* Accepted payment methods */}
-            <div className="mt-4 flex items-center gap-2 flex-wrap">
-              <VisaIcon className="h-7 w-auto" />
-              <MastercardIcon className="h-7 w-auto" />
-              <ApplePayIcon className="h-7 w-auto" />
-              <TwintIcon className="h-7 w-auto" />
-            </div>
+            <div className="mt-4">{paymentIcons}</div>
 
             {/* Limited Offer */}
-            {!upsellAdded && (
-              <div className="mt-6 p-4 bg-pink-50 rounded-lg">
-                <h3 className="font-bold text-sm mb-2">{c.upsellTitle}</h3>
-                <div className="flex gap-3 items-center">
-                  <img
-                    src="/original3.jpeg"
-                    alt="Angebot"
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-bold">CLASSIC (2-3 Personen)</p>
-                    <p className="text-xs text-gray-600">(10% RABATT)</p>
-                    <p className="text-sm">
-                      <span className="font-bold"><PriceDisplay amount={14.31} showCurrency={false} className="text-sm" /> CHF</span>{" "}
-                      <span className="text-gray-500 line-through"><PriceDisplay amount={15.90} showCurrency={false} className="text-sm" /> CHF</span>
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleAddUpsellProduct}
-                    className="px-4 py-2 bg-black text-white rounded-lg font-bold text-sm hover:bg-gray-900 transition-colors"
-                  >
-                    {c.upsellAdd}
-                  </button>
-                </div>
-              </div>
-            )}
+            {!upsellAdded && <div className="mt-6">{upsellBlock}</div>}
           </div>
         </div>
       </div >
