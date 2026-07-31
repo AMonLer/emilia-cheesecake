@@ -15,7 +15,7 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
 import { enUS } from "date-fns/locale"
 import "react-datepicker/dist/react-datepicker.css"
-import { addHours, eachDayOfInterval, isSameDay, startOfDay } from "date-fns"
+import { addDays, addHours, eachDayOfInterval, isSameDay, startOfDay } from "date-fns"
 
 registerLocale("de", de)
 registerLocale("en", enUS)
@@ -148,40 +148,17 @@ function CheckoutContent() {
     }
   }, [])
 
+  // "Ahora" vivo: una pestaña que lleva horas abierta seguiría midiendo las 36h desde
+  // el momento de carga, así que lo refrescamos mientras se está eligiendo la entrega.
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    if (!showDeliveryStep || showPayment) return
+    const id = setInterval(() => setNow(new Date()), 60_000)
+    return () => clearInterval(id)
+  }, [showDeliveryStep, showPayment])
+
   // Calculate minimum delivery date (36 hours from now)
-  const minDeliveryDate = useMemo(() => addHours(new Date(), 36), [])
-
-  // Generate blocked dates (Dec 20 - Jan 6)
-  const blockedDates = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-    const nextYear = currentYear + 1
-
-    // Dec 20 - Dec 31 of current year
-    const dec20 = new Date(currentYear, 11, 20)
-    const dec31 = new Date(currentYear, 11, 31)
-
-    // Jan 1 - Jan 6 of next year
-    const jan1 = new Date(nextYear, 0, 1)
-    const jan6 = new Date(nextYear, 0, 6)
-
-    const decemberDates = eachDayOfInterval({ start: dec20, end: dec31 })
-    const januaryDates = eachDayOfInterval({ start: jan1, end: jan6 })
-
-    // Block April 30, 2026
-    const thisThursday = new Date(2026, 3, 30)
-
-    // Block June 4-8, 2026
-    const june4 = new Date(2026, 5, 4)
-    const june8 = new Date(2026, 5, 8)
-    const june4to8 = eachDayOfInterval({ start: june4, end: june8 })
-
-    // Block June 12-24, 2026
-    const june12 = new Date(2026, 5, 12)
-    const june24 = new Date(2026, 5, 24)
-    const june12to24 = eachDayOfInterval({ start: june12, end: june24 })
-
-    return [...decemberDates, ...januaryDates, thisThursday, ...june4to8, ...june12to24]
-  }, [])
+  const minDeliveryDate = useMemo(() => addHours(now, 36), [now])
 
   // Generate time slots
   const timeSlots = [
@@ -190,6 +167,21 @@ function CheckoutContent() {
     "15:00 - 18:00",
     "18:00 - 21:00"
   ]
+
+  // Cierre de Navidad: del 20 de diciembre al 6 de enero siguiente. Generamos tres
+  // temporadas porque en enero el año en curso ya es el siguiente, y su propio 1-6 de
+  // enero tiene que seguir bloqueado.
+  const currentYear = now.getFullYear()
+  const blockedDates = useMemo(
+    () =>
+      [currentYear - 1, currentYear, currentYear + 1].flatMap((year) =>
+        eachDayOfInterval({
+          start: new Date(year, 11, 20),
+          end: new Date(year + 1, 0, 6),
+        })
+      ),
+    [currentYear]
+  )
 
   // Un tramo solo es válido si su inicio respeta las 36h de antelación
   const slotStartFor = (date: Date, slot: string) => {
@@ -202,6 +194,24 @@ function CheckoutContent() {
     if (!date) return true
     return slotStartFor(date, slot) >= minDeliveryDate
   }
+
+  // El calendario compara solo días naturales, así que por sí solo dejaría elegir el día
+  // de "ahora + 36h" aunque a esas alturas ya no quede ningún tramo (pasaba en todos los
+  // pedidos entre las 07:00 y las 12:00: se podía elegir el día y luego salían los cuatro
+  // tramos tachados). Un día solo vale si le queda al menos un tramo y no está bloqueado.
+  const hasAvailableSlot = (date: Date) => timeSlots.some((slot) => isSlotAvailable(slot, date))
+  const isDateSelectable = (date: Date) =>
+    hasAvailableSlot(date) && !blockedDates.some((b) => isSameDay(b, date))
+
+  // Primer día realmente reservable: el calendario arranca aquí y se abre en su mes.
+  const firstSelectableTime = (() => {
+    let day = startOfDay(minDeliveryDate)
+    for (let i = 0; i < 400 && !isDateSelectable(day); i++) {
+      day = addDays(day, 1)
+    }
+    return day.getTime()
+  })()
+  const firstSelectableDate = useMemo(() => new Date(firstSelectableTime), [firstSelectableTime])
 
   // Restaurar el formulario guardado (p. ej. al volver de un pago TWINT cancelado)
   useEffect(() => {
@@ -224,10 +234,7 @@ function CheckoutContent() {
         }
         if (d.deliveryDate) {
           const date = new Date(d.deliveryDate)
-          const isValid = !isNaN(date.getTime())
-            && date >= startOfDay(minDeliveryDate)
-            && !blockedDates.some((b) => isSameDay(b, date))
-          if (isValid) {
+          if (!isNaN(date.getTime()) && isDateSelectable(date)) {
             setDeliveryDate(date)
             if (d.deliveryTime && isSlotAvailable(d.deliveryTime, date)) {
               setDeliveryTime(d.deliveryTime)
@@ -259,6 +266,21 @@ function CheckoutContent() {
       }))
     } catch { }
   }, [email, phone, firstName, lastName, address, city, postalCode, kanton, isGift, appliedDiscountCode, deliveryDate, deliveryTime])
+
+  // Si el reloj avanza mientras el checkout está abierto, lo ya elegido puede dejar de
+  // cumplir las 36h. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
+  useEffect(() => {
+    if (!deliveryDate) return
+    if (!isDateSelectable(deliveryDate)) {
+      setDeliveryDate(null)
+      setDeliveryTime("")
+      setDeliveryError(c.slotExpired)
+    } else if (deliveryTime && !isSlotAvailable(deliveryTime, deliveryDate)) {
+      setDeliveryTime("")
+      setDeliveryError(c.slotExpired)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minDeliveryDate, deliveryDate, deliveryTime])
 
   // Calculate discount and shipping
   const shippingCost = totalPrice >= 100 ? 0 : 8.40
@@ -325,6 +347,14 @@ function CheckoutContent() {
 
     if (!deliveryDate || !deliveryTime) {
       setDeliveryError(c.deliveryError)
+      return
+    }
+    // Revalidar contra la hora actual: entre elegir la entrega y pulsar pagar puede
+    // haberse cruzado el límite de las 36h.
+    if (!isDateSelectable(deliveryDate) || !isSlotAvailable(deliveryTime, deliveryDate)) {
+      if (!isDateSelectable(deliveryDate)) setDeliveryDate(null)
+      setDeliveryTime("")
+      setDeliveryError(c.slotExpired)
       return
     }
     setDeliveryError("")
@@ -792,12 +822,15 @@ function CheckoutContent() {
                             selected={deliveryDate}
                             onChange={(date) => {
                               setDeliveryDate(date)
+                              setDeliveryError("")
                               if (date && deliveryTime && !isSlotAvailable(deliveryTime, date)) {
                                 setDeliveryTime("")
                               }
                             }}
-                            minDate={minDeliveryDate}
+                            minDate={firstSelectableDate}
                             excludeDates={blockedDates}
+                            filterDate={hasAvailableSlot}
+                            openToDate={deliveryDate ?? firstSelectableDate}
                             locale={locale === 'en' ? 'en' : 'de'}
                             inline
                             calendarClassName="custom-datepicker"
@@ -880,7 +913,10 @@ function CheckoutContent() {
                               key={slot}
                               type="button"
                               disabled={!available}
-                              onClick={() => setDeliveryTime(slot)}
+                              onClick={() => {
+                                setDeliveryTime(slot)
+                                setDeliveryError("")
+                              }}
                               className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${!available
                                 ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
                                 : deliveryTime === slot

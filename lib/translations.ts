@@ -163,6 +163,7 @@ export type Translations = {
     paymentInitError: string
     paymentFailedNotice: string
     slotUnavailable: string
+    slotExpired: string
     persons: string
   }
   paymentSuccess: {
@@ -341,6 +342,7 @@ export const translations: Record<Locale, Translations> = {
       paymentInitError: 'Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.',
       paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – Ihre Angaben sind gespeichert. Bitte versuchen Sie es erneut.',
       slotUnavailable: 'Für dieses Datum nicht verfügbar',
+      slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 36 Stunden Vorlaufzeit. Bitte wählen Sie einen neuen Termin.',
       persons: 'Personen',
     },
     paymentSuccess: {
@@ -517,6 +519,7 @@ export const translations: Record<Locale, Translations> = {
       paymentInitError: 'Error starting payment. Please try again.',
       paymentFailedNotice: 'Your payment was not completed. Don\'t worry – your details are saved. Please try again.',
       slotUnavailable: 'Not available for this date',
+      slotExpired: 'Your delivery slot no longer meets the 36-hour lead time. Please pick a new one.',
       persons: 'persons',
     },
     paymentSuccess: {
