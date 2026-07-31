@@ -1,0 +1,21 @@
+[mcp_servers.clarity]
+command = "npx"
+args = [
+    "-y",
+    "@microsoft/clarity-mcp-server",
+    "--clarity_api_token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ4M0FCMDhFNUYwRDMxNjdEOTRFMTQ3M0FEQTk2RTcyRDkwRUYwRkYiLCJ0eXAiOiJKV1QifQ.eyJqdGkiOiI0NzhlZGZiZC0zZGQxLTQ4YzktODc3MS04NTU4ZDJkMjdlOWYiLCJzdWIiOiIzMTQ5NjUxMzU5MTk4Mzc3Iiwic2NvcGUiOiJEYXRhLkV4cG9ydCIsIm5iZiI6MTc3NzE4NDY3OCwiZXhwIjo0OTMwNzg0Njc4LCJpYXQiOjE3NzcxODQ2NzgsImlzcyI6ImNsYXJpdHkiLCJhdWQiOiJjbGFyaXR5LmRhdGEtZXhwb3J0ZXIifQ.hWGjkgVGm0a-MJdEYiQhFCAMTfUJsZGReDdrVq8f-kg9j51KC7aO1mindpjfe37-B8TBzmr9YDjl502QSiSnJ3f7SQvxS4nh-37aYgF_pCEovUOsrZOEkoWt9lxBtEx4Ivos0mGPKrpy084PMWIHr8i9v7rtGv7F7PH692fW1wVXq7MD_DVDkrzBSzQp0dtm7PEf__8QHi_UwnqkeC0p1Zo6oPAlwRTeW8rff7Ndcuz76VpTfbXUCsNMkKON6MEEhdZ4IBKZyxlY2-DfHMB52HXgZZyEIM3dKHp2oM5x5Kg6MHC5fer2pClmQD1dv1y2sq-bOsugCd7amggR58yu9w",
+]
+
+[mcp_servers.ms365]
+command = "npx"
+args = ["@softeria/ms-365-mcp-server"]
+
+[mcp_servers.notion]
+command = "cmd"
+args = [
+    "/c",
+    "npx -y mcp-remote https://mcp.notion.com/mcp",
+]
+
+[mcp_servers.pipeboard-meta-ads]
+url = "https://meta-ads.mcp.pipeboard.co/"

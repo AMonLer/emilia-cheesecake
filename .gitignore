@@ -39,3 +39,24 @@ render.yaml
 
 # problematic files
 nul
+
+# local playwright tooling (screenshots)
+/.pw/
+
+# python bytecode from the agent skill scripts
+__pycache__/
+*.pyc
+
+# working image files: none of these are referenced from the code, and they are
+# heavy enough (~24MB) that we do not want them in the history or on the deploy
+/assets-source/
+/public/Adobe Express - file (1).png
+/public/ChatGPT Image Jul 29, 2026, 07_43_13 PM (1).png
+/public/ChatGPT Image Jul 29, 2026, 07_43_13 PM.png
+/public/ChatGPT Image Jul 29, 2026, 07_43_25 PM.png
+/public/ChatGPT Image Jul 29, 2026, 08_28_31 PM.png
+/public/New.png
+/public/classic3.png
+/public/eee (1).png
+/public/hf_20260713_122456_9a282ef3-82d6-4d42-a872-2db592a79d6c.png
+/public/pistacho1 (2).png
