@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, X, ShoppingBag } from 'lucide-react'
+import { Menu, X, ShoppingBag, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -12,7 +12,7 @@ import PriceDisplay from '@/components/PriceDisplay'
 import ContactModal from '@/components/ContactModal'
 import { useScrollLock } from '@/lib/useScrollLock'
 
-export default function Navbar() {
+export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const router = useRouter()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
@@ -41,6 +41,62 @@ export default function Navbar() {
     { href: '/versand', label: t.footer.shipping },
     { href: '/faq', label: t.footer.faq },
   ]
+
+  // Minimal mode (checkout): sin menú ni carrito. La única salida es volver a
+  // la tienda; cuantas menos distracciones en caja, menos abandono.
+  if (minimal) {
+    return (
+      <nav className="sticky top-0 bg-[#651A1A] border-b border-[#8B3A3A] z-30">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-20">
+            <div className="flex-1">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1 -ml-2 py-2 pr-2 text-[#F5E6D3] hover:text-white transition-colors text-xs font-bold tracking-[0.12em] uppercase whitespace-nowrap"
+              >
+                <ChevronLeft className="h-4 w-4" strokeWidth={2} />
+                {t.cart.shop}
+              </Link>
+            </div>
+            <Link href="/" className="flex-shrink-0">
+              <Image
+                src="/Emilia (6).png"
+                alt="Emilia"
+                width={180}
+                height={50}
+                className="object-contain max-w-[100px] sm:max-w-[120px] md:max-w-[170px]"
+                priority
+              />
+            </Link>
+            <div className="flex items-center gap-2 flex-1 justify-end">
+              <button
+                onClick={() => setLocale(locale === 'de' ? 'en' : 'de')}
+                aria-label={locale === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
+                className="sm:hidden flex h-10 items-center justify-center rounded-md px-1.5 text-[#F5E6D3]/80 text-xs font-bold tracking-widest active:bg-white/15 active:text-white transition-colors"
+              >
+                {locale === 'de' ? 'EN' : 'DE'}
+              </button>
+              <div className="hidden sm:flex items-center text-[#F5E6D3] text-xs font-bold tracking-widest">
+                <button
+                  onClick={() => setLocale('de')}
+                  className={`px-2 py-2 transition-opacity duration-200 ${locale === 'de' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                >
+                  DE
+                </button>
+                <span className="opacity-30">|</span>
+                <button
+                  onClick={() => setLocale('en')}
+                  className={`px-2 py-2 transition-opacity duration-200 ${locale === 'en' ? 'opacity-100' : 'opacity-40 hover:opacity-70'}`}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+    )
+  }
 
   return (
     <>
