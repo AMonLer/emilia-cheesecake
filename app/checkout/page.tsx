@@ -10,6 +10,7 @@ import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
 import { loadStripe } from "@stripe/stripe-js"
+import { stripeAppearance } from "@/lib/stripe-appearance"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
@@ -21,6 +22,7 @@ registerLocale("de", de)
 registerLocale("en", enUS)
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
+
 
 // Ocultar la opción de regalo "For You" hasta que se lance la funcionalidad
 const SHOW_GIFT_OPTION = false
@@ -1211,12 +1213,7 @@ function CheckoutContent() {
                     stripe={stripePromise}
                     options={{
                       clientSecret,
-                      appearance: {
-                        theme: 'stripe',
-                        variables: {
-                          colorPrimary: '#000000',
-                        },
-                      },
+                      appearance: stripeAppearance,
                     }}
                   >
                     <PaymentForm clientSecret={clientSecret} amount={finalPrice} />
