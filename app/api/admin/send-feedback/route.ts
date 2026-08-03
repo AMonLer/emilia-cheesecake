@@ -3,9 +3,13 @@ import Stripe from 'stripe'
 import { Resend } from 'resend'
 import { getSession } from '@/lib/admin-auth'
 import { render } from '@react-email/render'
-import FeedbackEmail from '@/emails/FeedbackEmail'
+import FeedbackEmail, { feedbackEmailText } from '@/emails/FeedbackEmail'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
+
+// Remitente con nombre de persona: clasifica mejor que una dirección de marca.
+const fromAddress = process.env.EMAIL_FROM || 'info@emilialab.com'
+const FROM = fromAddress.includes('<') ? fromAddress : `Emilia <${fromAddress}>`
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -44,11 +48,12 @@ export async function POST(req: NextRequest) {
   }))
 
   const { error: resendError } = await resend.emails.send({
-    from: process.env.EMAIL_FROM || 'info@emilialab.com',
+    from: FROM,
     to: email,
     replyTo: 'info@emilialab.com',
-    subject: 'Wie hat es Ihnen geschmeckt? ❤️',
+    subject: 'Wie hat es Ihnen geschmeckt?',
     html,
+    text: feedbackEmailText(name, gender ?? undefined),
   })
 
   if (resendError) {
