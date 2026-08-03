@@ -19,7 +19,7 @@ export async function POST() {
 
   const { error: resendError } = await resend.emails.send({
     from: FROM,
-    to: 'adrianmonjelerin@gmail.com',
+    to: 'amonjelerin@gmail.com',
     replyTo: 'info@emilialab.com',
     subject: '[TEST] Wie hat es Ihnen geschmeckt?',
     html,

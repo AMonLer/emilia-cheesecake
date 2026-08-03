@@ -24,7 +24,7 @@ export function feedbackEmailText(customerName: string, gender?: 'male' | 'femal
   const greeting = germanGreeting(customerName, resolvedGender)
   return `${greeting},
 
-ich hoffe, Ihr Cheesecake ist gut angekommen — und hat Ihnen gut geschmeckt.
+ich hoffe, unser Cheesecake hat Ihnen geschmeckt.
 
 Ihr Feedback ist der beste Weg, Emilia noch besser zu machen. Wenn Sie mir eine Minute schenken, freue ich mich sehr über Ihre ehrliche Meinung:
 ${TALLY_URL}
@@ -53,7 +53,7 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
           <Hr style={rule} />
           <Text style={p}>{greeting},</Text>
           <Text style={p}>
-            ich hoffe, Ihr Cheesecake ist gut angekommen — und hat Ihnen gut geschmeckt.
+            ich hoffe, unser Cheesecake hat Ihnen geschmeckt.
           </Text>
           <Text style={p}>
             Ihr Feedback ist der beste Weg, Emilia noch besser zu machen. Wenn Sie mir eine
