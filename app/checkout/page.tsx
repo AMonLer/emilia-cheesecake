@@ -187,18 +187,25 @@ function CheckoutContent() {
     "18:00 - 21:00"
   ]
 
-  // Cierre de Navidad: del 20 de diciembre al 6 de enero siguiente. Generamos tres
-  // temporadas porque en enero el año en curso ya es el siguiente, y su propio 1-6 de
-  // enero tiene que seguir bloqueado.
   const currentYear = now.getFullYear()
   const blockedDates = useMemo(
-    () =>
-      [currentYear - 1, currentYear, currentYear + 1].flatMap((year) =>
+    () => [
+      // Cierre de verano: del 14 al 24 de agosto de 2026 no hay reparto. Es un
+      // cierre puntual (año fijo), no un bloqueo anual como el de Navidad.
+      ...eachDayOfInterval({
+        start: new Date(2026, 7, 14),
+        end: new Date(2026, 7, 24),
+      }),
+      // Cierre de Navidad: del 20 de diciembre al 6 de enero siguiente. Generamos tres
+      // temporadas porque en enero el año en curso ya es el siguiente, y su propio 1-6 de
+      // enero tiene que seguir bloqueado.
+      ...[currentYear - 1, currentYear, currentYear + 1].flatMap((year) =>
         eachDayOfInterval({
           start: new Date(year, 11, 20),
           end: new Date(year + 1, 0, 6),
         })
       ),
+    ],
     [currentYear]
   )
 
