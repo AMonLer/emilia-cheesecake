@@ -17,19 +17,10 @@ export default async function ForYouCodePage({ params }: { params: { code: strin
     <div className="min-h-screen bg-[#651A1A] flex flex-col">
       {hasContent ? (
         <>
-          {/* El vídeo es el protagonista: a sangre y arriba del todo */}
-          {data!.videoUrl && (
-            <video
-              controls
-              playsInline
-              preload="metadata"
-              poster={videoPosterUrl(data!.videoUrl)}
-              src={videoDeliveryUrl(data!.videoUrl)}
-              className="w-full max-h-[78svh] object-contain bg-black"
-            />
-          )}
-
-          <div className="flex-1 flex flex-col items-center px-8 py-14 text-center">
+          {/* El mensaje primero: se lee gratis, sin scroll ni decisión, y
+              prepara emocionalmente el vídeo. flex-1 centra el texto cuando
+              no hay media debajo. */}
+          <div className="flex-1 flex flex-col items-center justify-center px-8 py-14 text-center">
             <p className="text-white/35 text-[0.65rem] tracking-[0.4em] uppercase font-bold mb-8">
               A message for you
             </p>
@@ -52,6 +43,18 @@ export default async function ForYouCodePage({ params }: { params: { code: strin
               </a>
             )}
           </div>
+
+          {/* Vídeo a media pantalla: invita al play sin esconder el mensaje */}
+          {data!.videoUrl && (
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={videoPosterUrl(data!.videoUrl)}
+              src={videoDeliveryUrl(data!.videoUrl)}
+              className="w-full max-h-[50svh] object-contain bg-black"
+            />
+          )}
 
           {/* Foto también a sangre, cerrando la experiencia */}
           {data!.fileUrl && isImageUrl(data!.fileUrl) && (
