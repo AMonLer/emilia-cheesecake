@@ -20,6 +20,13 @@ function loadTs(file, mocks = {}) {
 }
 
 async function main() {
+  process.env.CLOUDINARY_CLOUD_NAME = ' test-cloud\n'
+  process.env.CLOUDINARY_API_KEY = ' test-key\r\n'
+  process.env.CLOUDINARY_API_SECRET = ' test-secret\n'
+  const realCloudinary = loadTs('lib/cloudinary.ts')
+  assert.deepEqual(realCloudinary.getUploadCredentials(), { cloudName: 'test-cloud', apiKey: 'test-key' })
+  assert.equal(realCloudinary.signUpload({ folder: 'emilia/foryou', timestamp: 123 }), require('node:crypto').createHash('sha1').update('folder=emilia/foryou&timestamp=123test-secret').digest('hex'))
+  console.log('PASS: pasted environment whitespace does not break upload credentials or signatures')
   const auth = loadTs('lib/foryou-auth.ts')
   const code = 'EM-ABC234'
   const now = Date.now()

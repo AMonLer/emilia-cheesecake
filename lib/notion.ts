@@ -1,12 +1,12 @@
 import { Client } from '@notionhq/client'
 
-const notion = process.env.NOTION_TOKEN
-  ? new Client({ auth: process.env.NOTION_TOKEN })
+const notion = process.env.NOTION_TOKEN?.trim()
+  ? new Client({ auth: process.env.NOTION_TOKEN.trim() })
   : null
 // NOTION_DATABASE_ID holds the data_source_id (Notion API 2025+)
-const dataSourceId = process.env.NOTION_DATABASE_ID
+const dataSourceId = process.env.NOTION_DATABASE_ID?.trim()
 // Separate database for "For You" personal messages (its own data_source_id)
-const foryouDataSourceId = process.env.NOTION_FORYOU_DB_ID
+const foryouDataSourceId = process.env.NOTION_FORYOU_DB_ID?.trim()
 
 export type OrderForNotion = {
   paymentIntentId: string

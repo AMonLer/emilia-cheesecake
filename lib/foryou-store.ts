@@ -11,7 +11,7 @@ export type { ForYouMessage }
 // Almacenamiento conmutable: con Notion configurado se usa Notion; sin él, un
 // JSON local para poder probar el flujo entero en desarrollo. En Vercel el JSON
 // es efímero, así que producción siempre debe tener NOTION_FORYOU_DB_ID.
-const useNotion = Boolean(process.env.NOTION_TOKEN && process.env.NOTION_FORYOU_DB_ID)
+const useNotion = Boolean(process.env.NOTION_TOKEN?.trim() && process.env.NOTION_FORYOU_DB_ID?.trim())
 const STORE_PATH = path.join(process.cwd(), '.foryou-local.json')
 
 function readLocal(): Record<string, ForYouMessage> {
