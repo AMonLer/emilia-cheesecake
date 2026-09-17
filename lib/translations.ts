@@ -37,6 +37,8 @@ export type Translations = {
     lotus: string
     schoggi: string
     dulceDeLeche: string
+    hippo: string
+    limited: string
   }
   quality: {
     title1: string
@@ -132,6 +134,7 @@ export type Translations = {
     chocolate: string
     original: string
     cafe: string
+    hippo: string
   }
   relatedProducts: {
     title: string
@@ -237,12 +240,14 @@ export const translations: Record<Locale, Translations> = {
     marquee: '10% RABATT AB 100 CHF • GRATIS VERSAND',
     products: {
       heading: 'UNSERE',
-      subtitle: 'Fünf Sorten, alle frisch auf Bestellung gebacken.',
+      subtitle: 'Sechs Sorten, alle frisch auf Bestellung gebacken.',
       pistachio: 'Mit reiner Pistazienpaste aus Sizilien. Kein Farbstoff, kein künstliches Aroma.',
       classic: 'Unser klassisches Originalrezept, cremig und zart. Der authentische traditionelle Geschmack...',
       lotus: 'Käsekuchen mit Lotus Biscoff Keksen, unwiderstehlicher gewürzter Karamellgeschmack...',
       schoggi: 'Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber...',
       dulceDeLeche: 'Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell...',
+      hippo: 'Cremige Haselnuss-Kakao-Creme auf seidigem Käsekuchen. Limitierte Edition...',
+      limited: 'Limitiert',
     },
     quality: {
       title1: 'DEIN',
@@ -338,6 +343,7 @@ export const translations: Record<Locale, Translations> = {
       chocolate: 'Cremige Schweizer Schokolade mit einem tiefen Geschmack, der umhüllt, ohne zu überwältigen. Eine perfekte Balance zwischen Intensität und Sanftheit.',
       original: 'Das Rezept, mit dem alles begann. Cremig, seidig und im baskischen Stil gebacken. Pure Emilia-Essenz: einfach, perfekt, unvergesslich.',
       cafe: 'Cremiges Dulce de Leche mit zartem Karamell und einer verführerischen Süße. Eine lateinamerikanische Köstlichkeit, die jeden Bissen zu einem unvergesslichen Erlebnis macht.',
+      hippo: 'Cremige Haselnuss-Kakao-Creme auf unserem seidigen Käsekuchen. Limitierte Edition — nur solange der Vorrat reicht.',
     },
     relatedProducts: {
       title: 'PASST PERFEKT DAZU',
@@ -441,12 +447,14 @@ export const translations: Record<Locale, Translations> = {
     marquee: '10% DISCOUNT FROM CHF 100 • FREE DELIVERY',
     products: {
       heading: 'OUR',
-      subtitle: 'Five varieties, all freshly baked to order.',
+      subtitle: 'Six varieties, all freshly baked to order.',
       pistachio: 'Made with pure Sicilian pistachio paste. No colouring, no artificial flavouring.',
       classic: 'Our classic original recipe, creamy and delicate. The authentic traditional taste...',
       lotus: 'Cheesecake with Lotus Biscoff cookies, irresistible spiced caramel flavour...',
       schoggi: 'Intense cheesecake with Swiss chocolate, for true cocoa lovers...',
       dulceDeLeche: 'Indulgent cheesecake with creamy Dulce de Leche and delicate caramel...',
+      hippo: 'Creamy hazelnut-cocoa cream on our silky cheesecake. Limited edition...',
+      limited: 'Limited',
     },
     quality: {
       title1: 'YOUR',
@@ -542,6 +550,7 @@ export const translations: Record<Locale, Translations> = {
       chocolate: 'Creamy Swiss chocolate with a deep flavour that envelops without overwhelming. A perfect balance between intensity and softness.',
       original: 'The recipe that started it all. Creamy, silky and baked in the Basque style. Pure Emilia essence: simple, perfect, unforgettable.',
       cafe: 'Creamy Dulce de Leche with delicate caramel and an irresistible sweetness. A Latin American delight that makes every bite an unforgettable experience.',
+      hippo: 'Creamy hazelnut-cocoa cream on our silky Basque-style cheesecake. Limited edition — only while stocks last.',
     },
     relatedProducts: {
       title: 'PAIRS PERFECTLY WITH',

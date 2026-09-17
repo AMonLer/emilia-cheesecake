@@ -25,6 +25,18 @@ export default function FeaturedProducts() {
                 <Reveal delay={100} className="md:hidden grid grid-cols-2 gap-2">
                     <ProductCard
                         className="w-full"
+                        href="/product/hippo"
+                        slug="hippo"
+                        image1="/hippo1.png"
+                        image2="/hippo2.png"
+                        name="HIPPO"
+                        priceSmall={17.90}
+                        priceLarge={45.90}
+                        description=""
+                        tag={{ label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
+                    />
+                    <ProductCard
+                        className="w-full"
                         href="/product/pistacho"
                         slug="pistacho"
                         image1="/pistacho1.png"
@@ -83,6 +95,18 @@ export default function FeaturedProducts() {
                 {/* Desktop: Horizontal scroll */}
                 <Reveal delay={100} className="hidden md:block overflow-x-auto pb-4 -mx-4 px-4 custom-scrollbar">
                     <div className="flex gap-4 min-w-min">
+                        <ProductCard
+                            className="w-80 flex-shrink-0"
+                            href="/product/hippo"
+                            image1="/hippo1.png"
+                            image2="/hippo2.png"
+                            name="HIPPO"
+                            priceSmall={17.90}
+                            priceLarge={45.90}
+                            description={p.hippo}
+                            tag={{ label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
+                        />
+
                         <ProductCard
                             className="w-80 flex-shrink-0"
                             href="/product/pistacho"

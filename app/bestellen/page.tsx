@@ -48,7 +48,28 @@ export default function BestellenPage() {
   const { t } = useLanguage()
   const p = t.products
 
-  const products = [
+  const products: Array<{
+    id: string
+    name: string
+    slug: string
+    image1: string
+    image2: string
+    priceSmall: number
+    priceLarge: number
+    description: string
+    tag?: { label: string; bgColor: string; textColor: string }
+  }> = [
+    {
+      id: "hippo",
+      name: "HIPPO",
+      slug: "hippo",
+      image1: "/hippo1.png",
+      image2: "/hippo2.png",
+      priceSmall: 17.90,
+      priceLarge: 45.90,
+      description: p.hippo,
+      tag: { label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }
+    },
     {
       id: "verdalia",
       name: "PISTACHIO",
@@ -128,6 +149,7 @@ export default function BestellenPage() {
                 priceSmall={product.priceSmall}
                 priceLarge={product.priceLarge}
                 description={product.description}
+                tag={product.tag}
                 compact
                 className="w-full"
               />

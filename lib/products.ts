@@ -1,4 +1,33 @@
 export const products: { [key: string]: any } = {
+    "hippo": {
+        name: "HIPPO",
+        limited: true,
+        prices: {
+            "8-10": 45.90,  // CHF for 8-10 people
+            "2-3": 17.90    // CHF for 2-3 people
+        },
+        description: "Cremige Haselnuss-Kakao-Creme auf unserem seidigen Käsekuchen. Limitierte Edition — nur solange der Vorrat reicht.",
+        images: ["/hippo1.png", "/hippo2.png"],
+        includes: [
+            "Haselnuss-Käsekuchen",
+            "Limitierte Edition — solange der Vorrat reicht"
+        ],
+        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Haselnuss-Kakao-Creme (<strong>Schalenfrüchte</strong>, <strong>Milch</strong>, <strong>Soja</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Kakao, Salz.",
+        frequentlyBought: [
+            {
+                id: 1,
+                name: "CLASSIC",
+                price: 42.90,
+                image: "/original1.png"
+            },
+            {
+                id: 2,
+                name: "PISTACHIO",
+                price: 49.90,
+                image: "/pistacho1.png"
+            }
+        ]
+    },
     "pistacho": {
         name: "PISTACHIO",
         prices: {
@@ -24,6 +53,12 @@ export const products: { [key: string]: any } = {
                 name: "SCHOGGI",
                 price: 44.90,
                 image: "/chocolate1.png"
+            },
+            {
+                id: 3,
+                name: "HIPPO",
+                price: 45.90,
+                image: "/hippo1.png"
             }
         ]
     },
@@ -39,7 +74,7 @@ export const products: { [key: string]: any } = {
             "Lotus Biscoff Käsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Karamellgebäck (<strong>Gluten</strong>, <strong>Soja</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Zimt, Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Karamellgebäck (<strong>Gluten</strong>, <strong>Soja</strong>), Butter (<strong>Milch</strong>), Zimt, Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -52,6 +87,12 @@ export const products: { [key: string]: any } = {
                 name: "DULCE DE LECHE",
                 price: 45.90,
                 image: "/cafe1.png"
+            },
+            {
+                id: 3,
+                name: "HIPPO",
+                price: 45.90,
+                image: "/hippo1.png"
             }
         ]
     },
@@ -64,10 +105,10 @@ export const products: { [key: string]: any } = {
         description: "Cremige Schweizer Schokolade mit einem tiefen Geschmack, der umhüllt, ohne zu überwältigen. Eine perfekte Balance zwischen Intensität und Sanftheit.",
         images: ["/chocolate1.png", "/chocolate2.png"],
         includes: [
-            "Schokoladenkäsekuchen mit Schweizer Schokolade",
+            "Schokoladen Käsekuchen mit Schweizer Schokolade",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Schweizer Schokolade (<strong>Milch</strong>, <strong>Soja</strong>), <strong>Eier</strong>, Kakaokekse (<strong>Gluten</strong>, <strong>Soja</strong>), Weizenmehl (<strong>Gluten</strong>), Kakao, Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Schokolade (<strong>Milch</strong>, <strong>Soja</strong>), <strong>Eier</strong>, Kakaokekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Kakao, Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -80,6 +121,12 @@ export const products: { [key: string]: any } = {
                 name: "CLASSIC",
                 price: 42.90,
                 image: "/original1.png"
+            },
+            {
+                id: 3,
+                name: "HIPPO",
+                price: 45.90,
+                image: "/hippo1.png"
             }
         ]
     },
@@ -95,7 +142,7 @@ export const products: { [key: string]: any } = {
             "Original Käsekuchen im baskischen Stil",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Käsemischung (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Käsemischung (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -108,6 +155,12 @@ export const products: { [key: string]: any } = {
                 name: "LOTUS",
                 price: 44.90,
                 image: "/lotus1.png"
+            },
+            {
+                id: 3,
+                name: "HIPPO",
+                price: 45.90,
+                image: "/hippo1.png"
             }
         ]
     },
@@ -123,7 +176,7 @@ export const products: { [key: string]: any } = {
             "Dulce de Leche Käsekuchen",
             "Handgefertigt nach traditionellem Rezept"
         ],
-        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Dulce de Leche (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
+        ingredients: "Frischkäse (<strong>Milch</strong>), Mascarpone (<strong>Milch</strong>), Zucker, Rahm (<strong>Milch</strong>), Dulce de Leche (<strong>Milch</strong>), <strong>Eier</strong>, Butterkekse (<strong>Gluten</strong>, <strong>Milch</strong>), Weizenmehl (<strong>Gluten</strong>), Butter (<strong>Milch</strong>), Salz.",
         frequentlyBought: [
             {
                 id: 1,
@@ -136,6 +189,12 @@ export const products: { [key: string]: any } = {
                 name: "PISTACHIO",
                 price: 49.90,
                 image: "/pistacho1.png"
+            },
+            {
+                id: 3,
+                name: "HIPPO",
+                price: 45.90,
+                image: "/hippo1.png"
             }
         ]
     }

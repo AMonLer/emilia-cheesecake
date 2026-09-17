@@ -59,6 +59,9 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
     if (compact === "top") {
         return (
             <div className="flex flex-col justify-center h-full">
+                {product.limited && (
+                    <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#651A1A]/60 mb-1.5">{t.products.limited}</p>
+                )}
                 <h1 className="text-xl font-black tracking-tight leading-tight text-black mb-2">
                     {product.name}
                 </h1>
@@ -215,6 +218,9 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
     return (
         <div className="flex flex-col h-full justify-center">
             <div className="mb-4">
+                {product.limited && (
+                    <p className="text-xs font-bold tracking-[0.25em] uppercase text-[#651A1A]/60 mb-2">{t.products.limited}</p>
+                )}
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-black">
                     {product.name}
                 </h1>
