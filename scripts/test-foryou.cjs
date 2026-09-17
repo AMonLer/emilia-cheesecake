@@ -99,7 +99,7 @@ async function main() {
   const cloudinary = { getUploadCredentials: () => ({ cloudName: 'test', apiKey: 'test' }), cloudinaryConfigured: true, FORYOU_FOLDER: 'emilia/foryou', signUpload: () => 'test-signature' }
   const save = loadTs('app/api/foryou/save/route.ts', {
     '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
-    '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true } },
+    '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => null },
   })
   const payload = { code, message: 'Happy birthday' }
   assert.equal((await save.POST(request('/api/foryou/save', payload))).status, 403)
@@ -110,6 +110,19 @@ async function main() {
   assert.equal((await save.POST(request('/api/foryou/save', { ...payload, fileUrl: stored.fileUrl }, cookie))).status, 200)
   assert.equal(saved.paymentIntentId, intent.id)
   assert.equal(saved.message, payload.message)
+  // Sticker reservado pero sin mensaje todavía: debe dejar guardar
+  const saveReserved = loadTs('app/api/foryou/save/route.ts', {
+    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
+    '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => ({ code, message: '' }) },
+  })
+  assert.equal((await saveReserved.POST(request('/api/foryou/save', payload, cookie))).status, 200)
+  // Mensaje ya grabado: bloqueado, editar pasa por soporte
+  const saveLocked = loadTs('app/api/foryou/save/route.ts', {
+    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
+    '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => stored },
+  })
+  assert.equal((await saveLocked.POST(request('/api/foryou/save', payload, cookie))).status, 409)
+  console.log('PASS: a saved message is locked (edits go through support); a reserved empty code still accepts its first message')
   const sign = loadTs('app/api/foryou/sign-upload/route.ts', { '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary })
   assert.equal((await sign.POST(request('/api/foryou/sign-upload', { code }))).status, 403)
   assert.equal((await sign.POST(request('/api/foryou/sign-upload', { code: '2043' }, cookie))).status, 403)

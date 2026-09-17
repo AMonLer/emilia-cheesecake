@@ -71,6 +71,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
   const [authorized, setAuthorized] = useState<boolean | null>(null)
+  const [alreadySaved, setAlreadySaved] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -79,11 +80,11 @@ export default function CreateForYouMessage({ params }: { params: { code: string
       .then((data) => {
         if (cancelled) return
         setAuthorized(data.authorized === true)
-        if (data.message) {
-          setMessage(data.message.message || '')
-          setVideoUrl(data.message.videoUrl || '')
-          setFileUrl(data.message.fileUrl || '')
-          setFileName(data.message.fileName || '')
+        // El mensaje se graba una sola vez: si ya existe contenido, el editor
+        // no se muestra y cualquier cambio pasa por soporte.
+        const existing = data.message
+        if (existing && (existing.message || existing.videoUrl || existing.fileUrl)) {
+          setAlreadySaved(true)
         }
       })
       .catch(() => { if (!cancelled) setAuthorized(false) })
@@ -145,6 +146,10 @@ export default function CreateForYouMessage({ params }: { params: { code: string
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, message, videoUrl, fileUrl, fileName }),
       })
+      if (res.status === 409) {
+        setAlreadySaved(true)
+        return
+      }
       if (!res.ok) throw new Error("save failed")
       setDone(true)
     } catch {
@@ -165,6 +170,19 @@ export default function CreateForYouMessage({ params }: { params: { code: string
           <Link href={`/foryou/${code}`} className="underline underline-offset-4">View the message</Link>
           <p className="mt-8 text-sm text-[#651A1A]/50">Having trouble? <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a></p>
         </>}
+      </main>
+    )
+  }
+
+  if (alreadySaved) {
+    return (
+      <main className="min-h-screen bg-[#FAF6F1] flex flex-col items-center justify-center px-6 text-center text-[#651A1A]">
+        <h1 className="text-3xl font-bold mb-4">Your message is saved</h1>
+        <p className="max-w-md font-light leading-relaxed">
+          It travels with your cake. If you&apos;d like to change it, write to us at{' '}
+          <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a>{' '}
+          and we&apos;ll take care of it.
+        </p>
       </main>
     )
   }

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { saveForYouMessage } from '@/lib/foryou-store'
+import { getForYouMessage, saveForYouMessage } from '@/lib/foryou-store'
 import { forYouCookieName, verifyForYouSession } from '@/lib/foryou-auth'
 import { getUploadCredentials } from '@/lib/cloudinary'
 
@@ -19,6 +19,14 @@ export async function POST(req: NextRequest) {
     }
     const session = verifyForYouSession(req.cookies.get(forYouCookieName(code))?.value, code)
     if (!session) return NextResponse.json({ error: 'Payment authorization required' }, { status: 403 })
+
+    // El mensaje se graba una sola vez: si ya hay contenido, cualquier cambio
+    // pasa por soporte (info@emilialab.com), no por edición directa.
+    const existing = await getForYouMessage(code)
+    if (existing && (existing.message || existing.videoUrl || existing.fileUrl)) {
+      return NextResponse.json({ error: 'Message already saved' }, { status: 409 })
+    }
+
     if (!message && !videoUrl && !fileUrl) {
       return NextResponse.json({ error: 'Nothing to save' }, { status: 400 })
     }
