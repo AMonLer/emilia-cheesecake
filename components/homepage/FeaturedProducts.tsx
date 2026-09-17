@@ -24,7 +24,7 @@ export default function FeaturedProducts() {
                 {/* Mobile: 2-column vertical grid */}
                 <Reveal delay={100} className="md:hidden grid grid-cols-2 gap-2">
                     <ProductCard
-                        className="w-full"
+                        className="w-full col-span-2"
                         href="/product/hippo"
                         slug="hippo"
                         image1="/hippo1.png"
@@ -33,18 +33,7 @@ export default function FeaturedProducts() {
                         priceSmall={17.90}
                         priceLarge={45.90}
                         description=""
-                        tag={{ label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
-                    />
-                    <ProductCard
-                        className="w-full"
-                        href="/product/pistacho"
-                        slug="pistacho"
-                        image1="/pistacho1.png"
-                        image2="/pistacho2.png"
-                        name="PISTACHIO"
-                        priceSmall={19.90}
-                        priceLarge={49.90}
-                        description=""
+                        tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
                     />
                     <ProductCard
                         className="w-full"
@@ -59,22 +48,33 @@ export default function FeaturedProducts() {
                     />
                     <ProductCard
                         className="w-full"
-                        href="/product/lotus"
-                        slug="lotus"
-                        image1="/lotus1.png"
-                        image2="/lotus2.png"
-                        name="LOTUS"
+                        href="/product/chocolate"
+                        slug="chocolate"
+                        image1="/chocolate1.png"
+                        image2="/chocolate2.png"
+                        name="SCHOGGI"
                         priceSmall={16.90}
                         priceLarge={44.90}
                         description=""
                     />
                     <ProductCard
                         className="w-full"
-                        href="/product/chocolate"
-                        slug="chocolate"
-                        image1="/chocolate1.png"
-                        image2="/chocolate2.png"
-                        name="SCHOGGI"
+                        href="/product/pistacho"
+                        slug="pistacho"
+                        image1="/pistacho1.png"
+                        image2="/pistacho2.png"
+                        name="PISTACHIO"
+                        priceSmall={19.90}
+                        priceLarge={49.90}
+                        description=""
+                    />
+                    <ProductCard
+                        className="w-full"
+                        href="/product/lotus"
+                        slug="lotus"
+                        image1="/lotus1.png"
+                        image2="/lotus2.png"
+                        name="LOTUS"
                         priceSmall={16.90}
                         priceLarge={44.90}
                         description=""
@@ -104,18 +104,7 @@ export default function FeaturedProducts() {
                             priceSmall={17.90}
                             priceLarge={45.90}
                             description={p.hippo}
-                            tag={{ label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
-                        />
-
-                        <ProductCard
-                            className="w-80 flex-shrink-0"
-                            href="/product/pistacho"
-                            image1="/pistacho1.png"
-                            image2="/pistacho2.png"
-                            name="PISTACHIO"
-                            priceSmall={19.90}
-                            priceLarge={49.90}
-                            description={p.pistachio}
+                            tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
                         />
 
                         <ProductCard
@@ -131,17 +120,6 @@ export default function FeaturedProducts() {
 
                         <ProductCard
                             className="w-80 flex-shrink-0"
-                            href="/product/lotus"
-                            image1="/lotus1.png"
-                            image2="/lotus2.png"
-                            name="LOTUS"
-                            priceSmall={16.90}
-                            priceLarge={44.90}
-                            description={p.lotus}
-                        />
-
-                        <ProductCard
-                            className="w-80 flex-shrink-0"
                             href="/product/chocolate"
                             image1="/chocolate1.png"
                             image2="/chocolate2.png"
@@ -149,6 +127,28 @@ export default function FeaturedProducts() {
                             priceSmall={16.90}
                             priceLarge={44.90}
                             description={p.schoggi}
+                        />
+
+                        <ProductCard
+                            className="w-80 flex-shrink-0"
+                            href="/product/pistacho"
+                            image1="/pistacho1.png"
+                            image2="/pistacho2.png"
+                            name="PISTACHIO"
+                            priceSmall={19.90}
+                            priceLarge={49.90}
+                            description={p.pistachio}
+                        />
+
+                        <ProductCard
+                            className="w-80 flex-shrink-0"
+                            href="/product/lotus"
+                            image1="/lotus1.png"
+                            image2="/lotus2.png"
+                            name="LOTUS"
+                            priceSmall={16.90}
+                            priceLarge={44.90}
+                            description={p.lotus}
                         />
 
                         <ProductCard

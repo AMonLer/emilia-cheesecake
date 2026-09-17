@@ -57,7 +57,7 @@ export default function BestellenPage() {
     priceSmall: number
     priceLarge: number
     description: string
-    tag?: { label: string; bgColor: string; textColor: string }
+    tag?: { label: string; subLabel?: string; bgColor: string; textColor: string }
   }> = [
     {
       id: "hippo",
@@ -68,17 +68,7 @@ export default function BestellenPage() {
       priceSmall: 17.90,
       priceLarge: 45.90,
       description: p.hippo,
-      tag: { label: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }
-    },
-    {
-      id: "verdalia",
-      name: "PISTACHIO",
-      slug: "pistacho",
-      image1: "/pistacho1.png",
-      image2: "/pistacho2.png",
-      priceSmall: 19.90,
-      priceLarge: 49.90,
-      description: p.pistachio
+      tag: { label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }
     },
     {
       id: "clasica",
@@ -91,16 +81,6 @@ export default function BestellenPage() {
       description: p.classic
     },
     {
-      id: "emilia3",
-      name: "LOTUS",
-      slug: "lotus",
-      image1: "/lotus1.png",
-      image2: "/lotus2.png",
-      priceSmall: 16.90,
-      priceLarge: 44.90,
-      description: p.lotus
-    },
-    {
       id: "schoggi",
       name: "SCHOGGI",
       slug: "chocolate",
@@ -109,6 +89,26 @@ export default function BestellenPage() {
       priceSmall: 16.90,
       priceLarge: 44.90,
       description: p.schoggi
+    },
+    {
+      id: "verdalia",
+      name: "PISTACHIO",
+      slug: "pistacho",
+      image1: "/pistacho1.png",
+      image2: "/pistacho2.png",
+      priceSmall: 19.90,
+      priceLarge: 49.90,
+      description: p.pistachio
+    },
+    {
+      id: "emilia3",
+      name: "LOTUS",
+      slug: "lotus",
+      image1: "/lotus1.png",
+      image2: "/lotus2.png",
+      priceSmall: 16.90,
+      priceLarge: 44.90,
+      description: p.lotus
     },
     {
       id: "manjar",

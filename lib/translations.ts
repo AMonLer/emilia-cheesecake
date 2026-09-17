@@ -39,6 +39,7 @@ export type Translations = {
     dulceDeLeche: string
     hippo: string
     limited: string
+    monthlySpecial: string
   }
   quality: {
     title1: string
@@ -247,7 +248,8 @@ export const translations: Record<Locale, Translations> = {
       schoggi: 'Intensiver Käsekuchen mit Schweizer Schokolade, für echte Kakaoliebhaber...',
       dulceDeLeche: 'Verführerischer Käsekuchen mit cremigem Dulce de Leche und zartem Karamell...',
       hippo: 'Cremige Haselnuss-Kakao-Creme auf seidigem Käsekuchen. Limitierte Edition...',
-      limited: 'Limitiert',
+      limited: 'Limitierte Edition',
+      monthlySpecial: 'Torte des Monats',
     },
     quality: {
       title1: 'DEIN',
@@ -454,7 +456,8 @@ export const translations: Record<Locale, Translations> = {
       schoggi: 'Intense cheesecake with Swiss chocolate, for true cocoa lovers...',
       dulceDeLeche: 'Indulgent cheesecake with creamy Dulce de Leche and delicate caramel...',
       hippo: 'Creamy hazelnut-cocoa cream on our silky cheesecake. Limited edition...',
-      limited: 'Limited',
+      limited: 'Limited Edition',
+      monthlySpecial: 'Cake of the Month',
     },
     quality: {
       title1: 'YOUR',

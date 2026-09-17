@@ -5,7 +5,7 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import Image from "next/image"
 import PriceDisplay from "@/components/PriceDisplay"
-import { ShoppingCart, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { ShoppingCart, X, Check, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useScrollLock } from "@/lib/useScrollLock"
@@ -21,6 +21,7 @@ interface ProductCardProps {
     slug?: string
     tag?: {
         label: string
+        subLabel?: string
         bgColor: string
         textColor: string
     }
@@ -138,10 +139,16 @@ export default function ProductCard({ href, image1, image2, name, description, p
             <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${className}`}>
                 <div className="relative h-48 md:h-80">
                     {tag && (
-                        <div className={`absolute top-0 left-4 h-24 w-8 ${tag.bgColor} rounded-b-lg flex items-center justify-center z-10`}>
-                            <span className={`${tag.textColor} text-[10px] font-semibold tracking-wider uppercase [writing-mode:vertical-lr] rotate-180`}>
+                        <div className={`absolute top-2 right-2 md:top-3 md:left-3 md:right-auto z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/25 text-left`}>
+                            <span className="flex items-center gap-1 text-[9px] md:text-[10px] font-black tracking-[0.18em] uppercase leading-none">
+                                <Sparkles className="h-2.5 w-2.5 md:h-3 md:w-3 shrink-0" strokeWidth={2.5} />
                                 {tag.label}
                             </span>
+                            {tag.subLabel && (
+                                <span className="block mt-1 text-[8px] md:text-[9px] font-medium italic opacity-80 leading-none">
+                                    {tag.subLabel}
+                                </span>
+                            )}
                         </div>
                     )}
 

@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
-import { Check, CheckCircle, CreditCard } from "lucide-react"
+import { Check, CheckCircle, CreditCard, Sparkles } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
 
@@ -60,7 +60,11 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         return (
             <div className="flex flex-col justify-center h-full">
                 {product.limited && (
-                    <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-[#651A1A]/60 mb-1.5">{t.products.limited}</p>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#651A1A] text-[#F5E6D3] px-2.5 py-1 mb-2 shadow-md shadow-[#651A1A]/25">
+                        <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
+                        <span className="text-[9px] font-black tracking-[0.2em] uppercase leading-none">{t.products.monthlySpecial}</span>
+                        <span className="text-[9px] font-medium italic opacity-80 leading-none">· {t.products.limited}</span>
+                    </span>
                 )}
                 <h1 className="text-xl font-black tracking-tight leading-tight text-black mb-2">
                     {product.name}
@@ -219,7 +223,11 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         <div className="flex flex-col h-full justify-center">
             <div className="mb-4">
                 {product.limited && (
-                    <p className="text-xs font-bold tracking-[0.25em] uppercase text-[#651A1A]/60 mb-2">{t.products.limited}</p>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#651A1A] text-[#F5E6D3] px-3 py-1.5 mb-3 shadow-md shadow-[#651A1A]/25">
+                        <Sparkles className="h-3 w-3 shrink-0" strokeWidth={2.5} />
+                        <span className="text-[11px] font-black tracking-[0.2em] uppercase leading-none">{t.products.monthlySpecial}</span>
+                        <span className="text-[11px] font-medium italic opacity-80 leading-none">· {t.products.limited}</span>
+                    </span>
                 )}
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-black">
                     {product.name}
