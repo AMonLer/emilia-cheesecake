@@ -401,7 +401,7 @@ export const translations: Record<Locale, Translations> = {
     },
     paymentSuccess: {
       title: 'Vielen Dank',
-      message: 'Wir haben Ihre Bestellung erhalten und bereiten alles mit größter Sorgfalt in unserer Backstube vor.',
+      message: 'Ihre Bestellung ist bestätigt. Wir backen Ihren Kuchen frisch für Ihren Liefertermin.',
       pendingTitle: 'Zahlung wird bestätigt',
       pendingMessage: 'Ihre Zahlung wird gerade verarbeitet. Das dauert in der Regel nur einen Moment – diese Seite aktualisiert sich automatisch.',
       backHome: 'Zurück zur Startseite',
@@ -605,7 +605,7 @@ export const translations: Record<Locale, Translations> = {
     },
     paymentSuccess: {
       title: 'Thank You',
-      message: 'We have received your order and are preparing everything with the greatest care in our bakery.',
+      message: 'Your order is confirmed. We bake your cake fresh for your delivery date.',
       pendingTitle: 'Confirming your payment',
       pendingMessage: 'Your payment is being processed. This usually only takes a moment – this page will update automatically.',
       backHome: 'Back to Home',
