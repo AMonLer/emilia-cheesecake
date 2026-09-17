@@ -163,6 +163,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
         {authorized === false && <>
           <p className="max-w-md mb-6">To create or edit your message, use the link on your payment confirmation page in the browser where you placed your order.</p>
           <Link href={`/foryou/${code}`} className="underline underline-offset-4">View the message</Link>
+          <p className="mt-8 text-sm text-[#651A1A]/50">Having trouble? <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a></p>
         </>}
       </main>
     )
@@ -297,6 +298,8 @@ export default function CreateForYouMessage({ params }: { params: { code: string
         </div>
 
         <p className="mt-12 text-center text-xs text-[#651A1A]/30 tracking-wider">
+          Having trouble? <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a>
+          <br />
           emilialab.com · Handcrafted in Zürich
         </p>
       </div>
