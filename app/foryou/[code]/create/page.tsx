@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -16,8 +16,13 @@ type UploadResult = {
 async function uploadToCloudinary(
   file: File,
   onProgress: (pct: number) => void,
+  code: string,
 ): Promise<UploadResult> {
-  const signRes = await fetch("/api/foryou/sign-upload", { method: "POST" })
+  const signRes = await fetch("/api/foryou/sign-upload", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  })
   if (!signRes.ok) throw new Error("Could not start upload")
   const { timestamp, signature, folder, cloudName, apiKey } = await signRes.json()
 
@@ -64,6 +69,25 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [authorized, setAuthorized] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch(`/api/foryou/code?code=${encodeURIComponent(code)}`, { cache: 'no-store' })
+      .then((res) => { if (!res.ok) throw new Error('Session unavailable'); return res.json() })
+      .then((data) => {
+        if (cancelled) return
+        setAuthorized(data.authorized === true)
+        if (data.message) {
+          setMessage(data.message.message || '')
+          setVideoUrl(data.message.videoUrl || '')
+          setFileUrl(data.message.fileUrl || '')
+          setFileName(data.message.fileName || '')
+        }
+      })
+      .catch(() => { if (!cancelled) setAuthorized(false) })
+    return () => { cancelled = true }
+  }, [code])
 
   const copyLink = async () => {
     const url = `${window.location.origin}/foryou/${code}`
@@ -95,7 +119,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
     }
     try {
       setVideoProgress(0)
-      const res = await uploadToCloudinary(file, setVideoProgress)
+      const res = await uploadToCloudinary(file, setVideoProgress, code)
       setVideoUrl(res.secureUrl)
     } catch {
       setError("The video could not be uploaded. Please try again.")
@@ -114,7 +138,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
     }
     try {
       setFileProgress(0)
-      const res = await uploadToCloudinary(file, setFileProgress)
+      const res = await uploadToCloudinary(file, setFileProgress, code)
       setFileUrl(res.secureUrl)
       setFileName(file.name)
     } catch {
@@ -147,6 +171,18 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   }
 
   const uploading = videoProgress !== null || fileProgress !== null
+
+  if (authorized !== true) {
+    return (
+      <main className="min-h-screen bg-[#FAF6F1] flex flex-col items-center justify-center px-6 text-center text-[#651A1A]">
+        <h1 className="text-3xl font-bold mb-4">{authorized === null ? 'Loading…' : 'Open this page after checkout'}</h1>
+        {authorized === false && <>
+          <p className="max-w-md mb-6">To create or edit your message, use the link on your payment confirmation page in the browser where you placed your order.</p>
+          <Link href={`/foryou/${code}`} className="underline underline-offset-4">View the message</Link>
+        </>}
+      </main>
+    )
+  }
 
   if (done) {
     return (

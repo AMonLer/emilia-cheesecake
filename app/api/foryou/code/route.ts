@@ -1,26 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { createForYouSession, forYouCookieName, FORYOU_SESSION_SECONDS, isForYouCode, verifyForYouSession } from '@/lib/foryou-auth'
+import { getForYouMessage } from '@/lib/foryou-store'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
 })
 
-// Resolves the "For You" code for a completed payment. The code lives in the
-// PaymentIntent metadata, so we verify the payment succeeded before returning it.
+// Checks an existing editing session without exposing its signed cookie.
 export async function GET(req: NextRequest) {
-  const paymentIntentId = req.nextUrl.searchParams.get('payment_intent')
-  if (!paymentIntentId) {
-    return NextResponse.json({ error: 'Missing payment_intent' }, { status: 400 })
-  }
+  const code = req.nextUrl.searchParams.get('code') || ''
+  const session = verifyForYouSession(req.cookies.get(forYouCookieName(code))?.value, code)
+  const message = session ? await getForYouMessage(code) : null
+  return NextResponse.json({ authorized: Boolean(session), message }, { headers: { 'Cache-Control': 'no-store' } })
+}
 
+// The payment ID alone is not proof of ownership. Verify Stripe's client secret
+// and successful payment before granting this browser permission to edit.
+export async function POST(req: NextRequest) {
   try {
+    const { paymentIntentId, clientSecret } = await req.json()
+    if (typeof paymentIntentId !== 'string' || !/^pi_[A-Za-z0-9]+$/.test(paymentIntentId) || typeof clientSecret !== 'string' || !clientSecret) {
+      return NextResponse.json({ error: 'Missing payment credentials' }, { status: 400 })
+    }
     const intent = await stripe.paymentIntents.retrieve(paymentIntentId)
+    if (intent.client_secret !== clientSecret) {
+      return NextResponse.json({ error: 'Invalid payment credentials' }, { status: 403 })
+    }
     if (intent.status !== 'succeeded') {
       return NextResponse.json({ code: null })
     }
-    return NextResponse.json({ code: intent.metadata?.foryouCode || null })
+    const code = intent.metadata?.foryouCode || ''
+    if (!isForYouCode(code)) return NextResponse.json({ code: null })
+    const response = NextResponse.json({ code }, { headers: { 'Cache-Control': 'no-store' } })
+    response.cookies.set(forYouCookieName(code), createForYouSession(code, intent.id), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: FORYOU_SESSION_SECONDS,
+    })
+    return response
   } catch (error: any) {
     console.error('Error retrieving For You code:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Could not verify payment' }, { status: 500 })
   }
 }

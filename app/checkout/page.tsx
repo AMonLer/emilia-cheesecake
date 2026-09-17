@@ -24,8 +24,8 @@ registerLocale("en", enUS)
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 
-// Ocultar la opción de regalo "For You" hasta que se lance la funcionalidad
-const SHOW_GIFT_OPTION = false
+// For You is available for gift orders.
+const SHOW_GIFT_OPTION = true
 
 function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: number }) {
   const stripe = useStripe()
@@ -113,7 +113,11 @@ function CheckoutContent() {
   const [address, setAddress] = useState("")
   const [city, setCity] = useState("")
   const [postalCode, setPostalCode] = useState("")
-  const [kanton, setKanton] = useState("Zürich")
+  const [recipientFirstName, setRecipientFirstName] = useState("")
+  const [recipientLastName, setRecipientLastName] = useState("")
+  const [recipientIsCompany, setRecipientIsCompany] = useState(false)
+  const [recipientCompany, setRecipientCompany] = useState("")
+  const [recipientPhone, setRecipientPhone] = useState("")
   const [deliveryDate, setDeliveryDate] = useState<Date | null>(null)
   const [deliveryTime, setDeliveryTime] = useState("")
   const [clientSecret, setClientSecret] = useState<string>("")
@@ -137,6 +141,7 @@ function CheckoutContent() {
   const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false)
   const [paymentFailed, setPaymentFailed] = useState(false)
   const formRestoredRef = useRef(false)
+  const forYouIntentRef = useRef(false)
 
   // Allowed postal codes: Zürich agglomeration + Baden (AG)
   const allowedPostalCodes = new Set([
@@ -196,6 +201,11 @@ function CheckoutContent() {
         start: new Date(2026, 7, 14),
         end: new Date(2026, 7, 24),
       }),
+      // 2 y 3 de septiembre de 2026: no podemos hacer pedidos esos días.
+      ...eachDayOfInterval({
+        start: new Date(2026, 8, 2),
+        end: new Date(2026, 8, 3),
+      }),
       // Cierre de Navidad: del 20 de diciembre al 6 de enero siguiente. Generamos tres
       // temporadas porque en enero el año en curso ya es el siguiente, y su propio 1-6 de
       // enero tiene que seguir bloqueado.
@@ -252,7 +262,11 @@ function CheckoutContent() {
         if (d.address) setAddress(d.address)
         if (d.city) setCity(d.city)
         if (d.postalCode) setPostalCode(d.postalCode)
-        if (d.kanton) setKanton(d.kanton)
+        if (d.recipientFirstName) setRecipientFirstName(d.recipientFirstName)
+        if (d.recipientLastName) setRecipientLastName(d.recipientLastName)
+        if (typeof d.recipientIsCompany === 'boolean') setRecipientIsCompany(d.recipientIsCompany)
+        if (d.recipientCompany) setRecipientCompany(d.recipientCompany)
+        if (d.recipientPhone) setRecipientPhone(d.recipientPhone)
         if (typeof d.isGift === 'boolean') setIsGift(d.isGift)
         if (d.appliedDiscountCode) {
           setAppliedDiscountCode(d.appliedDiscountCode)
@@ -270,6 +284,16 @@ function CheckoutContent() {
       }
     } catch { }
 
+    // Intent de la sección For You ("Nachricht senden" → /bestellen?foryou=1):
+    // el checkout abre ya con la opción de regalo activa. Es de un solo uso.
+    // Va por ref: StrictMode ejecuta el efecto dos veces y en la segunda
+    // pasada el flag ya no está, pero el restore podría pisar el valor.
+    if (sessionStorage.getItem('emilia-foryou-intent')) {
+      sessionStorage.removeItem('emilia-foryou-intent')
+      forYouIntentRef.current = true
+    }
+    if (forYouIntentRef.current) setIsGift(true)
+
     if (searchParams.get('payment') === 'failed') {
       setPaymentFailed(true)
       setShowDeliveryStep(true)
@@ -285,13 +309,13 @@ function CheckoutContent() {
     if (!formRestoredRef.current) return
     try {
       sessionStorage.setItem('emilia-checkout-form', JSON.stringify({
-        email, phone, firstName, lastName, address, city, postalCode, kanton,
-        isGift, appliedDiscountCode,
+        email, phone, firstName, lastName, address, city, postalCode,
+        isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode,
         deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
         deliveryTime,
       }))
     } catch { }
-  }, [email, phone, firstName, lastName, address, city, postalCode, kanton, isGift, appliedDiscountCode, deliveryDate, deliveryTime])
+  }, [email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryDate, deliveryTime])
 
   // Si el reloj avanza mientras el checkout está abierto, lo ya elegido puede dejar de
   // cumplir las 36h. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
@@ -342,6 +366,9 @@ function CheckoutContent() {
     if (!address) missing.add("address")
     if (!city) missing.add("city")
     if (!postalCode) missing.add("postalCode")
+    if (isGift && recipientIsCompany && !recipientCompany.trim()) missing.add("recipientCompany")
+    if (isGift && !recipientIsCompany && !recipientFirstName.trim()) missing.add("recipientFirstName")
+    if (isGift && !recipientIsCompany && !recipientLastName.trim()) missing.add("recipientLastName")
     setMissingFields(missing)
 
     if (missing.size > 0) {
@@ -403,8 +430,14 @@ function CheckoutContent() {
             address,
             city,
             postalCode,
-            kanton,
             isGift,
+            recipientName: isGift
+              ? recipientIsCompany
+                ? recipientCompany.trim()
+                : [recipientFirstName.trim(), recipientLastName.trim()].filter(Boolean).join(' ')
+              : '',
+            recipientIsCompany: isGift && recipientIsCompany ? 'yes' : '',
+            recipientPhone: isGift ? recipientPhone.trim() : '',
             deliveryDate: deliveryDate?.toLocaleDateString('de-CH'),
             deliveryTime,
             discountCode: appliedDiscountCode,
@@ -450,6 +483,110 @@ function CheckoutContent() {
     previousStepRef.current = currentStep
     stepTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [currentStep])
+
+  // Nombre y apellidos del comprador. En un pedido normal van dentro de la dirección
+  // de entrega (comprador = destinatario); en un regalo suben a "Deine Daten", porque
+  // la dirección pasa a ser la de quien recibe.
+  const nameFields = (
+    <div className="grid grid-cols-2 gap-4">
+      <input
+        type="text"
+        placeholder={c.firstNamePlaceholder}
+        value={firstName}
+        onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
+        data-error={missingFields.has('firstName')}
+        autoComplete="given-name"
+        autoCapitalize="words"
+        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('firstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+        required
+      />
+      <input
+        type="text"
+        placeholder={c.lastNamePlaceholder}
+        value={lastName}
+        onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
+        data-error={missingFields.has('lastName')}
+        autoComplete="family-name"
+        autoCapitalize="words"
+        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('lastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+        required
+      />
+    </div>
+  )
+
+  // Quien recibe el regalo: va junto a la dirección de entrega, que es la suya.
+  // Puede ser una persona o una empresa (p. ej. una tarta para la oficina).
+  const recipientFields = (
+    <>
+      <div className="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1">
+        {([
+          { company: false, label: 'Person' },
+          { company: true, label: locale === 'de' ? 'Firma' : 'Company' },
+        ] as const).map(({ company, label }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => setRecipientIsCompany(company)}
+            aria-pressed={recipientIsCompany === company}
+            className={`rounded-md px-3 py-2 text-sm font-bold transition-colors ${recipientIsCompany === company ? 'bg-white text-[#651A1A] shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {recipientIsCompany ? (
+        <input
+          type="text"
+          placeholder={locale === 'de' ? 'Firmenname' : 'Company name'}
+          value={recipientCompany}
+          onChange={(e) => { setRecipientCompany(e.target.value); if (missingFields.has('recipientCompany')) { const m = new Set(missingFields); m.delete('recipientCompany'); setMissingFields(m) } }}
+          data-error={missingFields.has('recipientCompany')}
+          autoComplete="organization"
+          autoCapitalize="words"
+          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientCompany') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+        />
+      ) : (
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="text"
+            placeholder={locale === 'de' ? 'Vorname des Empfängers' : "Recipient's first name"}
+            value={recipientFirstName}
+            onChange={(e) => { setRecipientFirstName(e.target.value); if (missingFields.has('recipientFirstName')) { const m = new Set(missingFields); m.delete('recipientFirstName'); setMissingFields(m) } }}
+            data-error={missingFields.has('recipientFirstName')}
+            autoComplete="off"
+            autoCapitalize="words"
+            className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+          />
+          <input
+            type="text"
+            placeholder={locale === 'de' ? 'Nachname des Empfängers' : "Recipient's last name"}
+            value={recipientLastName}
+            onChange={(e) => { setRecipientLastName(e.target.value); if (missingFields.has('recipientLastName')) { const m = new Set(missingFields); m.delete('recipientLastName'); setMissingFields(m) } }}
+            data-error={missingFields.has('recipientLastName')}
+            autoComplete="off"
+            autoCapitalize="words"
+            className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+          />
+        </div>
+      )}
+
+      <input
+        type="tel"
+        placeholder={locale === 'de' ? 'Telefon (optional)' : 'Phone (optional)'}
+        value={recipientPhone}
+        onChange={(e) => setRecipientPhone(e.target.value)}
+        autoComplete="off"
+        inputMode="tel"
+        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
+      />
+      <p className="text-xs text-gray-500 leading-snug">
+        {locale === 'de'
+          ? 'Telefon nur für Rückfragen zur Lieferung — die Überraschung bleibt sicher.'
+          : 'Phone only for delivery questions — the surprise stays safe.'}
+      </p>
+    </>
+  )
 
   // El código de descuento y la oferta viven en la columna derecha, que en móvil se
   // apila debajo y duplicaba todo el resumen. Los reutilizamos en los dos sitios.
@@ -716,8 +853,11 @@ function CheckoutContent() {
               {/* Contact Section */}
               <div className="mb-8">
                 <div className="mb-4">
-                  <h2 className="text-xl font-black">{c.contact}</h2>
+                  <h2 className="text-xl font-black">{isGift ? c.contactGift : c.contact}</h2>
                 </div>
+                {/* En un regalo, el nombre de quien envía vive aquí, con su email y
+                    teléfono — no en la dirección, que es del destinatario. */}
+                {isGift && <div className="mb-4">{nameFields}</div>}
                 <input
                   type="email"
                   placeholder={c.emailPlaceholder}
@@ -749,38 +889,17 @@ function CheckoutContent() {
               {/* Shipping Address */}
                 <div>
                   <div className="mb-8">
-                    <h2 className="text-xl font-black mb-4">{c.deliveryAddress}</h2>
+                    <h2 className="text-xl font-black mb-4">{isGift ? c.deliveryAddressGift : c.deliveryAddress}</h2>
 
                     <div className="space-y-4">
+                      {isGift && recipientFields}
+
                       {/* Solo se entrega en Suiza: un select de una opción parece roto */}
                       <div className="w-full border border-gray-200 bg-gray-50 rounded-lg px-4 py-3 text-base text-gray-600">
                         {c.country}
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4">
-                        <input
-                          type="text"
-                          placeholder={c.firstNamePlaceholder}
-                          value={firstName}
-                          onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
-                          data-error={missingFields.has('firstName')}
-                          autoComplete="given-name"
-                          autoCapitalize="words"
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('firstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-                          required
-                        />
-                        <input
-                          type="text"
-                          placeholder={c.lastNamePlaceholder}
-                          value={lastName}
-                          onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
-                          data-error={missingFields.has('lastName')}
-                          autoComplete="family-name"
-                          autoCapitalize="words"
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('lastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-                          required
-                        />
-                      </div>
+                      {!isGift && nameFields}
 
                       <input
                         type="text"
@@ -829,11 +948,6 @@ function CheckoutContent() {
                           {postalCodeError}
                         </div>
                       )}
-
-                      {/* Mismo caso: hoy solo se entrega en Zürich */}
-                      <div className="w-full border border-gray-200 bg-gray-50 rounded-lg px-4 py-3 text-base text-gray-600">
-                        {kanton}
-                      </div>
                     </div>
                   </div>
 

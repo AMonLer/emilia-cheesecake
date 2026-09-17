@@ -24,6 +24,7 @@ function readLocal(): Record<string, ForYouMessage> {
 
 export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
   if (useNotion) return saveInNotion(rec)
+  if (process.env.NODE_ENV === 'production') return false
   try {
     const store = readLocal()
     store[rec.code] = rec
@@ -37,5 +38,6 @@ export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
 
 export async function getForYouMessage(code: string): Promise<ForYouMessage | null> {
   if (useNotion) return getFromNotion(code)
+  if (process.env.NODE_ENV === 'production') return null
   return readLocal()[code] ?? null
 }

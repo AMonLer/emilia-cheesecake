@@ -73,7 +73,9 @@ async function createInNotion(pi) {
   const fullAddress = [
     metadata.address,
     `${metadata.postalCode || ''} ${metadata.city || ''}`.trim(),
-    metadata.kanton,
+    metadata.recipientName
+      ? `Geschenk für ${metadata.recipientIsCompany === 'yes' ? 'Firma ' : ''}${metadata.recipientName}${metadata.recipientPhone ? ` · Tel. ${metadata.recipientPhone}` : ''}`
+      : '',
   ]
     .filter(Boolean)
     .join(', ')
@@ -100,6 +102,10 @@ async function createInNotion(pi) {
       Products: { rich_text: [{ text: { content: productsText } }] },
       Total: { number: amount },
       'Stripe ID': { rich_text: [{ text: { content: pi.id } }] },
+      ...(metadata.foryouCode ? {
+        'For You Code': { rich_text: [{ text: { content: metadata.foryouCode } }] },
+        'For You URL': { url: `https://emilialab.com/foryou/${metadata.foryouCode}` },
+      } : {}),
     },
   })
 }

@@ -44,6 +44,30 @@ export type Translations = {
     desc: string
     cta: string
   }
+  forYou: {
+    eyebrow: string
+    free: string
+    title1: string
+    titleSerif: string
+    title2: string
+    desc: string
+    step1Title: string
+    step1Desc: string
+    step2Title: string
+    step2Desc: string
+    step3Title: string
+    step3Desc: string
+    cta: string
+    flowLabel: string
+    flowStep1: string
+    flowStep2: string
+    flowStep3: string
+    flowNote: string
+    previewLabel: string
+    previewMessage: string
+    previewMessage2: string
+    previewMessage3: string
+  }
   experience: {
     locationLabel: string
     desc: string
@@ -120,11 +144,13 @@ export type Translations = {
     breadcrumbInfo: string
     breadcrumbPayment: string
     contact: string
+    contactGift: string
     signIn: string
     emailPlaceholder: string
     phonePlaceholder: string
     newsletter: string
     deliveryAddress: string
+    deliveryAddressGift: string
     country: string
     firstNamePlaceholder: string
     lastNamePlaceholder: string
@@ -224,6 +250,30 @@ export const translations: Record<Locale, Translations> = {
       desc: 'Überrasche deine Freunde, Familie oder Kollegen mit unseren frisch gebackenen Käsekuchen. Ab 100 CHF bekommst du 10% Rabatt und Gratisversand!',
       cta: 'JETZT BESTELLEN',
     },
+    forYou: {
+      eyebrow: 'Neu · Emilia For You',
+      free: 'Kostenlos',
+      title1: 'VERSCHENKE EINEN',
+      titleSerif: 'Moment,',
+      title2: 'NICHT NUR EINEN KUCHEN.',
+      desc: 'Nimm ein Video auf, füge ein Foto hinzu oder schreibe eine Nachricht. Dein Lieblingsmensch öffnet deine Botschaft über einen Code, der dem Kuchen beiliegt.',
+      step1Title: 'Als Geschenk bestellen',
+      step1Desc: 'Wähle im Checkout die Option „Mach es persönlich“.',
+      step2Title: 'Botschaft gestalten',
+      step2Desc: 'Video, Foto oder Nachricht — direkt von deinem Handy, in einer Minute erledigt.',
+      step3Title: 'Moment verschenken',
+      step3Desc: 'Der Code kommt als Sticker oder Sleeve auf deinen Kuchen. Damit öffnet dein Lieblingsmensch deine Botschaft auf unserer Seite.',
+      cta: 'Nachricht senden',
+      flowLabel: 'So geht’s:',
+      flowStep1: 'Kuchen wählen',
+      flowStep2: 'Bezahlen',
+      flowStep3: 'Nachricht aufnehmen',
+      flowNote: 'nach der Zahlung — dauert 1 Minute',
+      previewLabel: 'A message for you',
+      previewMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniesse jeden Bissen. ❤️',
+      previewMessage2: 'Überraschung — wir fliegen auf die Malediven! 🌴',
+      previewMessage3: 'Hiermit bewerbe ich mich — Lebenslauf hängt an. Ich hoffe, der Kuchen hilft :)',
+    },
     experience: {
       locationLabel: 'AUS ZÜRICH',
       desc: 'Der erste San Sebastian Cheesecake in Zürich — handgemacht mit den besten Zutaten, frisch auf Bestellung.',
@@ -300,11 +350,13 @@ export const translations: Record<Locale, Translations> = {
       breadcrumbInfo: 'Informationen',
       breadcrumbPayment: 'Zahlung',
       contact: 'Kontakt',
+      contactGift: 'Deine Daten',
       signIn: 'Anmelden',
       emailPlaceholder: 'E-Mail',
       phonePlaceholder: 'Handynummer (z.B. +41 79 123 45 67)',
       newsletter: 'Senden Sie mir Neuigkeiten und Angebote per E-Mail',
       deliveryAddress: 'Lieferadresse',
+      deliveryAddressGift: 'Wohin liefern wir den Kuchen?',
       country: 'Schweiz',
       firstNamePlaceholder: 'Vorname',
       lastNamePlaceholder: 'Nachname',
@@ -402,6 +454,30 @@ export const translations: Record<Locale, Translations> = {
       desc: 'Surprise your friends, family or colleagues with our freshly baked cheesecakes. From CHF 100 you get 10% discount and free shipping!',
       cta: 'ORDER NOW',
     },
+    forYou: {
+      eyebrow: 'New · Emilia For You',
+      free: 'Free',
+      title1: 'SEND A',
+      titleSerif: 'message,',
+      title2: 'NOT JUST A CAKE.',
+      desc: 'Record a video, add a photo or write a note. Your favourite person opens your message with a code that comes with the cake.',
+      step1Title: 'Order as a gift',
+      step1Desc: 'Choose the "Make it personal" option at checkout.',
+      step2Title: 'Create your message',
+      step2Desc: 'Video, photo or note — straight from your phone, done in a minute.',
+      step3Title: 'Gift the moment',
+      step3Desc: 'The code comes as a sticker or sleeve on your cake. With it, your favourite person opens your message on our page.',
+      cta: 'Send a message',
+      flowLabel: 'How it works:',
+      flowStep1: 'Choose your cake',
+      flowStep2: 'Pay',
+      flowStep3: 'Record your message',
+      flowNote: 'after payment — takes 1 minute',
+      previewLabel: 'A message for you',
+      previewMessage: 'Happy birthday, Mum! Wish I could be there. Enjoy every bite. ❤️',
+      previewMessage2: 'Surprise — we\'re flying to the Maldives! 🌴',
+      previewMessage3: 'Consider this my application — CV attached. I hope the cake helps :)',
+    },
     experience: {
       locationLabel: 'FROM ZURICH',
       desc: 'The first San Sebastian Cheesecake in Zurich — handmade with the finest ingredients, freshly baked to order.',
@@ -478,11 +554,13 @@ export const translations: Record<Locale, Translations> = {
       breadcrumbInfo: 'Information',
       breadcrumbPayment: 'Payment',
       contact: 'Contact',
+      contactGift: 'Your details',
       signIn: 'Sign in',
       emailPlaceholder: 'Email',
       phonePlaceholder: 'Phone number (e.g. +41 79 123 45 67)',
       newsletter: 'Send me news and offers by email',
       deliveryAddress: 'Delivery Address',
+      deliveryAddressGift: 'Where should we deliver the cake?',
       country: 'Switzerland',
       firstNamePlaceholder: 'First name',
       lastNamePlaceholder: 'Last name',

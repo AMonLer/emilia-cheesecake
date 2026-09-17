@@ -5,6 +5,7 @@ import HeroSection from "@/components/homepage/HeroSection"
 
 import Marquee from "@/components/homepage/Marquee"
 import FeaturedProducts from "@/components/homepage/FeaturedProducts"
+import ForYouSection from "@/components/homepage/ForYouSection"
 import QualitySection from "@/components/homepage/QualitySection"
 import ProductExperienceSection from "@/components/homepage/ProductExperienceSection"
 import PhotoGallerySection from "@/components/homepage/PhotoGallerySection"
@@ -18,6 +19,7 @@ export default function EmiliaPage() {
       <HeroSection />
       <Marquee />
       <FeaturedProducts />
+      <ForYouSection />
       <QualitySection />
       <ProductExperienceSection />
       <InfluencerSection />

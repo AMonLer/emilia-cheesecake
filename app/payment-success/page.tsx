@@ -44,7 +44,11 @@ function PaymentSuccessContent() {
 
       if (paymentIntent) {
         // Recuperar el código para el mensaje personal de este pedido
-        fetch(`/api/foryou/code?payment_intent=${encodeURIComponent(paymentIntent)}`)
+        fetch('/api/foryou/code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId: paymentIntent, clientSecret }),
+        })
           .then((res) => res.json())
           .then((data) => { if (data?.code) setForyouCode(data.code) })
           .catch(() => {})
@@ -175,8 +179,8 @@ function PaymentSuccessContent() {
             </h2>
             <p className="text-white/70 font-light text-sm leading-relaxed mb-6">
               {locale === 'de'
-                ? 'Schreibe eine Nachricht, nimm ein Video auf oder füge ein Foto hinzu. Wir legen einen Code bei, mit dem die beschenkte Person alles auf unserer Seite sehen kann.'
-                : 'Write a note, record a video or add a photo. We include a code so the person receiving your gift can see it all on our page.'}
+                ? 'Schreibe eine Nachricht, nimm ein Video auf oder füge ein Foto hinzu. Wir legen einen Code bei, mit dem dein Lieblingsmensch alles auf unserer Seite sehen kann.'
+                : 'Write a note, record a video or add a photo. We include a code so your favourite person can see it all on our page.'}
             </p>
             <Link
               href={`/foryou/${foryouCode}/create`}

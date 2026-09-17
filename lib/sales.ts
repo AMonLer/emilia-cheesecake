@@ -24,7 +24,6 @@ export interface SaleRow {
   address: string
   postalCode: string
   city: string
-  kanton: string
   deliveryDate: string
   deliveryTime: string
   items: SaleItem[]
@@ -182,7 +181,6 @@ export async function fetchSalesForMonth(monthStr: string): Promise<SalesSummary
         address: pi.metadata?.address?.trim() || '',
         postalCode: pi.metadata?.postalCode?.trim() || '',
         city: pi.metadata?.city?.trim() || '',
-        kanton: pi.metadata?.kanton?.trim() || '',
         deliveryDate: pi.metadata?.deliveryDate?.trim() || '',
         deliveryTime: pi.metadata?.deliveryTime?.trim() || '',
         items,

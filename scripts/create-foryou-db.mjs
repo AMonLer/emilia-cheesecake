@@ -63,6 +63,7 @@ const db = await notion.databases.create({
       'Video URL': { url: {} },
       'File URL': { url: {} },
       'File Name': { rich_text: {} },
+      'Stripe ID': { rich_text: {} },
       Status: { select: { options: [{ name: 'New' }, { name: 'Sent' }] } },
     },
   },

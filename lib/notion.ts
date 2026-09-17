@@ -16,7 +16,10 @@ export type OrderForNotion = {
   address: string
   postalCode: string
   city: string
-  kanton: string
+  recipientName?: string
+  recipientIsCompany?: boolean
+  recipientPhone?: string
+  foryouCode?: string
   deliveryDate: string // "dd.mm.yyyy" from toLocaleDateString('de-CH')
   deliveryTime: string // "HH:MM - HH:MM"
   amount: number
@@ -56,7 +59,13 @@ export async function createOrderInNotion(order: OrderForNotion) {
   const cakeTags = Array.from(
     new Set(order.items.filter((i) => i.name).map((i) => formatCakeTag(i.name, i.size))),
   )
-  const fullAddress = [order.address, `${order.postalCode} ${order.city}`.trim(), order.kanton]
+  const fullAddress = [
+    order.address,
+    `${order.postalCode} ${order.city}`.trim(),
+    order.recipientName
+      ? `Geschenk für ${order.recipientIsCompany ? 'Firma ' : ''}${order.recipientName}${order.recipientPhone ? ` · Tel. ${order.recipientPhone}` : ''}`
+      : '',
+  ]
     .filter(Boolean)
     .join(', ')
 
@@ -91,6 +100,10 @@ export async function createOrderInNotion(order: OrderForNotion) {
         'Stripe ID': {
           rich_text: [{ text: { content: order.paymentIntentId } }],
         },
+        ...(order.foryouCode ? {
+          'For You Code': { rich_text: [{ text: { content: order.foryouCode } }] },
+          'For You URL': { url: `https://emilialab.com/foryou/${order.foryouCode}` },
+        } : {}),
         Cakes: {
           multi_select: cakeTags.map((name) => ({ name })),
         },
@@ -110,6 +123,7 @@ export type ForYouMessage = {
   videoUrl?: string
   fileUrl?: string
   fileName?: string
+  paymentIntentId?: string
 }
 
 async function findForYouPageId(code: string): Promise<string | null> {
@@ -138,7 +152,7 @@ export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
     'Video URL': { url: rec.videoUrl || null },
     'File URL': { url: rec.fileUrl || null },
     'File Name': { rich_text: [{ text: { content: rec.fileName || '' } }] },
-    Status: { select: { name: 'New' } },
+    ...(rec.paymentIntentId ? { 'Stripe ID': { rich_text: [{ text: { content: rec.paymentIntentId } }] } } : {}),
   }
 
   try {
@@ -148,7 +162,7 @@ export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
     } else {
       await notion.pages.create({
         parent: { type: 'data_source_id', data_source_id: foryouDataSourceId } as any,
-        properties,
+        properties: { ...properties, Status: { select: { name: 'New' } } },
       })
     }
     console.log('✅ Mensaje For You guardado en Notion')

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { saveForYouMessage } from '@/lib/foryou-store'
+import { forYouCookieName, verifyForYouSession } from '@/lib/foryou-auth'
+import { getUploadCredentials } from '@/lib/cloudinary'
 
 const MAX_MESSAGE_LENGTH = 2000
 
@@ -15,17 +17,19 @@ export async function POST(req: NextRequest) {
     if (!code) {
       return NextResponse.json({ error: 'Missing code' }, { status: 400 })
     }
+    const session = verifyForYouSession(req.cookies.get(forYouCookieName(code))?.value, code)
+    if (!session) return NextResponse.json({ error: 'Payment authorization required' }, { status: 403 })
     if (!message && !videoUrl && !fileUrl) {
       return NextResponse.json({ error: 'Nothing to save' }, { status: 400 })
     }
     // Only accept media URLs that actually come from Cloudinary.
     for (const url of [videoUrl, fileUrl]) {
-      if (url && !/^https:\/\/res\.cloudinary\.com\//.test(url)) {
+      if (url && !url.startsWith(`https://res.cloudinary.com/${getUploadCredentials().cloudName}/`)) {
         return NextResponse.json({ error: 'Invalid media URL' }, { status: 400 })
       }
     }
 
-    const ok = await saveForYouMessage({ code, message, videoUrl, fileUrl, fileName })
+    const ok = await saveForYouMessage({ code, message, videoUrl, fileUrl, fileName, paymentIntentId: session.paymentIntentId })
     if (!ok) {
       return NextResponse.json({ error: 'Could not save message' }, { status: 500 })
     }
@@ -33,6 +37,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true })
   } catch (error: any) {
     console.error('Error saving For You message:', error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Could not save message' }, { status: 500 })
   }
 }

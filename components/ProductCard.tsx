@@ -24,16 +24,20 @@ interface ProductCardProps {
         bgColor: string
         textColor: string
     }
+    /** En móvil muestra una fila compacta (foto pequeña + nombre + precio +
+        botón de carrito) en vez de la tarjeta vertical: compra más rápida en
+        listados de una columna. Desktop siempre usa la tarjeta. */
+    compact?: boolean
     className?: string
 }
 
-export default function ProductCard({ href, image1, image2, name, description, priceSmall, priceLarge, slug, tag, className = "" }: ProductCardProps) {
+export default function ProductCard({ href, image1, image2, name, description, priceSmall, priceLarge, slug, tag, compact = false, className = "" }: ProductCardProps) {
     // Which of the two photos the mobile card is showing (0 = whole cake, 1 = slice).
     const [mobileImage, setMobileImage] = useState(0)
     const [showSizePopup, setShowSizePopup] = useState(false)
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const { addToCart } = useCart()
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
 
     // The sheet is portalled to <body>, so it needs to wait for the client.
     const [mounted, setMounted] = useState(false)
@@ -98,7 +102,40 @@ export default function ProductCard({ href, image1, image2, name, description, p
 
     return (
         <>
-            <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex flex-col ${className}`}>
+            {/* Fila compacta (solo móvil, solo si compact): compra rápida */}
+            {compact && (
+                <Link href={href} className={`md:hidden flex items-center gap-3 bg-[#F5E6D3] rounded-2xl p-2.5 cursor-pointer ${className}`}>
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
+                        <Image
+                            src={image1}
+                            alt={name}
+                            fill
+                            sizes="80px"
+                            className="object-cover"
+                        />
+                    </div>
+                    <div className="flex-1 min-w-0 text-left">
+                        <h3 className="font-black text-sm tracking-tight">{name}</h3>
+                        {priceSmall && (
+                            <div className="flex items-baseline gap-1 mt-0.5 text-[#651A1A]">
+                                <span className="text-xs font-medium opacity-60">{locale === 'de' ? 'ab' : 'from'}</span>
+                                <PriceDisplay amount={priceSmall} className="text-base" />
+                            </div>
+                        )}
+                    </div>
+                    {slug && (
+                        <button
+                            onClick={handleCartClick}
+                            aria-label={t.productInfo.addToCart}
+                            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white active:scale-95 transition-transform"
+                        >
+                            <ShoppingCart className="w-4 h-4" />
+                        </button>
+                    )}
+                </Link>
+            )}
+
+            <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${className}`}>
                 <div className="relative h-48 md:h-80">
                     {tag && (
                         <div className={`absolute top-0 left-4 h-24 w-8 ${tag.bgColor} rounded-b-lg flex items-center justify-center z-10`}>

@@ -14,6 +14,9 @@ interface AdminNotificationEmailProps {
   customerName: string
   customerEmail: string
   phone?: string
+  recipientName?: string
+  recipientIsCompany?: boolean
+  recipientPhone?: string
   orderId: string
   amount: number
   paymentMethod: string
@@ -26,7 +29,6 @@ interface AdminNotificationEmailProps {
   address: string
   city: string
   postalCode: string
-  kanton: string
   deliveryDate: string
   deliveryTime: string
 }
@@ -35,6 +37,9 @@ export default function AdminNotificationEmail({
   customerName = 'N/A',
   customerEmail = 'N/A',
   phone = 'N/A',
+  recipientName = '',
+  recipientIsCompany = false,
+  recipientPhone = '',
   orderId = 'pi_xxxxxxxxxxxxx',
   amount = 0,
   paymentMethod = 'card',
@@ -42,7 +47,6 @@ export default function AdminNotificationEmail({
   address = '',
   city = '',
   postalCode = '',
-  kanton = '',
   deliveryDate = '',
   deliveryTime = '',
 }: AdminNotificationEmailProps) {
@@ -84,9 +88,13 @@ export default function AdminNotificationEmail({
                 {address}
                 <br />
                 {postalCode} {city}
-                <br />
-                {kanton}
               </Text>
+              {recipientName && (
+                <Text style={detailText}>
+                  <strong>{recipientIsCompany ? 'Geschenk an Firma:' : 'Geschenk für:'}</strong> {recipientName}
+                  {recipientPhone ? ` · ${recipientPhone}` : ''}
+                </Text>
+              )}
             </Section>
 
             {/* Delivery Details */}

@@ -406,7 +406,6 @@ function AdminOrderRow({ row }: { row: SaleRow }) {
               {row.address}
               {row.address && (row.postalCode || row.city) ? ', ' : ''}
               {row.postalCode} {row.city}
-              {row.kanton ? ` (${row.kanton})` : ''}
             </span>
           </div>
         )}
