@@ -80,7 +80,7 @@ export default function FeaturedProducts() {
                         description=""
                     />
                     <ProductCard
-                        className="w-full col-span-2 max-w-[calc(50%-0.25rem)] mx-auto"
+                        className="w-full"
                         href="/product/cafe"
                         slug="cafe"
                         image1="/cafe1.png"

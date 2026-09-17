@@ -117,6 +117,12 @@ export default function ProductCard({ href, image1, image2, name, description, p
                     </div>
                     <div className="flex-1 min-w-0 text-left">
                         <h3 className="font-black text-sm tracking-tight">{name}</h3>
+                        {tag && (
+                            <p className="mt-0.5 flex items-center gap-1 text-[9px] font-black tracking-[0.12em] uppercase text-[#651A1A]">
+                                <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
+                                {tag.label}
+                            </p>
+                        )}
                         {priceSmall && (
                             <div className="flex items-baseline gap-1 mt-0.5 text-[#651A1A]">
                                 <span className="text-xs font-medium opacity-60">{locale === 'de' ? 'ab' : 'from'}</span>
