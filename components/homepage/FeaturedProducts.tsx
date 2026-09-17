@@ -29,7 +29,7 @@ export default function FeaturedProducts() {
                         slug="hippo"
                         image1="/hippo1.png"
                         image2="/hippo2.png"
-                        name="HIPPO"
+                        name="NOISETTE"
                         priceSmall={17.90}
                         priceLarge={45.90}
                         description=""
@@ -100,7 +100,7 @@ export default function FeaturedProducts() {
                             href="/product/hippo"
                             image1="/hippo1.png"
                             image2="/hippo2.png"
-                            name="HIPPO"
+                            name="NOISETTE"
                             priceSmall={17.90}
                             priceLarge={45.90}
                             description={p.hippo}

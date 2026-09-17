@@ -1,6 +1,6 @@
 export const products: { [key: string]: any } = {
     "hippo": {
-        name: "HIPPO",
+        name: "NOISETTE",
         limited: true,
         prices: {
             "8-10": 45.90,  // CHF for 8-10 people
@@ -56,7 +56,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 3,
-                name: "HIPPO",
+                name: "NOISETTE",
                 price: 45.90,
                 image: "/hippo1.png"
             }
@@ -90,7 +90,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 3,
-                name: "HIPPO",
+                name: "NOISETTE",
                 price: 45.90,
                 image: "/hippo1.png"
             }
@@ -124,7 +124,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 3,
-                name: "HIPPO",
+                name: "NOISETTE",
                 price: 45.90,
                 image: "/hippo1.png"
             }
@@ -158,7 +158,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 3,
-                name: "HIPPO",
+                name: "NOISETTE",
                 price: 45.90,
                 image: "/hippo1.png"
             }
@@ -192,7 +192,7 @@ export const products: { [key: string]: any } = {
             },
             {
                 id: 3,
-                name: "HIPPO",
+                name: "NOISETTE",
                 price: 45.90,
                 image: "/hippo1.png"
             }

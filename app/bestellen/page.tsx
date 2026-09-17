@@ -61,7 +61,7 @@ export default function BestellenPage() {
   }> = [
     {
       id: "hippo",
-      name: "HIPPO",
+      name: "NOISETTE",
       slug: "hippo",
       image1: "/hippo1.png",
       image2: "/hippo2.png",
