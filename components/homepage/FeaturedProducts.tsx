@@ -24,7 +24,7 @@ export default function FeaturedProducts() {
                 {/* Mobile: 2-column vertical grid */}
                 <Reveal delay={100} className="md:hidden grid grid-cols-2 gap-2">
                     <ProductCard
-                        className="w-full col-span-2"
+                        className="w-full"
                         href="/product/hippo"
                         slug="hippo"
                         image1="/hippo1.png"

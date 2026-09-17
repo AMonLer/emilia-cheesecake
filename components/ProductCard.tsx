@@ -139,13 +139,13 @@ export default function ProductCard({ href, image1, image2, name, description, p
             <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${className}`}>
                 <div className="relative h-48 md:h-80">
                     {tag && (
-                        <div className={`absolute top-2 right-2 md:top-3 md:left-3 md:right-auto z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/25 text-left border border-[#651A1A]/20`}>
-                            <span className="flex items-center gap-1 text-[9px] md:text-[10px] font-black tracking-[0.18em] uppercase leading-none">
-                                <Sparkles className="h-2.5 w-2.5 md:h-3 md:w-3 shrink-0" strokeWidth={2.5} />
+                        <div className={`absolute top-2 left-2 md:top-3 z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2 py-1 md:px-2.5 md:py-1.5 shadow-lg shadow-black/25 text-left border border-[#651A1A]/20`}>
+                            <span className="flex items-center gap-1 text-[8px] md:text-[10px] font-black tracking-[0.12em] md:tracking-[0.18em] uppercase leading-none whitespace-nowrap">
+                                <Sparkles className="h-2 w-2 md:h-3 md:w-3 shrink-0" strokeWidth={2.5} />
                                 {tag.label}
                             </span>
                             {tag.subLabel && (
-                                <span className="block mt-1 text-[8px] md:text-[9px] font-medium italic opacity-80 leading-none">
+                                <span className="hidden md:block mt-1 text-[9px] font-medium italic opacity-80 leading-none">
                                     {tag.subLabel}
                                 </span>
                             )}
@@ -187,9 +187,11 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             className={`object-cover absolute inset-0 transition-opacity duration-300 ${mobileImage === 1 ? 'opacity-100' : 'opacity-0'}`}
                         />
 
-                        <span className="absolute top-2 left-2 z-20 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full">
-                            + info
-                        </span>
+                        {!tag && (
+                            <span className="absolute top-2 left-2 z-20 text-[9px] text-white/70 bg-black/30 px-1.5 py-0.5 rounded-full">
+                                + info
+                            </span>
+                        )}
 
                         {/* Arrows and dots share one row at the foot of the photo, so the
                             middle of the image stays free to tap through to the product. */}
