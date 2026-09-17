@@ -57,6 +57,8 @@ async function uploadToCloudinary(
 }
 
 export default function CreateForYouMessage({ params }: { params: { code: string } }) {
+  // El comprador nunca necesita ver el código: viaja en la URL y en su sesión.
+  // El código impreso lo pega la tienda y lo usa quien recibe la tarta.
   const code = params.code.toUpperCase()
 
   const [message, setMessage] = useState("")
@@ -68,7 +70,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   const [error, setError] = useState("")
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
-  const [copied, setCopied] = useState(false)
   const [authorized, setAuthorized] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -88,23 +89,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
       .catch(() => { if (!cancelled) setAuthorized(false) })
     return () => { cancelled = true }
   }, [code])
-
-  const copyLink = async () => {
-    const url = `${window.location.origin}/foryou/${code}`
-    try {
-      await navigator.clipboard.writeText(url)
-    } catch {
-      // Portapapeles no disponible (permisos/iOS viejo): plan B con textarea
-      const ta = document.createElement("textarea")
-      ta.value = url
-      document.body.appendChild(ta)
-      ta.select()
-      document.execCommand("copy")
-      document.body.removeChild(ta)
-    }
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2500)
-  }
 
   const videoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -203,49 +187,12 @@ export default function CreateForYouMessage({ params }: { params: { code: string
           <p className="text-[#F5E6D3]/60 text-xs tracking-[0.35em] uppercase font-bold mb-3">
             Message saved
           </p>
-          <h1 className="text-5xl font-black text-white tracking-tight leading-[0.95] mb-10">
+          <h1 className="text-5xl font-black text-white tracking-tight leading-[0.95] mb-6">
             All <span className="font-serif italic font-medium text-[#F5E6D3]">set.</span>
           </h1>
-
-          {/* Etiqueta de regalo con el código */}
-          <div className="relative w-full rounded-3xl bg-[#F5E6D3] px-8 pt-10 pb-8 shadow-2xl">
-            <div className="absolute -top-3 left-1/2 h-6 w-6 -translate-x-1/2 rounded-full bg-[#651A1A] ring-4 ring-[#F5E6D3]/60" />
-            <p className="text-[0.65rem] font-bold uppercase tracking-[0.35em] text-[#651A1A]/50 mb-2">
-              Your code
-            </p>
-            <p className="text-4xl font-black tracking-[0.18em] text-[#651A1A] mb-4">{code}</p>
-            <div className="mx-auto mb-4 h-px w-16 bg-[#651A1A]/20" />
-            <p className="text-sm font-light leading-relaxed text-[#651A1A]/70">
-              We print this code on the card that travels with your cake.
-              They scan it — and your message opens.
-            </p>
-          </div>
-
-          {/* Acciones */}
-          <div className="mt-8 w-full space-y-3">
-            <Link
-              href={`/foryou/${code}`}
-              className="block w-full rounded-2xl bg-white py-4 text-sm font-black uppercase tracking-[0.2em] text-[#651A1A] transition-colors hover:bg-[#F5E6D3]"
-            >
-              See what they&apos;ll see
-            </Link>
-            <button
-              type="button"
-              onClick={copyLink}
-              className="w-full rounded-2xl border border-white/25 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white/80 transition-colors hover:bg-white/10"
-            >
-              {copied ? (
-                <span className="inline-flex items-center justify-center gap-2">
-                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Link copied
-                </span>
-              ) : (
-                "Copy the link"
-              )}
-            </button>
-          </div>
+          <p className="text-white/60 font-light leading-relaxed max-w-xs text-sm">
+            We print the card and add it to your cake. They scan it — and your message opens.
+          </p>
 
           <p className="mt-10 text-xs text-white/30 tracking-wider">
             emilialab.com · Handcrafted in Zürich
@@ -269,9 +216,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
             className="object-contain mb-8"
             style={{ filter: "brightness(0) saturate(100%) invert(14%) sepia(60%) saturate(800%) hue-rotate(320deg) brightness(70%)" }}
           />
-          <p className="text-xs tracking-[0.35em] text-[#651A1A]/60 font-bold uppercase mb-4">
-            Code · {code}
-          </p>
           <h1 className="text-4xl md:text-5xl font-black text-[#651A1A] tracking-tight leading-[0.95] mb-3">
             Leave a message<br />
             <span className="font-serif italic font-medium text-5xl md:text-6xl">they&apos;ll never forget</span>
