@@ -196,3 +196,53 @@ export async function getForYouMessage(code: string): Promise<ForYouMessage | nu
     return null
   }
 }
+
+/** Todos los códigos de sticker ya entregados (haya mensaje grabado o solo reserva). */
+export async function listUsedForYouCodes(): Promise<Set<string>> {
+  const used = new Set<string>()
+  if (!notion || !foryouDataSourceId) return used
+  try {
+    let cursor: string | undefined
+    do {
+      const res = await (notion as any).dataSources.query({
+        data_source_id: foryouDataSourceId,
+        page_size: 100,
+        ...(cursor ? { start_cursor: cursor } : {}),
+      })
+      for (const page of res.results) {
+        const title = page.properties?.Code?.title?.[0]?.plain_text
+        if (title) used.add(String(title).trim())
+      }
+      cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined
+    } while (cursor)
+  } catch (err) {
+    console.error('Error listando códigos For You usados:', err)
+  }
+  return used
+}
+
+/**
+ * Reserva un código de sticker nada más cobrarse el pedido, para no entregarlo
+ * dos veces. La fila queda con Status "Assigned" hasta que el cliente graba su
+ * mensaje (saveForYouMessage la encuentra por código y la actualiza).
+ */
+export async function reserveForYouCode(code: string, paymentIntentId: string): Promise<boolean> {
+  if (!notion || !foryouDataSourceId) {
+    console.warn('Notion For You no configurado, saltando')
+    return false
+  }
+  try {
+    await notion.pages.create({
+      parent: { type: 'data_source_id', data_source_id: foryouDataSourceId } as any,
+      properties: {
+        Code: { title: [{ text: { content: code } }] },
+        Status: { select: { name: 'Assigned' } },
+        ...(paymentIntentId ? { 'Stripe ID': { rich_text: [{ text: { content: paymentIntentId } }] } } : {}),
+      },
+    })
+    return true
+  } catch (err) {
+    console.error('Error reservando código For You en Notion:', err)
+    return false
+  }
+}

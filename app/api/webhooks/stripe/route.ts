@@ -5,6 +5,8 @@ import { render } from '@react-email/render'
 import OrderConfirmationEmail from '@/emails/OrderConfirmation'
 import AdminNotificationEmail from '@/emails/AdminNotification'
 import { createOrderInNotion } from '@/lib/notion'
+import { forYouRangeForItems, nextFreeForYouCode } from '@/lib/foryou-code'
+import { listUsedForYouCodes, reserveForYouCode } from '@/lib/foryou-store'
 import crypto from 'crypto'
 
 const META_PIXEL_ID = '26409977948633382'
@@ -122,24 +124,51 @@ export async function POST(req: NextRequest) {
       const metadata = paymentIntent.metadata
       const amount = paymentIntent.amount / 100 // Convertir de centavos a francos
 
-      // Formatear productos para Telegram
-      let productsText = 'Ver en Stripe'
+      // Parsear items una sola vez: Telegram, rango del sticker For You y Notion
+      let items: any[] = []
       try {
         if (metadata.items) {
-          const items = JSON.parse(metadata.items)
-          productsText = items.map((item: any) =>
-            `• ${item.name} (${item.size || 'N/A'}) x${item.quantity} - CHF ${(item.price * item.quantity).toFixed(2)}`
-          ).join('\n')
+          items = JSON.parse(metadata.items)
         }
       } catch (e) {
         console.error('Error parseando items:', e)
       }
 
-      // Regalo: si el cliente lo marcó, hay que imprimir la tarjeta con el código
+      // Formatear productos para Telegram
+      const productsText = items.length
+        ? items.map((item: any) =>
+            `• ${item.name} (${item.size || 'N/A'}) x${item.quantity} - CHF ${(item.price * item.quantity).toFixed(2)}`
+          ).join('\n')
+        : 'Ver en Stripe'
+
+      // Sticker For You: los códigos ya están impresos (2000–2300 para tarta
+      // pequeña, 3001–3200 para grande; si el pedido mezcla tamaños, el sticker
+      // va en la grande). Se asigna tras cobrar para no quemar stickers en pagos
+      // abandonados, y se reserva en Notion para no entregar el mismo dos veces.
       const isGift = metadata.isGift === 'yes'
-      const foryouCode = metadata.foryouCode || ''
+      let foryouCode = metadata.foryouCode || ''
+      let foryouAlert = ''
+      if (isGift && !foryouCode) {
+        try {
+          const range = forYouRangeForItems(items)
+          const next = nextFreeForYouCode(await listUsedForYouCodes(), range)
+          if (!next) {
+            foryouAlert = `\n⚠️ <b>SIN STICKERS FOR YOU</b> en el rango ${range === 'large' ? '3001–3200 (grande)' : '2000–2300 (pequeña)'}: reimprimir y asignar uno a mano`
+          } else if (await reserveForYouCode(next, paymentIntent.id)) {
+            await stripe.paymentIntents.update(paymentIntent.id, { metadata: { foryouCode: next } })
+            foryouCode = next
+          } else {
+            foryouAlert = `\n⚠️ No se pudo reservar el sticker ${next} en Notion: asignarlo a mano`
+          }
+        } catch (e) {
+          console.error('Error asignando código For You:', e)
+          foryouAlert = '\n⚠️ Error asignando el sticker For You: asignarlo a mano'
+        }
+      }
+
+      // Regalo: si el cliente lo marcó, hay que pegar el sticker con su código
       const giftBlock = isGift
-        ? `\n🎁 <b>MENSAJE PERSONAL</b>\n👉 Imprimir sticker/sleeve con QR/código: <code>${foryouCode}</code>\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${metadata.recipientName || '—'}${metadata.recipientPhone ? ` · Tel: ${metadata.recipientPhone}` : ''}\n`
+        ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${metadata.recipientName || '—'}${metadata.recipientPhone ? ` · Tel: ${metadata.recipientPhone}` : ''}\n`
         : ''
 
       // Enviar notificación por Telegram
@@ -168,16 +197,6 @@ ${productsText}
       `.trim()
 
       await sendTelegramMessage(telegramMessage)
-
-      // Parsear items del pedido
-      let items: any[] = []
-      try {
-        if (metadata.items) {
-          items = JSON.parse(metadata.items)
-        }
-      } catch (e) {
-        console.error('Error parseando items:', e)
-      }
 
       // Email al cliente con React Email
       const customerEmailHtml = await render(
@@ -238,7 +257,7 @@ ${productsText}
       // Crear pedido en Notion (calendario móvil)
       await createOrderInNotion({
         paymentIntentId: paymentIntent.id,
-        foryouCode: metadata.foryouCode || '',
+        foryouCode,
         customerName: metadata.customerName || '',
         customerEmail: metadata.customerEmail || '',
         customerPhone: metadata.customerPhone || '',

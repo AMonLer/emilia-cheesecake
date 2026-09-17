@@ -64,7 +64,7 @@ const db = await notion.databases.create({
       'File URL': { url: {} },
       'File Name': { rich_text: {} },
       'Stripe ID': { rich_text: {} },
-      Status: { select: { options: [{ name: 'New' }, { name: 'Sent' }] } },
+      Status: { select: { options: [{ name: 'Assigned' }, { name: 'New' }, { name: 'Sent' }] } },
     },
   },
 })

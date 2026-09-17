@@ -43,15 +43,22 @@ function PaymentSuccessContent() {
       const value = orderValue ? parseFloat(orderValue) : 60.0
 
       if (paymentIntent) {
-        // Recuperar el código para el mensaje personal de este pedido
-        fetch('/api/foryou/code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentIntentId: paymentIntent, clientSecret }),
-        })
-          .then((res) => res.json())
-          .then((data) => { if (data?.code) setForyouCode(data.code) })
-          .catch(() => {})
+        // El sticker lo asigna el webhook tras cobrar; si aún no está (pending),
+        // reintentar cada 2s hasta que aparezca (~30s máximo).
+        const fetchForYouCode = (attempt: number) => {
+          fetch('/api/foryou/code', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentIntentId: paymentIntent, clientSecret }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data?.code) setForyouCode(data.code)
+              else if (data?.pending && attempt < 15) setTimeout(() => fetchForYouCode(attempt + 1), 2000)
+            })
+            .catch(() => {})
+        }
+        fetchForYouCode(0)
       }
 
       if (typeof window !== 'undefined' && window.fbq) {
@@ -81,7 +88,7 @@ function PaymentSuccessContent() {
     // Atajo SOLO para desarrollo: ?demo=1 muestra el bloque sin pago real
     if (searchParams.get('demo') === '1' && process.env.NODE_ENV !== 'production') {
       setStatus('succeeded')
-      setForyouCode('EM-DEMO01')
+      setForyouCode('2000')
       return
     }
 

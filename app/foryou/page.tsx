@@ -55,6 +55,9 @@ export default function ForYouPage() {
         <form onSubmit={handleSubmit} className="w-full space-y-4">
           <input
             type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
             value={code}
             onChange={(e) => { setCode(e.target.value); setError("") }}
             placeholder="Enter your code"

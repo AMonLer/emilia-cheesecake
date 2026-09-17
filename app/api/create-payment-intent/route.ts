@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { generateForYouCode } from '@/lib/foryou-code'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -30,10 +29,10 @@ export async function POST(req: NextRequest) {
       finalAmount = subtotal - discountValue + shippingCost
     }
 
-    // Código para el mensaje personal "For You": solo se genera si es un regalo,
-    // así solo imprimimos la tarjeta con QR para los pedidos que lo necesitan.
+    // El sticker For You ya no se genera aquí: los códigos están impresos y el
+    // webhook asigna el siguiente libre tras cobrar (así no se queman stickers
+    // en pagos abandonados). Aquí solo queda constancia de si es regalo.
     const isGift = Boolean(orderData?.isGift)
-    const foryouCode = isGift ? generateForYouCode() : ''
 
     // Crear Payment Intent con metadata del pedido
     const paymentIntent = await stripe.paymentIntents.create({
@@ -41,7 +40,7 @@ export async function POST(req: NextRequest) {
       currency: 'chf',
       automatic_payment_methods: { enabled: true },
       metadata: {
-        foryouCode,
+        foryouCode: '',
         isGift: isGift ? 'yes' : 'no',
         customerEmail: orderData?.email || '',
         customerPhone: orderData?.phone || '',

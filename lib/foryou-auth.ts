@@ -1,7 +1,14 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
+import { FORYOU_RANGES } from './foryou-code'
 
 export const FORYOU_SESSION_SECONDS = 30 * 24 * 60 * 60
-export const isForYouCode = (code: string) => /^EM-[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{6}$/.test(code)
+// Los códigos válidos son los de los stickers impresos: 2000–2300 y 3001–3200.
+export const isForYouCode = (code: string) => {
+  if (!/^\d{4}$/.test(code)) return false
+  const n = Number(code)
+  return (n >= FORYOU_RANGES.small.min && n <= FORYOU_RANGES.small.max)
+      || (n >= FORYOU_RANGES.large.min && n <= FORYOU_RANGES.large.max)
+}
 export const forYouCookieName = (code: string) => `emilia-foryou-${code}`
 
 function signature(payload: string): string {

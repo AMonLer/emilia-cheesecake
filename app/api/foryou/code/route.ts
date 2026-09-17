@@ -31,7 +31,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ code: null })
     }
     const code = intent.metadata?.foryouCode || ''
-    if (!isForYouCode(code)) return NextResponse.json({ code: null })
+    if (!isForYouCode(code)) {
+      // Regalo sin código todavía: el webhook está asignando el sticker.
+      // La página de confirmación reintenta unos segundos hasta que aparezca.
+      return NextResponse.json({ code: null, pending: intent.metadata?.isGift === 'yes' })
+    }
     const response = NextResponse.json({ code }, { headers: { 'Cache-Control': 'no-store' } })
     response.cookies.set(forYouCookieName(code), createForYouSession(code, intent.id), {
       httpOnly: true,
