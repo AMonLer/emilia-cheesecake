@@ -33,7 +33,7 @@ export default function FeaturedProducts() {
                         priceSmall={17.90}
                         priceLarge={45.90}
                         description=""
-                        tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
+                        tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#F5E6D3]", textColor: "text-[#651A1A]" }}
                     />
                     <ProductCard
                         className="w-full"
@@ -104,7 +104,7 @@ export default function FeaturedProducts() {
                             priceSmall={17.90}
                             priceLarge={45.90}
                             description={p.hippo}
-                            tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }}
+                            tag={{ label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#F5E6D3]", textColor: "text-[#651A1A]" }}
                         />
 
                         <ProductCard

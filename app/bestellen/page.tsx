@@ -68,7 +68,7 @@ export default function BestellenPage() {
       priceSmall: 17.90,
       priceLarge: 45.90,
       description: p.hippo,
-      tag: { label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#651A1A]", textColor: "text-[#F5E6D3]" }
+      tag: { label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#F5E6D3]", textColor: "text-[#651A1A]" }
     },
     {
       id: "clasica",

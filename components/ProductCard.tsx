@@ -139,7 +139,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
             <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${className}`}>
                 <div className="relative h-48 md:h-80">
                     {tag && (
-                        <div className={`absolute top-2 right-2 md:top-3 md:left-3 md:right-auto z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/25 text-left`}>
+                        <div className={`absolute top-2 right-2 md:top-3 md:left-3 md:right-auto z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2.5 py-1.5 shadow-lg shadow-black/25 text-left border border-[#651A1A]/20`}>
                             <span className="flex items-center gap-1 text-[9px] md:text-[10px] font-black tracking-[0.18em] uppercase leading-none">
                                 <Sparkles className="h-2.5 w-2.5 md:h-3 md:w-3 shrink-0" strokeWidth={2.5} />
                                 {tag.label}

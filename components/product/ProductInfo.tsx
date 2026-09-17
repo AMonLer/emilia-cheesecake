@@ -60,7 +60,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         return (
             <div className="flex flex-col justify-center h-full">
                 {product.limited && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#651A1A] text-[#F5E6D3] px-2.5 py-1 mb-2 shadow-md shadow-[#651A1A]/25">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5E6D3] text-[#651A1A] border border-[#651A1A]/20 px-2.5 py-1 mb-2 shadow-sm">
                         <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
                         <span className="text-[9px] font-black tracking-[0.2em] uppercase leading-none">{t.products.monthlySpecial}</span>
                         <span className="text-[9px] font-medium italic opacity-80 leading-none">· {t.products.limited}</span>
@@ -223,7 +223,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         <div className="flex flex-col h-full justify-center">
             <div className="mb-4">
                 {product.limited && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#651A1A] text-[#F5E6D3] px-3 py-1.5 mb-3 shadow-md shadow-[#651A1A]/25">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5E6D3] text-[#651A1A] border border-[#651A1A]/20 px-3 py-1.5 mb-3 shadow-sm">
                         <Sparkles className="h-3 w-3 shrink-0" strokeWidth={2.5} />
                         <span className="text-[11px] font-black tracking-[0.2em] uppercase leading-none">{t.products.monthlySpecial}</span>
                         <span className="text-[11px] font-medium italic opacity-80 leading-none">· {t.products.limited}</span>
