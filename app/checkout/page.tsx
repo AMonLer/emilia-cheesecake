@@ -172,6 +172,30 @@ function CheckoutContent() {
     }
   }, [])
 
+  // Errores JS del navegador (p. ej. "Java object is gone" del WebView de Instagram)
+  // → /api/client-error → Telegram. Antes solo se veían como "sesiones atascadas"
+  // en las grabaciones de Clarity, sin saber qué fallaba.
+  useEffect(() => {
+    const report = (message: string, source?: string, line?: number) => {
+      try {
+        const body = JSON.stringify({ message, source, line, url: location.pathname, ua: navigator.userAgent })
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon('/api/client-error', new Blob([body], { type: 'application/json' }))
+        } else {
+          fetch('/api/client-error', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true })
+        }
+      } catch { }
+    }
+    const onError = (e: ErrorEvent) => report(e.message, e.filename, e.lineno)
+    const onRejection = (e: PromiseRejectionEvent) => report('unhandledrejection: ' + String((e.reason as any)?.message || e.reason).slice(0, 200))
+    window.addEventListener('error', onError)
+    window.addEventListener('unhandledrejection', onRejection)
+    return () => {
+      window.removeEventListener('error', onError)
+      window.removeEventListener('unhandledrejection', onRejection)
+    }
+  }, [])
+
   // "Ahora" vivo: una pestaña que lleva horas abierta seguiría midiendo las 36h desde
   // el momento de carga, así que lo refrescamos mientras se está eligiendo la entrega.
   const [now, setNow] = useState(() => new Date())
@@ -359,16 +383,43 @@ function CheckoutContent() {
   const handleContinueToDelivery = (e: React.MouseEvent | React.FormEvent) => {
     e.preventDefault()
 
+    // El navegador interno de Instagram (Android) a veces autocompleta los campos
+    // sin disparar onChange: el input se ve lleno pero el estado está vacío y la
+    // validación marcaba como vacíos campos que el cliente veía rellenos. Antes de
+    // validar leemos el DOM como respaldo y sincronizamos el estado.
+    const formEl = (e.currentTarget as HTMLElement).closest('form')
+    const dom = (name: string) =>
+      (formEl?.querySelector(`input[name="${name}"]`) as HTMLInputElement | null)?.value.trim() || ''
+    if (!email && dom('email')) setEmail(dom('email'))
+    if (!firstName && dom('firstName')) setFirstName(dom('firstName'))
+    if (!lastName && dom('lastName')) setLastName(dom('lastName'))
+    if (!address && dom('address')) setAddress(dom('address'))
+    if (!city && dom('city')) setCity(dom('city'))
+    if (!postalCode && dom('postalCode')) setPostalCode(dom('postalCode'))
+    if (isGift && !recipientIsCompany && !recipientFirstName && dom('recipientFirstName')) setRecipientFirstName(dom('recipientFirstName'))
+    if (isGift && !recipientIsCompany && !recipientLastName && dom('recipientLastName')) setRecipientLastName(dom('recipientLastName'))
+    if (isGift && recipientIsCompany && !recipientCompany && dom('recipientCompany')) setRecipientCompany(dom('recipientCompany'))
+
+    const vEmail = email.trim() || dom('email')
+    const vFirstName = firstName.trim() || dom('firstName')
+    const vLastName = lastName.trim() || dom('lastName')
+    const vAddress = address.trim() || dom('address')
+    const vCity = city.trim() || dom('city')
+    const vPostalCode = postalCode.trim() || dom('postalCode')
+    const vRecipientCompany = recipientCompany.trim() || dom('recipientCompany')
+    const vRecipientFirstName = recipientFirstName.trim() || dom('recipientFirstName')
+    const vRecipientLastName = recipientLastName.trim() || dom('recipientLastName')
+
     const missing = new Set<string>()
-    if (!email) missing.add("email")
-    if (!firstName) missing.add("firstName")
-    if (!lastName) missing.add("lastName")
-    if (!address) missing.add("address")
-    if (!city) missing.add("city")
-    if (!postalCode) missing.add("postalCode")
-    if (isGift && recipientIsCompany && !recipientCompany.trim()) missing.add("recipientCompany")
-    if (isGift && !recipientIsCompany && !recipientFirstName.trim()) missing.add("recipientFirstName")
-    if (isGift && !recipientIsCompany && !recipientLastName.trim()) missing.add("recipientLastName")
+    if (!vEmail) missing.add("email")
+    if (!vFirstName) missing.add("firstName")
+    if (!vLastName) missing.add("lastName")
+    if (!vAddress) missing.add("address")
+    if (!vCity) missing.add("city")
+    if (!vPostalCode) missing.add("postalCode")
+    if (isGift && recipientIsCompany && !vRecipientCompany) missing.add("recipientCompany")
+    if (isGift && !recipientIsCompany && !vRecipientFirstName) missing.add("recipientFirstName")
+    if (isGift && !recipientIsCompany && !vRecipientLastName) missing.add("recipientLastName")
     setMissingFields(missing)
 
     if (missing.size > 0) {
@@ -383,7 +434,7 @@ function CheckoutContent() {
     }
 
     // Validate postal code is within delivery area
-    if (!isPostalCodeValid(postalCode)) {
+    if (!isPostalCodeValid(vPostalCode)) {
       setPostalCodeError(c.postalCodeError)
       setFormError("")
       return
@@ -491,6 +542,7 @@ function CheckoutContent() {
     <div className="grid grid-cols-2 gap-4">
       <input
         type="text"
+        name="firstName"
         placeholder={c.firstNamePlaceholder}
         value={firstName}
         onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
@@ -502,6 +554,7 @@ function CheckoutContent() {
       />
       <input
         type="text"
+        name="lastName"
         placeholder={c.lastNamePlaceholder}
         value={lastName}
         onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
@@ -538,6 +591,7 @@ function CheckoutContent() {
       {recipientIsCompany ? (
         <input
           type="text"
+          name="recipientCompany"
           placeholder={locale === 'de' ? 'Firmenname' : 'Company name'}
           value={recipientCompany}
           onChange={(e) => { setRecipientCompany(e.target.value); if (missingFields.has('recipientCompany')) { const m = new Set(missingFields); m.delete('recipientCompany'); setMissingFields(m) } }}
@@ -550,6 +604,7 @@ function CheckoutContent() {
         <div className="grid grid-cols-2 gap-4">
           <input
             type="text"
+            name="recipientFirstName"
             placeholder={locale === 'de' ? 'Vorname des Empfängers' : "Recipient's first name"}
             value={recipientFirstName}
             onChange={(e) => { setRecipientFirstName(e.target.value); if (missingFields.has('recipientFirstName')) { const m = new Set(missingFields); m.delete('recipientFirstName'); setMissingFields(m) } }}
@@ -560,6 +615,7 @@ function CheckoutContent() {
           />
           <input
             type="text"
+            name="recipientLastName"
             placeholder={locale === 'de' ? 'Nachname des Empfängers' : "Recipient's last name"}
             value={recipientLastName}
             onChange={(e) => { setRecipientLastName(e.target.value); if (missingFields.has('recipientLastName')) { const m = new Set(missingFields); m.delete('recipientLastName'); setMissingFields(m) } }}
@@ -860,6 +916,7 @@ function CheckoutContent() {
                 {isGift && <div className="mb-4">{nameFields}</div>}
                 <input
                   type="email"
+                  name="email"
                   placeholder={c.emailPlaceholder}
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
@@ -903,6 +960,7 @@ function CheckoutContent() {
 
                       <input
                         type="text"
+                        name="address"
                         placeholder={c.addressPlaceholder}
                         value={address}
                         onChange={(e) => { setAddress(e.target.value); if (missingFields.has('address')) { const m = new Set(missingFields); m.delete('address'); setMissingFields(m) } }}
@@ -916,6 +974,7 @@ function CheckoutContent() {
                       <div className="grid grid-cols-2 gap-4">
                         <input
                           type="text"
+                          name="city"
                           placeholder={c.cityPlaceholder}
                           value={city}
                           onChange={(e) => { setCity(e.target.value); if (missingFields.has('city')) { const m = new Set(missingFields); m.delete('city'); setMissingFields(m) } }}
@@ -927,6 +986,7 @@ function CheckoutContent() {
                         />
                         <input
                           type="text"
+                          name="postalCode"
                           placeholder={c.postalCodePlaceholder}
                           value={postalCode}
                           onChange={(e) => {
