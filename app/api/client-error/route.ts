@@ -11,6 +11,12 @@ export async function POST(req: NextRequest) {
     const text = String(message || '').slice(0, 300)
     if (!text) return NextResponse.json({ ok: false }, { status: 400 })
 
+    // "Script error." = error enmascarado de un script de terceros (Stripe,
+    // Clarity, Google) dentro de un WebView: no contiene información útil.
+    if (text === 'Script error.' || text === 'Script error') {
+      return NextResponse.json({ ok: true, ignored: true })
+    }
+
     const key = text
     const now = Date.now()
     if (now - (lastSent.get(key) || 0) < 10 * 60 * 1000) {

@@ -177,6 +177,9 @@ function CheckoutContent() {
   // en las grabaciones de Clarity, sin saber qué fallaba.
   useEffect(() => {
     const report = (message: string, source?: string, line?: number) => {
+      // "Script error." es el error enmascarado que dan los scripts de terceros
+      // (Stripe, Clarity, Google) en WebViews: no dice nada y solo genera ruido.
+      if (!message || message === 'Script error.' || message === 'Script error') return
       try {
         const body = JSON.stringify({ message, source, line, url: location.pathname, ua: navigator.userAgent })
         if (navigator.sendBeacon) {
