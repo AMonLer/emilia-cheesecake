@@ -49,10 +49,9 @@ export type Translations = {
   }
   forYou: {
     eyebrow: string
-    free: string
+    included: string
     title1: string
     titleSerif: string
-    title2: string
     desc: string
     step1Title: string
     step1Desc: string
@@ -61,15 +60,22 @@ export type Translations = {
     step3Title: string
     step3Desc: string
     cta: string
+    ctaNote: string
     flowLabel: string
     flowStep1: string
     flowStep2: string
     flowStep3: string
     flowNote: string
+    examplesLabel: string
+    birthdayLabel: string
+    thankYouLabel: string
+    pauseExamples: string
+    playExamples: string
     previewLabel: string
+    previewImageAlt: string
+    thankYouImageAlt: string
     previewMessage: string
     previewMessage2: string
-    previewMessage3: string
   }
   experience: {
     locationLabel: string
@@ -259,27 +265,33 @@ export const translations: Record<Locale, Translations> = {
     },
     forYou: {
       eyebrow: 'Neu · Emilia For You',
-      free: 'Kostenlos',
-      title1: 'VERSCHENKE EINEN',
-      titleSerif: 'Moment,',
-      title2: 'NICHT NUR EINEN KUCHEN.',
-      desc: 'Nimm ein Video auf, füge ein Foto hinzu oder schreibe eine Nachricht. Dein Lieblingsmensch öffnet deine Botschaft über einen Code, der dem Kuchen beiliegt.',
-      step1Title: 'Als Geschenk bestellen',
-      step1Desc: 'Wähle im Checkout die Option „Mach es persönlich“.',
+      included: 'Personalisierung inklusive',
+      title1: 'Der Lieblingskuchen.',
+      titleSerif: 'Deine persönliche Botschaft.',
+      desc: 'Zum Geburtstag oder einfach als Dankeschön: Mach dein Geschenk persönlich. Ergänze ein Video, Foto oder eine Nachricht, die dein Lieblingsmensch über den Code beim Kuchen öffnet.',
+      step1Title: 'Kuchen als Geschenk wählen',
+      step1Desc: 'Wähle deinen Kuchen und im Checkout die Option „Mach es persönlich“.',
       step2Title: 'Botschaft gestalten',
-      step2Desc: 'Video, Foto oder Nachricht — direkt von deinem Handy, in einer Minute erledigt.',
+      step2Desc: 'Füge nach der Zahlung dein Video, Foto oder deine Nachricht hinzu.',
       step3Title: 'Moment verschenken',
-      step3Desc: 'Der Code kommt als Sticker oder Sleeve auf deinen Kuchen. Damit öffnet dein Lieblingsmensch deine Botschaft auf unserer Seite.',
-      cta: 'Nachricht senden',
+      step3Desc: 'Dein Lieblingsmensch erhält den Kuchen und öffnet deine Botschaft mit dem beiliegenden Code.',
+      cta: 'Geschenk personalisieren',
+      ctaNote: 'Wähle zuerst deinen Kuchen. Deine Botschaft fügst du nach der Zahlung hinzu.',
       flowLabel: 'So geht’s:',
       flowStep1: 'Kuchen wählen',
       flowStep2: 'Bezahlen',
-      flowStep3: 'Nachricht aufnehmen',
-      flowNote: 'nach der Zahlung — dauert 1 Minute',
-      previewLabel: 'A message for you',
-      previewMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniesse jeden Bissen. ❤️',
-      previewMessage2: 'Überraschung — wir fliegen auf die Malediven! 🌴',
-      previewMessage3: 'Hiermit bewerbe ich mich — Lebenslauf hängt an. Ich hoffe, der Kuchen hilft :)',
+      flowStep3: 'Botschaft hinzufügen',
+      flowNote: 'Video, Foto oder Nachricht',
+      examplesLabel: 'Anlass für die Beispielnachricht wählen',
+      birthdayLabel: 'Geburtstag',
+      thankYouLabel: 'Dankeschön',
+      pauseExamples: 'Beispiele pausieren',
+      playExamples: 'Beispiele abspielen',
+      previewLabel: 'Eine Nachricht für dich',
+      previewImageAlt: 'Eine Mutter mit ihrer Tochter',
+      thankYouImageAlt: 'Zwei Frauen vor einer grünen Berglandschaft',
+      previewMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniesse jeden Bissen.',
+      previewMessage2: 'Danke, dass du immer für mich da bist. Dieser Kuchen ist für dich.',
     },
     experience: {
       locationLabel: 'AUS ZÜRICH',
@@ -467,27 +479,33 @@ export const translations: Record<Locale, Translations> = {
     },
     forYou: {
       eyebrow: 'New · Emilia For You',
-      free: 'Free',
-      title1: 'SEND A',
-      titleSerif: 'message,',
-      title2: 'NOT JUST A CAKE.',
-      desc: 'Record a video, add a photo or write a note. Your favourite person opens your message with a code that comes with the cake.',
-      step1Title: 'Order as a gift',
-      step1Desc: 'Choose the "Make it personal" option at checkout.',
+      included: 'Personalisation included',
+      title1: 'Their favourite cake.',
+      titleSerif: 'Your personal message.',
+      desc: 'Make their birthday or your thank-you a little more personal. Add a video, photo or note they can open with the code included with their cake.',
+      step1Title: 'Choose a cake to gift',
+      step1Desc: 'Pick your cake and choose "Make it personal" at checkout.',
       step2Title: 'Create your message',
-      step2Desc: 'Video, photo or note — straight from your phone, done in a minute.',
+      step2Desc: 'Add your video, photo or note after payment.',
       step3Title: 'Gift the moment',
-      step3Desc: 'The code comes as a sticker or sleeve on your cake. With it, your favourite person opens your message on our page.',
-      cta: 'Send a message',
+      step3Desc: 'They receive their cake and open your message with the code included.',
+      cta: 'Personalise your gift',
+      ctaNote: 'Choose your cake first. Add your message after checkout.',
       flowLabel: 'How it works:',
       flowStep1: 'Choose your cake',
       flowStep2: 'Pay',
-      flowStep3: 'Record your message',
-      flowNote: 'after payment — takes 1 minute',
+      flowStep3: 'Add your message',
+      flowNote: 'Video, photo or note',
+      examplesLabel: 'Choose a message example',
+      birthdayLabel: 'Birthday',
+      thankYouLabel: 'Thank you',
+      pauseExamples: 'Pause examples',
+      playExamples: 'Play examples',
       previewLabel: 'A message for you',
-      previewMessage: 'Happy birthday, Mum! Wish I could be there. Enjoy every bite. ❤️',
-      previewMessage2: 'Surprise — we\'re flying to the Maldives! 🌴',
-      previewMessage3: 'Consider this my application — CV attached. I hope the cake helps :)',
+      previewImageAlt: 'A mother with her daughter',
+      thankYouImageAlt: 'Two women together in a green mountain landscape',
+      previewMessage: 'Happy birthday, Mum! Wish I could be there. Enjoy every bite.',
+      previewMessage2: 'Thank you for always being there. This one\'s for you.',
     },
     experience: {
       locationLabel: 'FROM ZURICH',
