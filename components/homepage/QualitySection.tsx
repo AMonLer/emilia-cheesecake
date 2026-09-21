@@ -6,16 +6,16 @@ import { useLanguage } from "@/contexts/LanguageContext"
 import Reveal from "@/components/ui/Reveal"
 
 export default function QualitySection() {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
     const q = t.quality
 
     return (
-        <section className="py-16 bg-white overflow-hidden">
+        <section id="quality" aria-labelledby="quality-heading" className="scroll-mt-24 py-16 bg-white overflow-hidden">
             <div className="container mx-auto px-4">
                 <Reveal className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
                     {/* Lado izquierdo - Texto */}
                     <div className="space-y-6 text-center lg:text-left order-2 lg:order-1 relative z-10 w-full mb-6">
-                        <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
+                        <h2 id="quality-heading" className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A]">
                             {q.title1} <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal ml-1 py-1">Cheesecake</span>,
                             <br />
                             {q.title2}
@@ -33,15 +33,15 @@ export default function QualitySection() {
                     </div>
 
                     {/* Lado derecho - Imagen */}
-                    <div className="relative h-[400px] lg:h-[600px] w-full order-1 lg:order-2 group">
+                    <div className="relative aspect-square lg:aspect-auto lg:h-[600px] w-full max-w-[640px] lg:max-w-none mx-auto order-1 lg:order-2 group">
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[110%] h-[110%] bg-[#F5E6D3] rounded-full filter blur-[80px] opacity-60 group-hover:opacity-80 transition-opacity duration-700 pointer-events-none -z-10" />
                         <div className="relative w-full h-full transform transition-transform duration-700 group-hover:-translate-y-2">
                             <Image
-                                src="/Generated Image January 31, 2026 - 12_00AM.jpeg"
-                                alt="San Sebastian Cheesecake von Emilia"
+                                src="/cheesecake-creamy-slice.png"
+                                alt={locale === 'de' ? 'Ein Stück San Sebastian Cheesecake mit cremigem Kern und goldbrauner Oberfläche auf einem Teller' : 'A slice of San Sebastian cheesecake with a creamy centre and golden top on a plate'}
                                 fill
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                                className="object-cover rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
+                                sizes="(max-width: 671px) calc(100vw - 32px), (max-width: 1023px) 640px, 50vw"
+                                className="object-cover object-[center_85%] rounded-[2rem] shadow-2xl shadow-[#651A1A]/10 border border-white/50"
                             />
                         </div>
                         <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-[#D4AF85]/40 rounded-full -z-10 hidden lg:block"></div>
