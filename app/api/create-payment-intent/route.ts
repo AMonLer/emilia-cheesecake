@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { isDeliveryDateBlocked, parseDeliveryDate } from '@/lib/delivery-dates'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -8,6 +9,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 export async function POST(req: NextRequest) {
   try {
     const { amount, orderData } = await req.json()
+
+    // Recheck on the server so an older checkout cannot book a closed day.
+    const deliveryDate = parseDeliveryDate(orderData?.deliveryDate)
+    if (!deliveryDate || isDeliveryDateBlocked(deliveryDate)) {
+      return NextResponse.json(
+        { error: 'Please choose an available delivery date.', code: 'DELIVERY_DATE_UNAVAILABLE' },
+        { status: 400 }
+      )
+    }
 
     const rawDiscountCode = String(orderData?.discountCode || '').trim().toLowerCase()
     const subtotal = Number(orderData?.subtotal || 0)

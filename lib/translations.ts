@@ -200,6 +200,7 @@ export type Translations = {
     paymentFailedNotice: string
     slotUnavailable: string
     slotExpired: string
+    dateUnavailable: string
     change: string
     persons: string
   }
@@ -416,6 +417,7 @@ export const translations: Record<Locale, Translations> = {
       paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – Ihre Angaben sind gespeichert. Bitte versuchen Sie es erneut.',
       slotUnavailable: 'Für dieses Datum nicht verfügbar',
       slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 36 Stunden Vorlaufzeit. Bitte wählen Sie einen neuen Termin.',
+      dateUnavailable: 'Dieses Lieferdatum ist nicht mehr verfügbar. Bitte wählen Sie ein anderes Datum.',
       change: 'Ändern',
       persons: 'Personen',
     },
@@ -630,6 +632,7 @@ export const translations: Record<Locale, Translations> = {
       paymentFailedNotice: 'Your payment was not completed. Don\'t worry – your details are saved. Please try again.',
       slotUnavailable: 'Not available for this date',
       slotExpired: 'Your delivery slot no longer meets the 36-hour lead time. Please pick a new one.',
+      dateUnavailable: 'This delivery date is no longer available. Please choose another date.',
       change: 'Change',
       persons: 'persons',
     },

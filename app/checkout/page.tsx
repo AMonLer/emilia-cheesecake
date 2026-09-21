@@ -16,7 +16,8 @@ import DatePicker, { registerLocale } from "react-datepicker"
 import { de } from "date-fns/locale"
 import { enUS } from "date-fns/locale"
 import "react-datepicker/dist/react-datepicker.css"
-import { addDays, addHours, eachDayOfInterval, isSameDay, startOfDay } from "date-fns"
+import { addDays, addHours, isSameDay, startOfDay } from "date-fns"
+import { getBlockedDeliveryDates } from "@/lib/delivery-dates"
 
 registerLocale("de", de)
 registerLocale("en", enUS)
@@ -220,31 +221,7 @@ function CheckoutContent() {
   ]
 
   const currentYear = now.getFullYear()
-  const blockedDates = useMemo(
-    () => [
-      // Cierre de verano: del 14 al 24 de agosto de 2026 no hay reparto. Es un
-      // cierre puntual (año fijo), no un bloqueo anual como el de Navidad.
-      ...eachDayOfInterval({
-        start: new Date(2026, 7, 14),
-        end: new Date(2026, 7, 24),
-      }),
-      // 2 y 3 de septiembre de 2026: no podemos hacer pedidos esos días.
-      ...eachDayOfInterval({
-        start: new Date(2026, 8, 2),
-        end: new Date(2026, 8, 3),
-      }),
-      // Cierre de Navidad: del 20 de diciembre al 6 de enero siguiente. Generamos tres
-      // temporadas porque en enero el año en curso ya es el siguiente, y su propio 1-6 de
-      // enero tiene que seguir bloqueado.
-      ...[currentYear - 1, currentYear, currentYear + 1].flatMap((year) =>
-        eachDayOfInterval({
-          start: new Date(year, 11, 20),
-          end: new Date(year + 1, 0, 6),
-        })
-      ),
-    ],
-    [currentYear]
-  )
+  const blockedDates = useMemo(() => getBlockedDeliveryDates(currentYear), [currentYear])
 
   // Un tramo solo es válido si su inicio respeta las 36h de antelación
   const slotStartFor = (date: Date, slot: string) => {
@@ -509,7 +486,11 @@ function CheckoutContent() {
 
       const data = await response.json()
 
-      if (data.clientSecret) {
+      if (data.code === 'DELIVERY_DATE_UNAVAILABLE') {
+        setDeliveryDate(null)
+        setDeliveryTime("")
+        setDeliveryError(c.dateUnavailable)
+      } else if (data.clientSecret) {
         // Store order value for Google Ads conversion tracking
         localStorage.setItem('emilia-order-value', finalPrice.toString())
         setClientSecret(data.clientSecret)
