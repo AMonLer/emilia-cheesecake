@@ -6,11 +6,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Menu, X, ShoppingBag, ChevronLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { useCart } from '@/contexts/CartContext'
+import { useCart, productSlugForItem } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
 import PriceDisplay from '@/components/PriceDisplay'
 import ContactModal from '@/components/ContactModal'
 import { useScrollLock } from '@/lib/useScrollLock'
+import { computeOrderTotals, VOLUME_DISCOUNT_FROM } from '@/lib/pricing'
+import EarliestDelivery from '@/components/EarliestDelivery'
+import CartSizeToggle from '@/components/cart/CartSizeToggle'
+import QuantityStepper from '@/components/cart/QuantityStepper'
 
 export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const router = useRouter()
@@ -22,10 +26,12 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
     isCartOpen,
     setIsCartOpen,
     updateQuantity,
+    updateSize,
     removeItem,
     totalPrice,
     cartItemCount,
   } = useCart()
+  const totals = computeOrderTotals(totalPrice)
 
   const handleCheckout = () => {
     setIsCartOpen(false)
@@ -317,7 +323,9 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                 </div>
               ) : (
                 <div className="space-y-8">
-                  {cartItems.map((item) => (
+                  {cartItems.map((item) => {
+                    const slug = productSlugForItem(item)
+                    return (
                     <div key={item.id} className="flex gap-6">
                       {/* Image */}
                       <div className="w-24 h-24 bg-gray-50 overflow-hidden flex-shrink-0 relative">
@@ -329,48 +337,65 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                       </div>
 
                       {/* Details */}
-                      <div className="flex-1 flex flex-col justify-between py-1">
-                        <div className="flex justify-between items-start">
-                          <div>
+                      <div className="flex-1 flex flex-col justify-between gap-3 py-1">
+                        <div className="flex justify-between items-start gap-2">
+                          <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <h3 className="font-medium text-base text-black tracking-wide uppercase">{item.name}</h3>
+                              {/* People tapped the name expecting the cake's page. */}
+                              {slug ? (
+                                <Link
+                                  href={`/product/${slug}`}
+                                  onClick={() => setIsCartOpen(false)}
+                                  className="font-medium text-base text-black tracking-wide uppercase underline-offset-4 hover:underline"
+                                >
+                                  {item.name}
+                                </Link>
+                              ) : (
+                                <h3 className="font-medium text-base text-black tracking-wide uppercase">{item.name}</h3>
+                              )}
                               {item.price === 13.5 && (
                                 <span className="bg-[#651A1A] text-[#F5E6D3] text-[9px] px-1.5 py-0.5 rounded-sm tracking-widest font-bold">
                                   {t.cart.offer}
                                 </span>
                               )}
                             </div>
-                            <p className="text-xs text-gray-500 mt-1 font-light">{item.size} {t.cart.persons}</p>
+                            {slug ? (
+                              <CartSizeToggle
+                                size={item.size}
+                                onChange={(size) => updateSize(item.id, size)}
+                                personsLabel={t.cart.persons}
+                                className="mt-2"
+                              />
+                            ) : (
+                              <p className="text-xs text-gray-500 mt-1 font-light">{item.size} {t.cart.persons}</p>
+                            )}
                           </div>
                           <button
                             onClick={() => removeItem(item.id)}
-                            className="text-gray-300 hover:text-black transition-colors duration-200"
+                            aria-label={t.cart.remove}
+                            className="-m-2 p-2 text-gray-300 hover:text-black transition-colors duration-200"
                           >
                             <X className="w-4 h-4" strokeWidth={1.5} />
                           </button>
                         </div>
 
                         <div className="flex items-end justify-between">
-                          <div className="flex items-center border border-gray-200">
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
-                              >
-                                −
-                              </button>
-                              <span className="text-xs font-medium w-8 text-center text-black">{item.quantity}</span>
-                              <button
-                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                className="w-8 h-8 flex items-center justify-center hover:bg-gray-50 transition-colors text-gray-500"
-                              >
-                                +
-                              </button>
-                            </div>
+                          {slug ? (
+                            <QuantityStepper
+                              quantity={item.quantity}
+                              onChange={(quantity) => updateQuantity(item.id, quantity)}
+                              onRemove={() => removeItem(item.id)}
+                              labels={t.cart}
+                            />
+                          ) : (
+                            <span className="text-xs text-gray-500">{item.quantity} ×</span>
+                          )}
                           <PriceDisplay amount={item.price * item.quantity} className="text-lg font-black text-black tracking-wide" />
                         </div>
                       </div>
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -379,12 +404,12 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
             {cartItems.length > 0 && (
               <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] space-y-5">
                 <div className="space-y-3">
-                    {totalPrice >= 100 ? (
+                    {totals.discount > 0 ? (
                       <div className="flex items-center justify-between gap-3 text-[#651A1A] bg-[#F5E6D3]/30 border border-[#D4AF85]/30 p-3 rounded-lg">
                         <span className="text-xs font-bold tracking-widest uppercase">{t.cart.discountActivated}</span>
                         <span className="text-xs font-bold font-serif flex items-center">
                           -<PriceDisplay
-                            amount={totalPrice * 0.10}
+                            amount={totals.discount}
                             className="text-base font-black"
                             currencyClassName="text-[0.5em] opacity-100"
                           />
@@ -394,12 +419,12 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                       <div className="space-y-2 bg-gray-50 p-3 rounded-lg">
                         <div className="flex justify-between text-xs uppercase tracking-wider text-gray-600 font-medium">
                           <span>{t.cart.untilDiscount}</span>
-                          <span>{t.cart.remaining((100 - totalPrice).toFixed(2))}</span>
+                          <span>{t.cart.remaining((VOLUME_DISCOUNT_FROM - totalPrice).toFixed(2))}</span>
                         </div>
                         <div className="h-1 bg-gray-200 w-full overflow-hidden rounded-full">
                           <div
                             className="h-full bg-[#651A1A] transition-all duration-500 rounded-full"
-                            style={{ width: `${(totalPrice / 100) * 100}%` }}
+                            style={{ width: `${Math.min(100, (totalPrice / VOLUME_DISCOUNT_FROM) * 100)}%` }}
                           />
                         </div>
                       </div>
@@ -414,18 +439,18 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                   </div>
                   <div className="flex items-center justify-between text-sm font-light text-gray-500">
                     <span>{t.cart.shipping}</span>
-                    {totalPrice >= 100 ? (
+                    {totals.shipping === 0 ? (
                       <span className="text-sm font-bold text-green-600">{t.cart.free}</span>
                     ) : (
-                      <PriceDisplay amount={8.40} className="text-sm font-bold text-black" />
+                      <PriceDisplay amount={totals.shipping} className="text-sm font-bold text-black" />
                     )}
                   </div>
-                  {totalPrice >= 100 && (
+                  {totals.discount > 0 && (
                     <div className="flex items-center justify-between text-sm font-black text-[#651A1A]">
                       <span>{t.cart.discount}</span>
                       <span className="flex items-center">
                         -<PriceDisplay
-                          amount={totalPrice * 0.10}
+                          amount={totals.discount}
                           className="text-sm"
                           currencyClassName="text-[0.6em] opacity-100"
                         />
@@ -434,9 +459,11 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                   )}
                   <div className="flex items-center justify-between text-lg font-black text-black pt-2 border-t border-gray-100">
                     <span>{t.cart.total}</span>
-                    <PriceDisplay amount={(totalPrice * (totalPrice >= 100 ? 0.90 : 1) + (totalPrice >= 100 ? 0 : 8.40))} className="text-2xl font-black" />
+                    <PriceDisplay amount={totals.total} className="text-2xl font-black" />
                   </div>
                 </div>
+
+                <EarliestDelivery className="justify-center text-xs text-gray-600" />
 
                 <button
                   onClick={handleCheckout}

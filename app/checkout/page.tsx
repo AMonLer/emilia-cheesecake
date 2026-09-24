@@ -1,26 +1,28 @@
 "use client"
 
-import { useState, useMemo, useEffect, useRef, Suspense } from "react"
+import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, ChevronLeft, ChevronDown, X, Gift, ShoppingBag } from "lucide-react"
-import { useCart } from "@/contexts/CartContext"
+import { ChevronRight, ChevronDown, X, Gift, ShoppingBag, Truck } from "lucide-react"
+import { useCart, productSlugForItem } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
+import DeliveryPicker from "@/components/checkout/DeliveryPicker"
+import CartSizeToggle from "@/components/cart/CartSizeToggle"
+import QuantityStepper from "@/components/cart/QuantityStepper"
 import { loadStripe } from "@stripe/stripe-js"
 import { stripeAppearance } from "@/lib/stripe-appearance"
 import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
-import DatePicker, { registerLocale } from "react-datepicker"
-import { de } from "date-fns/locale"
-import { enUS } from "date-fns/locale"
-import "react-datepicker/dist/react-datepicker.css"
-import { addDays, addHours, isSameDay, startOfDay } from "date-fns"
-import { getBlockedDeliveryDates } from "@/lib/delivery-dates"
-
-registerLocale("de", de)
-registerLocale("en", enUS)
+import {
+  firstBookableDate,
+  firstBookableSlot,
+  isDateBookable,
+  isSlotBookable,
+} from "@/lib/delivery-dates"
+import { computeOrderTotals, isKnownDiscountCode, normalizeDiscountCode } from "@/lib/pricing"
+import { readConsent, trackCheckoutStep, trackEvent, type CheckoutStep } from "@/lib/tracking"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
@@ -28,7 +30,29 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 // For You is available for gift orders.
 const SHOW_GIFT_OPTION = true
 
-function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: number }) {
+const FORM_STORAGE_KEY = 'emilia-checkout-form'
+// The PaymentIntent this tab is paying. /payment-success clears it once paid.
+const PAYMENT_STORAGE_KEY = 'emilia-payment-intent'
+const PAID_STATUSES = new Set(['succeeded', 'processing', 'requires_capture'])
+
+type StoredPaymentIntent = { id: string; clientSecret: string; order: string }
+
+function readStoredPaymentIntent(): StoredPaymentIntent | null {
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(PAYMENT_STORAGE_KEY) || 'null')
+    return stored?.id && stored?.clientSecret ? stored : null
+  } catch {
+    return null
+  }
+}
+
+function successUrl(id: string, clientSecret: string) {
+  return `/payment-success?payment_intent=${encodeURIComponent(id)}&payment_intent_client_secret=${encodeURIComponent(clientSecret)}`
+}
+
+const STEP_NAMES: Record<1 | 2 | 3, CheckoutStep> = { 1: 'date', 2: 'details', 3: 'payment' }
+
+function PaymentForm({ amount }: { amount: number }) {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessing, setIsProcessing] = useState(false)
@@ -40,12 +64,13 @@ function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: n
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!stripe || !elements) {
+    if (!stripe || !elements || isProcessing) {
       return
     }
 
     setIsProcessing(true)
     setErrorMessage("")
+    trackEvent('checkout_pay_click')
 
     try {
       const { error } = await stripe.confirmPayment({
@@ -56,6 +81,12 @@ function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: n
       })
 
       if (error) {
+        // A second tap on an intent that was already paid: show the order, not an error.
+        const intent = (error as any).payment_intent
+        if (intent?.id && intent?.client_secret && PAID_STATUSES.has(intent.status)) {
+          router.replace(successUrl(intent.id, intent.client_secret))
+          return
+        }
         setErrorMessage(error.message || c.paymentError)
         setIsProcessing(false)
       }
@@ -104,7 +135,7 @@ function PaymentForm({ clientSecret, amount }: { clientSecret: string; amount: n
 function CheckoutContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { cartItems, totalPrice, removeItem, addToCart } = useCart()
+  const { cartItems, totalPrice, removeItem, addToCart, updateQuantity, updateSize } = useCart()
   const { locale, t } = useLanguage()
   const c = t.checkout
   const [email, setEmail] = useState("")
@@ -121,9 +152,12 @@ function CheckoutContent() {
   const [recipientPhone, setRecipientPhone] = useState("")
   const [deliveryDate, setDeliveryDate] = useState<Date | null>(null)
   const [deliveryTime, setDeliveryTime] = useState("")
+  // Delivery comes first: buyers used to type their whole address and only then
+  // find out the date they needed was taken. 1 = delivery, 2 = details, 3 = payment.
+  const [step, setStep] = useState<1 | 2 | 3>(1)
   const [clientSecret, setClientSecret] = useState<string>("")
-  const [showPayment, setShowPayment] = useState(false)
-  const [showDeliveryStep, setShowDeliveryStep] = useState(false)
+  // What Stripe will charge, as the API computed it; the pay button shows this.
+  const [paymentAmount, setPaymentAmount] = useState(0)
   const [isGift, setIsGift] = useState(false)
   const [upsellAdded, setUpsellAdded] = useState(false)
   const [postalCodeError, setPostalCodeError] = useState("")
@@ -134,14 +168,17 @@ function CheckoutContent() {
   const [missingFields, setMissingFields] = useState<Set<string>>(new Set())
   const [deliveryError, setDeliveryError] = useState("")
   const [paymentInitError, setPaymentInitError] = useState("")
+  // Amber notice at the top of the details step (payment not completed, order changed).
+  const [notice, setNotice] = useState("")
   // Loading del paso 2: crear el PaymentIntent tarda >1s; sin esto el botón
   // parecía muerto y un doble toque creaba dos pagos.
   const [isInitializingPayment, setIsInitializingPayment] = useState(false)
   // Mobile-only: the order summary column sits below the form, so surface a collapsible
   // recap above it instead of making people scroll past everything to see the total.
   const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false)
-  const [paymentFailed, setPaymentFailed] = useState(false)
-  const formRestoredRef = useRef(false)
+  // State, not a ref: the save effect must wait for the render that carries the
+  // restored values. With a ref it ran in the same commit and stored the empty form.
+  const [formRestored, setFormRestored] = useState(false)
   const forYouIntentRef = useRef(false)
 
   // Allowed postal codes: Zürich agglomeration + Baden (AG)
@@ -200,63 +237,24 @@ function CheckoutContent() {
     }
   }, [])
 
-  // "Ahora" vivo: una pestaña que lleva horas abierta seguiría midiendo las 36h desde
-  // el momento de carga, así que lo refrescamos mientras se está eligiendo la entrega.
+  // "Ahora" vivo: una pestaña que lleva horas abierta seguiría midiendo la antelación
+  // desde el momento de carga, así que lo refrescamos hasta llegar al pago.
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
-    if (!showDeliveryStep || showPayment) return
+    if (step === 3) return
     const id = setInterval(() => setNow(new Date()), 60_000)
     return () => clearInterval(id)
-  }, [showDeliveryStep, showPayment])
-
-  // Calculate minimum delivery date (36 hours from now)
-  const minDeliveryDate = useMemo(() => addHours(now, 36), [now])
-
-  // Generate time slots
-  const timeSlots = [
-    "09:00 - 12:00",
-    "12:00 - 15:00",
-    "15:00 - 18:00",
-    "18:00 - 21:00"
-  ]
-
-  const currentYear = now.getFullYear()
-  const blockedDates = useMemo(() => getBlockedDeliveryDates(currentYear), [currentYear])
-
-  // Un tramo solo es válido si su inicio respeta las 36h de antelación
-  const slotStartFor = (date: Date, slot: string) => {
-    const start = new Date(date)
-    start.setHours(parseInt(slot, 10), 0, 0, 0)
-    return start
-  }
-
-  const isSlotAvailable = (slot: string, date: Date | null = deliveryDate) => {
-    if (!date) return true
-    return slotStartFor(date, slot) >= minDeliveryDate
-  }
-
-  // El calendario compara solo días naturales, así que por sí solo dejaría elegir el día
-  // de "ahora + 36h" aunque a esas alturas ya no quede ningún tramo (pasaba en todos los
-  // pedidos entre las 07:00 y las 12:00: se podía elegir el día y luego salían los cuatro
-  // tramos tachados). Un día solo vale si le queda al menos un tramo y no está bloqueado.
-  const hasAvailableSlot = (date: Date) => timeSlots.some((slot) => isSlotAvailable(slot, date))
-  const isDateSelectable = (date: Date) =>
-    hasAvailableSlot(date) && !blockedDates.some((b) => isSameDay(b, date))
-
-  // Primer día realmente reservable: el calendario arranca aquí y se abre en su mes.
-  const firstSelectableTime = (() => {
-    let day = startOfDay(minDeliveryDate)
-    for (let i = 0; i < 400 && !isDateSelectable(day); i++) {
-      day = addDays(day, 1)
-    }
-    return day.getTime()
-  })()
-  const firstSelectableDate = useMemo(() => new Date(firstSelectableTime), [firstSelectableTime])
+  }, [step])
 
   // Restaurar el formulario guardado (p. ej. al volver de un pago TWINT cancelado)
+  // y preseleccionar la primera fecha y franja libres.
   useEffect(() => {
+    const current = new Date()
+    const returningFromPayment = searchParams.get('payment') === 'failed'
+    let restoredDate: Date | null = null
+    let restoredSlot = ""
     try {
-      const raw = sessionStorage.getItem('emilia-checkout-form')
+      const raw = sessionStorage.getItem(FORM_STORAGE_KEY)
       if (raw) {
         const d = JSON.parse(raw)
         if (d.email) setEmail(d.email)
@@ -278,15 +276,25 @@ function CheckoutContent() {
         }
         if (d.deliveryDate) {
           const date = new Date(d.deliveryDate)
-          if (!isNaN(date.getTime()) && isDateSelectable(date)) {
-            setDeliveryDate(date)
-            if (d.deliveryTime && isSlotAvailable(d.deliveryTime, date)) {
-              setDeliveryTime(d.deliveryTime)
-            }
+          if (!isNaN(date.getTime()) && d.deliveryTime && isSlotBookable(date, d.deliveryTime, current) && isDateBookable(date, current)) {
+            restoredDate = date
+            restoredSlot = d.deliveryTime
           }
         }
       }
     } catch { }
+
+    // Most buyers take the earliest day, so it comes preselected with its first
+    // slot. The one exception: a buyer back from a failed payment whose slot has
+    // expired meanwhile is not moved to another day silently; they pick again.
+    const slotLost = returningFromPayment && !restoredDate
+    if (!restoredDate && !slotLost) {
+      restoredDate = firstBookableDate(current)
+      restoredSlot = restoredDate ? firstBookableSlot(restoredDate, current) ?? "" : ""
+    }
+    setDeliveryDate(restoredDate)
+    setDeliveryTime(restoredSlot)
+    if (slotLost) setDeliveryError(c.slotExpired)
 
     // Intent de la sección For You ("Nachricht senden" → /bestellen?foryou=1):
     // el checkout abre ya con la opción de regalo activa. Es de un solo uso.
@@ -298,54 +306,98 @@ function CheckoutContent() {
     }
     if (forYouIntentRef.current) setIsGift(true)
 
-    if (searchParams.get('payment') === 'failed') {
-      setPaymentFailed(true)
-      setShowDeliveryStep(true)
+    if (returningFromPayment) {
+      setNotice(c.paymentFailedNotice)
+      // Straight back to the step before payment, unless the slot has to be picked again.
+      setStep(slotLost ? 1 : 2)
       router.replace('/checkout', { scroll: false })
     }
 
-    formRestoredRef.current = true
+    setFormRestored(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Guardar el formulario para que sobreviva a la redirección de TWINT
   useEffect(() => {
-    if (!formRestoredRef.current) return
+    if (!formRestored) return
     try {
-      sessionStorage.setItem('emilia-checkout-form', JSON.stringify({
+      sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({
         email, phone, firstName, lastName, address, city, postalCode,
         isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode,
         deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
         deliveryTime,
       }))
     } catch { }
-  }, [email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryDate, deliveryTime])
+  }, [formRestored, email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryDate, deliveryTime])
 
   // Si el reloj avanza mientras el checkout está abierto, lo ya elegido puede dejar de
-  // cumplir las 36h. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
+  // cumplir la antelación. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
   useEffect(() => {
-    if (!deliveryDate) return
-    if (!isDateSelectable(deliveryDate)) {
+    if (step === 3 || !deliveryDate) return
+    if (!isDateBookable(deliveryDate, now)) {
       setDeliveryDate(null)
       setDeliveryTime("")
       setDeliveryError(c.slotExpired)
-    } else if (deliveryTime && !isSlotAvailable(deliveryTime, deliveryDate)) {
+    } else if (deliveryTime && !isSlotBookable(deliveryDate, deliveryTime, now)) {
       setDeliveryTime("")
       setDeliveryError(c.slotExpired)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [minDeliveryDate, deliveryDate, deliveryTime])
+  }, [now, deliveryDate, deliveryTime, step])
 
-  // Calculate discount and shipping
-  const shippingCost = totalPrice >= 100 ? 0 : 8.40
-  const normalizedDiscountCode = appliedDiscountCode.trim().toLowerCase()
-  const isAdminCode = normalizedDiscountCode === "emilia1"
-  const hasCodeDiscount = normalizedDiscountCode === "holaswitzerland"
-  const codeDiscountRate = totalPrice >= 100 ? 0.15 : 0.10
-  const codeDiscount = hasCodeDiscount ? totalPrice * codeDiscountRate : 0
-  const automaticDiscount = totalPrice >= 100 ? totalPrice * 0.10 : 0
-  const discount = hasCodeDiscount ? codeDiscount : automaticDiscount
-  const finalPrice = isAdminCode ? 1.00 : (totalPrice - discount + shippingCost)
+  const { shipping: shippingCost, discount, discountRate, total: finalPrice, promoCodeApplied: hasCodeDiscount } =
+    computeOrderTotals(totalPrice, appliedDiscountCode)
+  const discountLabel = `${Math.round(discountRate * 100)}% Rabatt${hasCodeDiscount ? ' (HolaSwitzerland)' : ''}`
+
+  // Everything the charged amount depends on. If it changes while the payment
+  // form is open (a code applied, a cake added), that PaymentIntent is stale.
+  const pricingKey = JSON.stringify([
+    cartItems.map(item => [item.id, item.quantity, item.price]),
+    normalizeDiscountCode(appliedDiscountCode),
+  ])
+  // Identifies this order, to tell "already paid" apart from a new order in the same tab.
+  const orderKey = JSON.stringify([pricingKey, deliveryDate?.toDateString() ?? null, deliveryTime, postalCode.trim(), address.trim()])
+  const pricingKeyAtPaymentRef = useRef("")
+  const orderKeyRef = useRef(orderKey)
+  orderKeyRef.current = orderKey
+
+  useEffect(() => {
+    if (step !== 3 || !pricingKeyAtPaymentRef.current || pricingKeyAtPaymentRef.current === pricingKey) return
+    setClientSecret("")
+    setStep(2)
+    setNotice(c.orderChanged)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pricingKey, step])
+
+  // TWINT hands the buyer back through several apps; some returned to this page
+  // (back button, restored tab) after paying and tapped "pay" again. If this
+  // tab's payment went through, show the confirmation instead of the form.
+  useEffect(() => {
+    let cancelled = false
+    const checkPaid = async () => {
+      const stored = readStoredPaymentIntent()
+      if (!stored) return
+      try {
+        const stripe = await stripePromise
+        if (!stripe || cancelled) return
+        const { paymentIntent } = await stripe.retrievePaymentIntent(stored.clientSecret)
+        if (cancelled || !paymentIntent || !PAID_STATUSES.has(paymentIntent.status)) return
+        if (stored.order === orderKeyRef.current) {
+          router.replace(successUrl(stored.id, stored.clientSecret))
+        } else {
+          // Paid, but this is a different order: start fresh.
+          sessionStorage.removeItem(PAYMENT_STORAGE_KEY)
+        }
+      } catch { }
+    }
+    checkPaid()
+    const onPageShow = (e: PageTransitionEvent) => { if (e.persisted) checkPaid() }
+    window.addEventListener('pageshow', onPageShow)
+    return () => {
+      cancelled = true
+      window.removeEventListener('pageshow', onPageShow)
+    }
+  }, [router])
 
   const handleAddUpsellProduct = () => {
     const upsellProduct = {
@@ -360,17 +412,50 @@ function CheckoutContent() {
     setUpsellAdded(true)
   }
 
-  const handleContinueToDelivery = (e: React.MouseEvent | React.FormEvent) => {
+  const handleDeliveryChange = (date: Date, slot: string) => {
+    setDeliveryDate(date)
+    setDeliveryTime(slot)
+    setDeliveryError("")
+  }
+
+  // Revalidar contra la hora actual: entre elegir la entrega y continuar puede
+  // haberse cruzado el límite de antelación.
+  const deliveryStillBookable = () => {
+    const current = new Date()
+    setNow(current)
+    if (!deliveryDate || !deliveryTime) {
+      setDeliveryError(c.deliveryError)
+      return false
+    }
+    if (!isDateBookable(deliveryDate, current) || !isSlotBookable(deliveryDate, deliveryTime, current)) {
+      if (!isDateBookable(deliveryDate, current)) setDeliveryDate(null)
+      setDeliveryTime("")
+      setDeliveryError(c.slotExpired)
+      return false
+    }
+    return true
+  }
+
+  const handleContinueToDetails = (e: React.FormEvent) => {
     e.preventDefault()
+    if (!deliveryStillBookable()) return
+    setDeliveryError("")
+    setStep(2)
+  }
+
+  const handleContinueToPayment = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (isInitializingPayment) return
 
     // El navegador interno de Instagram (Android) a veces autocompleta los campos
     // sin disparar onChange: el input se ve lleno pero el estado está vacío y la
     // validación marcaba como vacíos campos que el cliente veía rellenos. Antes de
     // validar leemos el DOM como respaldo y sincronizamos el estado.
-    const formEl = (e.currentTarget as HTMLElement).closest('form')
+    const formEl = e.currentTarget as HTMLFormElement
     const dom = (name: string) =>
       (formEl?.querySelector(`input[name="${name}"]`) as HTMLInputElement | null)?.value.trim() || ''
     if (!email && dom('email')) setEmail(dom('email'))
+    if (!phone && dom('phone')) setPhone(dom('phone'))
     if (!firstName && dom('firstName')) setFirstName(dom('firstName'))
     if (!lastName && dom('lastName')) setLastName(dom('lastName'))
     if (!address && dom('address')) setAddress(dom('address'))
@@ -380,7 +465,9 @@ function CheckoutContent() {
     if (isGift && !recipientIsCompany && !recipientLastName && dom('recipientLastName')) setRecipientLastName(dom('recipientLastName'))
     if (isGift && recipientIsCompany && !recipientCompany && dom('recipientCompany')) setRecipientCompany(dom('recipientCompany'))
 
+    // The state updates above land after this handler, so the request uses these.
     const vEmail = email.trim() || dom('email')
+    const vPhone = phone.trim() || dom('phone')
     const vFirstName = firstName.trim() || dom('firstName')
     const vLastName = lastName.trim() || dom('lastName')
     const vAddress = address.trim() || dom('address')
@@ -423,28 +510,18 @@ function CheckoutContent() {
     setPostalCodeError("")
     setFormError("")
     setMissingFields(new Set())
-    setShowDeliveryStep(true)
-  }
 
-  const handleContinueToPayment = async (e: React.MouseEvent | React.FormEvent) => {
-    e.preventDefault()
-
-    if (!deliveryDate || !deliveryTime) {
-      setDeliveryError(c.deliveryError)
+    // The slot may have expired while the buyer was typing: back to the delivery step.
+    if (!deliveryStillBookable() || !deliveryDate) {
+      setStep(1)
       return
     }
-    // Revalidar contra la hora actual: entre elegir la entrega y pulsar pagar puede
-    // haberse cruzado el límite de las 36h.
-    if (!isDateSelectable(deliveryDate) || !isSlotAvailable(deliveryTime, deliveryDate)) {
-      if (!isDateSelectable(deliveryDate)) setDeliveryDate(null)
-      setDeliveryTime("")
-      setDeliveryError(c.slotExpired)
-      return
-    }
-    setDeliveryError("")
+
     setPaymentInitError("")
     setIsInitializingPayment(true)
 
+    const stored = readStoredPaymentIntent()
+    const submittedOrderKey = JSON.stringify([pricingKey, deliveryDate.toDateString(), deliveryTime, vPostalCode, vAddress])
     try {
       const response = await fetch('/api/create-payment-intent', {
         method: 'POST',
@@ -452,28 +529,27 @@ function CheckoutContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: finalPrice,
           orderData: {
-            email,
-            phone,
-            firstName,
-            lastName,
-            address,
-            city,
-            postalCode,
+            email: vEmail,
+            phone: vPhone,
+            firstName: vFirstName,
+            lastName: vLastName,
+            address: vAddress,
+            city: vCity,
+            postalCode: vPostalCode,
             isGift,
             recipientName: isGift
               ? recipientIsCompany
-                ? recipientCompany.trim()
-                : [recipientFirstName.trim(), recipientLastName.trim()].filter(Boolean).join(' ')
+                ? vRecipientCompany
+                : [vRecipientFirstName, vRecipientLastName].filter(Boolean).join(' ')
               : '',
             recipientIsCompany: isGift && recipientIsCompany ? 'yes' : '',
             recipientPhone: isGift ? recipientPhone.trim() : '',
-            deliveryDate: deliveryDate?.toLocaleDateString('de-CH'),
+            deliveryDate: deliveryDate.toLocaleDateString('de-CH'),
             deliveryTime,
             discountCode: appliedDiscountCode,
             subtotal: totalPrice,
-            shippingCost,
+            trackingConsent: readConsent() ?? 'unset',
             items: cartItems.map(item => ({
               name: item.name,
               quantity: item.quantity,
@@ -481,21 +557,44 @@ function CheckoutContent() {
               size: item.size
             })),
           },
+          // The server cancels it (or recognises it as paid) before creating a new one.
+          previousPaymentIntent: stored
+            ? { id: stored.id, clientSecret: stored.clientSecret, sameOrder: stored.order === submittedOrderKey }
+            : undefined,
         }),
       })
 
       const data = await response.json()
 
+      if (data.alreadyPaid && data.paymentIntentId && data.clientSecret) {
+        router.replace(successUrl(data.paymentIntentId, data.clientSecret))
+        return
+      }
       if (data.code === 'DELIVERY_DATE_UNAVAILABLE') {
         setDeliveryDate(null)
         setDeliveryTime("")
         setDeliveryError(c.dateUnavailable)
+        setStep(1)
+      } else if (data.code === 'DELIVERY_SLOT_UNAVAILABLE') {
+        setDeliveryTime("")
+        setDeliveryError(c.slotExpired)
+        setStep(1)
       } else if (data.clientSecret) {
+        const amount = typeof data.amount === 'number' ? data.amount : finalPrice
+        try {
+          sessionStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify({
+            id: data.paymentIntentId,
+            clientSecret: data.clientSecret,
+            order: submittedOrderKey,
+          }))
+        } catch { }
         // Store order value for Google Ads conversion tracking
-        localStorage.setItem('emilia-order-value', finalPrice.toString())
+        localStorage.setItem('emilia-order-value', amount.toString())
+        pricingKeyAtPaymentRef.current = pricingKey
+        setPaymentAmount(amount)
         setClientSecret(data.clientSecret)
-        setShowPayment(true)
-        setPaymentFailed(false)
+        setNotice("")
+        setStep(3)
       } else {
         setPaymentInitError(c.paymentInitError)
       }
@@ -507,17 +606,34 @@ function CheckoutContent() {
     }
   }
 
-  const currentStep = showPayment ? 3 : showDeliveryStep ? 2 : 1
+  const goToStep = (target: 1 | 2) => {
+    setClientSecret("")
+    setStep(target)
+  }
+
+  // One Clarity event per step reached, to read the funnel without recordings.
+  // On a full page load the cart arrives a render later, hence the length dep.
+  const trackedStepRef = useRef(0)
+  useEffect(() => {
+    if (cartItems.length === 0 || trackedStepRef.current === step) return
+    trackedStepRef.current = step
+    trackCheckoutStep(STEP_NAMES[step])
+  }, [step, cartItems.length])
 
   // Al cambiar de paso el móvil se quedaba a media página: se pulsa el botón de abajo
   // y el paso nuevo aparece por encima de donde está mirando el usuario.
   const stepTopRef = useRef<HTMLDivElement>(null)
-  const previousStepRef = useRef(currentStep)
+  const previousStepRef = useRef(step)
   useEffect(() => {
-    if (previousStepRef.current === currentStep) return
-    previousStepRef.current = currentStep
+    if (previousStepRef.current === step) return
+    previousStepRef.current = step
     stepTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, [currentStep])
+  }, [step])
+
+  const dateLocale = locale === 'en' ? 'en-GB' : 'de-CH'
+  const deliverySummary = deliveryDate
+    ? `${deliveryDate.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' })}${deliveryTime ? ` · ${deliveryTime}` : ''}`
+    : ''
 
   // Nombre y apellidos del comprador. En un pedido normal van dentro de la dirección
   // de entrega (comprador = destinatario); en un regalo suben a "Deine Daten", porque
@@ -649,13 +765,12 @@ function CheckoutContent() {
         <button
           type="button"
           onClick={() => {
-            const normalized = discountCodeInput.trim().toLowerCase()
-            if (!normalized) {
+            if (!normalizeDiscountCode(discountCodeInput)) {
               setAppliedDiscountCode("")
               setDiscountCodeError("")
               return
             }
-            if (normalized === "holaswitzerland" || normalized === "emilia1") {
+            if (isKnownDiscountCode(discountCodeInput)) {
               setAppliedDiscountCode(discountCodeInput.trim())
               setDiscountCodeError("")
             } else {
@@ -711,6 +826,60 @@ function CheckoutContent() {
     </div>
   )
 
+  // Size and quantity can be changed right here: buyers used to leave the
+  // checkout (or start over) just to switch a cake from 8-10 to 2-3.
+  const orderLines = (thumbClass: string) => (
+    <div className="space-y-5">
+      {cartItems.map((item) => {
+        const slug = productSlugForItem(item)
+        return (
+          <div key={item.id} className="flex gap-3">
+            <div className={`${thumbClass} bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0`}>
+              <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-bold text-sm truncate">{item.name}</p>
+                <button
+                  type="button"
+                  onClick={() => removeItem(item.id)}
+                  aria-label={t.cart.remove}
+                  className="-m-1.5 p-1.5 text-gray-300 transition-colors hover:text-black"
+                >
+                  <X className="h-4 w-4" strokeWidth={1.5} />
+                </button>
+              </div>
+              {slug ? (
+                <CartSizeToggle
+                  size={item.size}
+                  onChange={(size) => updateSize(item.id, size)}
+                  personsLabel={c.persons}
+                  className="mt-1.5"
+                />
+              ) : (
+                <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
+              )}
+              <div className="mt-2 flex items-center justify-between gap-2">
+                {slug ? (
+                  <QuantityStepper
+                    quantity={item.quantity}
+                    onChange={(quantity) => updateQuantity(item.id, quantity)}
+                    onRemove={() => removeItem(item.id)}
+                    labels={t.cart}
+                    size="sm"
+                  />
+                ) : (
+                  <p className="text-xs text-gray-900 font-bold">{c.qty} {item.quantity}</p>
+                )}
+                <PriceDisplay amount={item.price * item.quantity} className="text-sm font-bold" currencyClassName="text-[0.6em] opacity-80" />
+              </div>
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen bg-white">
@@ -725,6 +894,18 @@ function CheckoutContent() {
     )
   }
 
+  const stepLabels = [c.deliveryTitle, c.breadcrumbDetails, c.breadcrumbPayment]
+
+  const errorAlert = (message: string) => (
+    <div role="alert" aria-live="polite" className="mb-3 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
+      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <span>{message}</span>
+    </div>
+  )
+
+  const stickyBar = "sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:mt-6 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none"
+  const primaryButton = "w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99] disabled:bg-gray-400 disabled:cursor-not-allowed disabled:active:scale-100"
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar minimal />
@@ -735,42 +916,44 @@ function CheckoutContent() {
         {/* Breadcrumb */}
         <div className="hidden md:flex items-center gap-2 text-sm mb-8">
           <Link href="/" className="text-pink-500 hover:underline">{c.breadcrumbCart}</Link>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-900 font-medium">{c.breadcrumbInfo}</span>
-          <ChevronRight className="w-4 h-4 text-gray-400" />
-          <span className="text-gray-400">{c.breadcrumbPayment}</span>
+          {stepLabels.map((label, i) => {
+            const target = (i + 1) as 1 | 2 | 3
+            const canGoBack = target < step
+            return (
+              <span key={label} className="flex items-center gap-2">
+                <ChevronRight className="w-4 h-4 text-gray-400" />
+                {canGoBack ? (
+                  <button type="button" onClick={() => goToStep(target as 1 | 2)} className="text-gray-600 hover:text-black hover:underline">
+                    {label}
+                  </button>
+                ) : (
+                  <span className={target === step ? "text-gray-900 font-medium" : "text-gray-400"}>{label}</span>
+                )}
+              </span>
+            )
+          })}
         </div>
 
         {/* En móvil no había breadcrumb: no se sabía cuánto quedaba para terminar.
             Los pasos ya completados se pueden tocar para volver atrás. */}
         <div className="md:hidden mb-6 flex items-start gap-2">
-          {[c.breadcrumbInfo, c.deliveryTitle, c.breadcrumbPayment].map((label, i) => {
-            const step = i + 1
-            const reached = step <= currentStep
-            const canGoBack = step < currentStep
-            const goBack = () => {
-              if (step === 1) {
-                setShowPayment(false)
-                setClientSecret("")
-                setShowDeliveryStep(false)
-              } else if (step === 2) {
-                setShowPayment(false)
-                setClientSecret("")
-              }
-            }
+          {stepLabels.map((label, i) => {
+            const target = (i + 1) as 1 | 2 | 3
+            const reached = target <= step
+            const canGoBack = target < step
             return (
               <button
                 key={label}
                 type="button"
-                onClick={canGoBack ? goBack : undefined}
-                aria-current={step === currentStep ? 'step' : undefined}
+                onClick={canGoBack ? () => goToStep(target as 1 | 2) : undefined}
+                aria-current={target === step ? 'step' : undefined}
                 className={`flex-1 text-left ${canGoBack ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 <div
                   className={`h-1 rounded-full transition-colors duration-300 ${reached ? 'bg-[#651A1A]' : 'bg-gray-200'}`}
                 />
                 <p
-                  className={`mt-2 text-[0.7rem] font-bold leading-tight tracking-wide transition-colors duration-300 ${step === currentStep ? 'text-[#651A1A]' : reached ? 'text-gray-500' : 'text-gray-300'} ${canGoBack ? 'underline underline-offset-2 decoration-gray-300' : ''}`}
+                  className={`mt-2 text-[0.7rem] font-bold leading-tight tracking-wide transition-colors duration-300 ${target === step ? 'text-[#651A1A]' : reached ? 'text-gray-500' : 'text-gray-300'} ${canGoBack ? 'underline underline-offset-2 decoration-gray-300' : ''}`}
                 >
                   {label}
                 </p>
@@ -799,25 +982,14 @@ function CheckoutContent() {
 
           {isMobileSummaryOpen && (
             <div className="px-4 pb-4 space-y-3 border-t border-gray-200 pt-4">
-              {cartItems.map((item) => (
-                <div key={item.id} className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-sm truncate">{item.name}</p>
-                    <p className="text-xs text-gray-600">{item.size} {c.persons} · {c.qty} {item.quantity}</p>
-                  </div>
-                  <PriceDisplay amount={item.price * item.quantity} className="text-sm font-bold" currencyClassName="text-[0.6em] opacity-80" />
-                </div>
-              ))}
-              <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
+              {orderLines("w-14 h-14")}
+              <div className="flex justify-between text-sm pt-3 border-t border-gray-200">
                 <span>{c.subtotal}</span>
                 <PriceDisplay amount={totalPrice} className="text-sm font-bold" currencyClassName="text-[0.6em] opacity-80" />
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-sm text-green-700 font-bold">
-                  <span>{hasCodeDiscount ? `${totalPrice >= 100 ? '15%' : '10%'} Rabatt` : '10% Rabatt'}</span>
+                  <span>{discountLabel}</span>
                   <span className="flex items-center">
                     -<PriceDisplay amount={discount} className="text-sm font-bold" currencyClassName="text-[0.5em] opacity-80" />
                   </span>
@@ -848,97 +1020,153 @@ function CheckoutContent() {
           {/* Left Side - Form */}
           <div className="space-y-8">
             <div>
-              {/* Gift option */}
-              {SHOW_GIFT_OPTION && !showPayment && (
-                <div className="mb-8">
-                  <button
-                    type="button"
-                    onClick={() => setIsGift(!isGift)}
-                    aria-pressed={isGift}
-                    className={`w-full text-left rounded-2xl border-2 p-5 transition-all duration-300 ${isGift ? "border-[#651A1A] bg-[#F5E6D3] shadow-[0_8px_24px_-14px_rgba(101,26,26,0.4)]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${isGift ? "border-[#651A1A] bg-[#651A1A] text-white" : "border-[#651A1A]/20 bg-[#FBF6EF] text-[#651A1A]"}`}>
-                        <Gift className="h-5 w-5" strokeWidth={1.5} />
-                      </div>
-                      <div className="flex-1">
-                        <p className={`font-black text-base tracking-tight transition-colors duration-300 ${isGift ? "text-[#651A1A]" : "text-[#1a1a1a]"}`}>
-                          {locale === 'de' ? 'Mach es persönlich. Sende eine Nachricht mit dem Kuchen.' : 'Make it personal. Send a message with the cake.'}
-                        </p>
-                        <p className={`text-sm leading-snug transition-colors duration-300 ${isGift ? "text-[#651A1A]/70" : "text-gray-600"}`}>
-                          {locale === 'de'
-                            ? 'Video, Foto oder Nachricht. Wir fügen einen QR-Code hinzu, um deine Überraschung zu sehen.'
-                            : 'Video, photo or message. We will add a QR to see your surprise.'}
-                        </p>
-                      </div>
-                      <div className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-300 ${isGift ? "bg-[#651A1A]" : "bg-gray-300"}`}>
-                        <div className={`absolute top-1 h-5 w-5 rounded-full shadow transition-all duration-300 ${isGift ? "left-6 bg-white" : "left-1 bg-white"}`} />
-                      </div>
-                    </div>
-                    {isGift && (
-                      <div className="mt-4 rounded-xl bg-white/60 px-4 py-3 text-sm text-[#651A1A] leading-relaxed">
-                        {locale === 'de'
-                          ? 'Nach der Bezahlung kannst du dein Video, Foto oder deine Nachricht hinzufügen. Wir fügen deinen persönlichen QR-Code hinzu. Zum Geburtstag, als Dankeschön, eine Reise-Überraschung oder einfach so. Einfach scannen und alles auf unserer Seite ansehen.'
-                          : 'After payment you can add your video, photo or message. We add your personal QR code. For a birthday, a thank you, a trip surprise, or just because. They scan it to see everything on our page.'}
-                      </div>
-                    )}
-                  </button>
+              {notice && step !== 3 && (
+                <div role="alert" aria-live="polite" className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg text-sm flex items-start gap-2 mb-6">
+                  <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span>{notice}</span>
                 </div>
               )}
 
-              {/* Paso 1 (contacto + dirección) dentro de un <form>: la tecla
-                  "ir/enter" del teclado móvil envía el paso en vez de no hacer nada. */}
-              {!showDeliveryStep && !showPayment && (
-              <form onSubmit={handleContinueToDelivery}>
-              {/* Contact Section */}
-              <div className="mb-8">
-                <div className="mb-4">
-                  <h2 className="text-xl font-black">{isGift ? c.contactGift : c.contact}</h2>
-                </div>
-                {/* En un regalo, el nombre de quien envía vive aquí, con su email y
-                    teléfono — no en la dirección, que es del destinatario. */}
-                {isGift && <div className="mb-4">{nameFields}</div>}
-                <input
-                  type="email"
-                  name="email"
-                  placeholder={c.emailPlaceholder}
-                  value={email}
-                  onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
-                  data-error={missingFields.has('email')}
-                  autoComplete="email"
-                  inputMode="email"
-                  autoCapitalize="off"
-                  autoCorrect="off"
-                  className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('email') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-                  required
-                />
-                <input
-                  type="tel"
-                  placeholder={c.phonePlaceholder}
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  autoComplete="tel"
-                  inputMode="tel"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
-                />
-                <label className="flex items-center gap-2.5 mt-3 py-1.5 cursor-pointer">
-                  <input type="checkbox" className="h-5 w-5 shrink-0 cursor-pointer accent-[#651A1A]" />
-                  <span className="text-sm">{c.newsletter}</span>
-                </label>
-              </div>
+              {/* Paso 1: fecha y franja. También como <form> para que "enter"
+                  del teclado confirme el paso. */}
+              {step === 1 && (
+                <form onSubmit={handleContinueToDetails}>
+                  <h2 className="text-xl font-black mb-2">{c.deliveryQuestion}</h2>
+                  <p className="text-sm text-gray-600 mb-6 flex items-start gap-2">
+                    <svg className="w-5 h-5 text-[#651A1A] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{c.deliveryNotice}</span>
+                  </p>
 
-              {/* Shipping Address */}
-                <div>
+                  <DeliveryPicker
+                    now={now}
+                    locale={locale === 'en' ? 'en' : 'de'}
+                    deliveryDate={deliveryDate}
+                    deliveryTime={deliveryTime}
+                    onChange={handleDeliveryChange}
+                    labels={c}
+                  />
+
+                  <div className={stickyBar}>
+                    {/* El error vive dentro de la barra sticky: fuera quedaba
+                        tapado por la propia barra justo donde aparece. */}
+                    {deliveryError && errorAlert(deliveryError)}
+                    {deliverySummary && deliveryTime && (
+                      <p className="mb-2 flex items-center gap-2 text-sm font-bold capitalize text-[#1a1a1a] lg:hidden">
+                        <Truck className="h-4 w-4 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
+                        {deliverySummary}
+                      </p>
+                    )}
+                    <button type="submit" className={primaryButton}>
+                      {c.continueToDetails}
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Paso 2 (contacto + dirección) dentro de un <form>: la tecla
+                  "ir/enter" del teclado móvil envía el paso en vez de no hacer nada. */}
+              {step === 2 && (
+                <form onSubmit={handleContinueToPayment} noValidate>
+                  {/* La entrega ya elegida, a la vista y con vuelta atrás en un toque */}
+                  <div className="mb-8 flex items-center gap-3 rounded-xl border border-[#E6D5C0] bg-[#FFFCF8] px-4 py-3">
+                    <Truck className="h-5 w-5 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[0.7rem] font-bold uppercase tracking-widest text-[#651A1A]">{c.deliveryTitle}</p>
+                      <p className="text-sm font-bold capitalize text-[#1a1a1a]">{deliverySummary}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => goToStep(1)}
+                      className="shrink-0 rounded-md px-2 py-1 text-sm font-bold text-[#651A1A] underline underline-offset-2 hover:text-black"
+                    >
+                      {c.change}
+                    </button>
+                  </div>
+
+                  {/* Gift option */}
+                  {SHOW_GIFT_OPTION && (
+                    <div className="mb-8">
+                      <button
+                        type="button"
+                        onClick={() => setIsGift(!isGift)}
+                        aria-pressed={isGift}
+                        className={`w-full text-left rounded-2xl border-2 p-5 transition-all duration-300 ${isGift ? "border-[#651A1A] bg-[#F5E6D3] shadow-[0_8px_24px_-14px_rgba(101,26,26,0.4)]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${isGift ? "border-[#651A1A] bg-[#651A1A] text-white" : "border-[#651A1A]/20 bg-[#FBF6EF] text-[#651A1A]"}`}>
+                            <Gift className="h-5 w-5" strokeWidth={1.5} />
+                          </div>
+                          <div className="flex-1">
+                            <p className={`font-black text-base tracking-tight transition-colors duration-300 ${isGift ? "text-[#651A1A]" : "text-[#1a1a1a]"}`}>
+                              {locale === 'de' ? 'Mach es persönlich. Sende eine Nachricht mit dem Kuchen.' : 'Make it personal. Send a message with the cake.'}
+                            </p>
+                            <p className={`text-sm leading-snug transition-colors duration-300 ${isGift ? "text-[#651A1A]/70" : "text-gray-600"}`}>
+                              {locale === 'de'
+                                ? 'Video, Foto oder Nachricht. Wir fügen einen QR-Code hinzu, um deine Überraschung zu sehen.'
+                                : 'Video, photo or message. We will add a QR to see your surprise.'}
+                            </p>
+                          </div>
+                          <div className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-300 ${isGift ? "bg-[#651A1A]" : "bg-gray-300"}`}>
+                            <div className={`absolute top-1 h-5 w-5 rounded-full shadow transition-all duration-300 ${isGift ? "left-6 bg-white" : "left-1 bg-white"}`} />
+                          </div>
+                        </div>
+                        {isGift && (
+                          <div className="mt-4 rounded-xl bg-white/60 px-4 py-3 text-sm text-[#651A1A] leading-relaxed">
+                            {locale === 'de'
+                              ? 'Nach der Bezahlung kannst du dein Video, Foto oder deine Nachricht hinzufügen. Wir fügen deinen persönlichen QR-Code hinzu. Zum Geburtstag, als Dankeschön, eine Reise-Überraschung oder einfach so. Einfach scannen und alles auf unserer Seite ansehen.'
+                              : 'After payment you can add your video, photo or message. We add your personal QR code. For a birthday, a thank you, a trip surprise, or just because. They scan it to see everything on our page.'}
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Contact Section */}
+                  <div className="mb-8">
+                    <div className="mb-4">
+                      <h2 className="text-xl font-black">{isGift ? c.contactGift : c.contact}</h2>
+                    </div>
+                    {/* En un regalo, el nombre de quien envía vive aquí, con su email y
+                        teléfono — no en la dirección, que es del destinatario. */}
+                    {isGift && <div className="mb-4">{nameFields}</div>}
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder={c.emailPlaceholder}
+                      value={email}
+                      onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
+                      data-error={missingFields.has('email')}
+                      autoComplete="email"
+                      inputMode="email"
+                      autoCapitalize="off"
+                      autoCorrect="off"
+                      className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('email') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+                      required
+                    />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder={c.phonePlaceholder}
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      autoComplete="tel"
+                      inputMode="tel"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
+                    />
+                    <label className="flex items-center gap-2.5 mt-3 py-1.5 cursor-pointer">
+                      <input type="checkbox" className="h-5 w-5 shrink-0 cursor-pointer accent-[#651A1A]" />
+                      <span className="text-sm">{c.newsletter}</span>
+                    </label>
+                  </div>
+
+                  {/* Shipping Address */}
                   <div className="mb-8">
                     <h2 className="text-xl font-black mb-4">{isGift ? c.deliveryAddressGift : c.deliveryAddress}</h2>
 
                     <div className="space-y-4">
                       {isGift && recipientFields}
-
-                      {/* Solo se entrega en Suiza: un select de una opción parece roto */}
-                      <div className="w-full border border-gray-200 bg-gray-50 rounded-lg px-4 py-3 text-base text-gray-600">
-                        {c.country}
-                      </div>
 
                       {!isGift && nameFields}
 
@@ -987,6 +1215,9 @@ function CheckoutContent() {
                         />
                       </div>
 
+                      {/* Solo se entrega en Suiza: el país es un dato, no un campo */}
+                      <p className="px-1 text-sm text-gray-500">{c.country}</p>
+
                       {postalCodeError && (
                         <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm">
                           {postalCodeError}
@@ -995,18 +1226,14 @@ function CheckoutContent() {
                     </div>
                   </div>
 
-                  {formError && (
-                    <div role="alert" aria-live="polite" className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-                      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      <span>{formError}</span>
-                    </div>
-                  )}
                   {/* En móvil la oferta y los métodos de pago vivían solo en la columna
                       derecha, que ahora está oculta. Los traemos al punto de decisión. */}
                   {!upsellAdded && <div className="lg:hidden mt-6">{upsellBlock}</div>}
                   <div className="lg:hidden mt-4 flex justify-center">{paymentIcons}</div>
 
-                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:mt-4 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none">
+                  <div className={stickyBar}>
+                    {formError && errorAlert(formError)}
+                    {!formError && paymentInitError && errorAlert(paymentInitError)}
                     <div className="mb-2 flex items-center justify-between lg:hidden">
                       <span className="text-sm text-gray-500">{c.total}</span>
                       <PriceDisplay
@@ -1015,337 +1242,7 @@ function CheckoutContent() {
                         currencyClassName="text-[0.55em] opacity-80"
                       />
                     </div>
-                    <button
-                      type="submit"
-                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99]"
-                    >
-                      {c.continueToDelivery}
-                    </button>
-                  </div>
-                </div>
-              </form>
-              )}
-
-              {/* Delivery Date & Time Section. También como <form> para que
-                  "enter" del teclado confirme el paso. */}
-              {showDeliveryStep && !showPayment && (
-                <form onSubmit={handleContinueToPayment}>
-                  {paymentFailed && (
-                    <div role="alert" aria-live="polite" className="bg-amber-50 border border-amber-300 text-amber-900 px-4 py-3 rounded-lg text-sm flex items-start gap-2 mb-6">
-                      <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                      <span>{c.paymentFailedNotice}</span>
-                    </div>
-                  )}
-
-                  <h2 className="text-xl font-black mb-2">{c.deliveryTitle}</h2>
-                  <p className="text-sm text-gray-600 mb-6 flex items-start gap-2">
-                    <svg className="w-5 h-5 text-[#651A1A] flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>{c.deliveryNotice}</span>
-                  </p>
-
-                  <div className="space-y-4 mb-8">
-                    {/* Date Picker */}
-                    <div>
-                      <label className="block text-sm font-bold mb-4">{c.chooseDateLabel}</label>
-                      <style>{`
-                        .custom-datepicker {
-                          font-family: var(--font-playfair), serif;
-                          border: none;
-                          padding: 0;
-                          width: 100%;
-                          background-color: transparent;
-                        }
-                        .react-datepicker {
-                          width: 100%;
-                          border: none;
-                          background-color: transparent;
-                        }
-                        .react-datepicker__month-container {
-                          width: 100%;
-                          margin: 0 auto;
-                        }
-                        .react-datepicker__header {
-                          background-color: transparent;
-                          border-bottom: none;
-                          padding-top: 0;
-                          margin-bottom: 1rem;
-                          width: 100%;
-                        }
-                        .react-datepicker__day-names,
-                        .react-datepicker__week {
-                          display: flex;
-                          justify-content: space-between;
-                          padding: 0;
-                        }
-                        /* Percentage widths so the 7-column grid never overflows a 320px viewport */
-                        .react-datepicker__day-name {
-                          color: #651A1A;
-                          font-family: var(--font-geist-sans), sans-serif;
-                          font-weight: 600;
-                          width: 14.28%;
-                          max-width: 2.75rem;
-                          text-transform: uppercase;
-                          font-size: 0.7rem;
-                          letter-spacing: 0.1em;
-                          margin: 0;
-                          text-align: center;
-                        }
-                        .react-datepicker__day {
-                          width: 14.28%;
-                          max-width: 2.75rem;
-                          aspect-ratio: 1;
-                          display: flex;
-                          align-items: center;
-                          justify-content: center;
-                          line-height: 1;
-                          border-radius: 50%;
-                          margin: 0;
-                          font-family: var(--font-playfair), serif;
-                          font-size: 1rem;
-                          color: #1a1a1a;
-                          transition: background-color 0.2s, color 0.2s, transform 0.12s;
-                          text-align: center;
-                          /* Sin esto, tocar un día en Android deja un cuadrado gris */
-                          -webkit-tap-highlight-color: transparent;
-                        }
-                        .react-datepicker__day:hover:not(.react-datepicker__day--disabled) {
-                          background-color: #E6D5C0;
-                          color: #651A1A;
-                        }
-                        .react-datepicker__day:active:not(.react-datepicker__day--disabled) {
-                          background-color: #E6D5C0;
-                          color: #651A1A;
-                          transform: scale(0.9);
-                        }
-                        .react-datepicker__day--selected {
-                          background-color: #651A1A !important;
-                          color: white !important;
-                        }
-                        /* Sin fecha elegida no debe verse ningún día "seleccionado" */
-                        .react-datepicker__day--keyboard-selected {
-                          background-color: transparent;
-                          color: #1a1a1a;
-                        }
-                        .react-datepicker__day--disabled {
-                          color: #ccc;
-                          opacity: 0.3;
-                        }
-                        .react-datepicker__day--today {
-                          font-weight: bold;
-                          color: #651A1A;
-                          position: relative;
-                        }
-                        .react-datepicker__day--today::after {
-                          content: '';
-                          position: absolute;
-                          bottom: 2px;
-                          left: 50%;
-                          transform: translateX(-50%);
-                          width: 4px;
-                          height: 4px;
-                          background-color: #651A1A;
-                          border-radius: 50%;
-                        }
-                        .react-datepicker__day--selected::after {
-                          display: none;
-                        }
-                        .react-datepicker__month {
-                          margin: 0;
-                        }
-                        /* Móvil: filas algo más bajas y cabecera más fina para que
-                           los tramos horarios no queden una pantalla entera abajo */
-                        @media (max-width: 1023px) {
-                          .custom-datepicker .react-datepicker__header {
-                            margin-bottom: 0.5rem;
-                          }
-                          .custom-datepicker .react-datepicker__day {
-                            height: 2.6rem;
-                            aspect-ratio: auto;
-                            font-size: 0.9rem;
-                          }
-                        }
-                      `}</style>
-
-                      <div className="bg-[#FFFCF8] border border-[#E6D5C0] rounded-2xl p-3 sm:p-6 lg:p-8 flex flex-col lg:flex-row gap-8 items-center mb-6">
-                        {/* Left Side: Calendar */}
-                        <div className="flex-1 w-full max-w-[360px] lg:max-w-none">
-                          <DatePicker
-                            selected={deliveryDate}
-                            onChange={(date) => {
-                              setDeliveryDate(date)
-                              setDeliveryError("")
-                              if (date && deliveryTime && !isSlotAvailable(deliveryTime, date)) {
-                                setDeliveryTime("")
-                              }
-                            }}
-                            minDate={firstSelectableDate}
-                            excludeDates={blockedDates}
-                            filterDate={hasAvailableSlot}
-                            openToDate={deliveryDate ?? firstSelectableDate}
-                            locale={locale === 'en' ? 'en' : 'de'}
-                            inline
-                            calendarClassName="custom-datepicker"
-                            renderCustomHeader={({
-                              date,
-                              decreaseMonth,
-                              increaseMonth,
-                              prevMonthButtonDisabled,
-                              nextMonthButtonDisabled,
-                            }) => (
-                              <div className="flex items-center justify-between px-2 mb-2">
-                                <button
-                                  onClick={decreaseMonth}
-                                  disabled={prevMonthButtonDisabled}
-                                  type="button"
-                                  aria-label={locale === 'en' ? 'Previous month' : 'Vorheriger Monat'}
-                                  className="p-2.5 hover:bg-[#E6D5C0] active:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:active:bg-transparent text-[#651A1A]"
-                                >
-                                  <ChevronLeft className="w-5 h-5" />
-                                </button>
-
-                                <h3 className="text-lg lg:text-xl font-black text-[#1a1a1a] font-serif capitalize">
-                                  {date.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', {
-                                    month: "long",
-                                    year: "numeric",
-                                  })}
-                                </h3>
-
-                                <button
-                                  onClick={increaseMonth}
-                                  disabled={nextMonthButtonDisabled}
-                                  type="button"
-                                  aria-label={locale === 'en' ? 'Next month' : 'Nächster Monat'}
-                                  className="p-2.5 hover:bg-[#E6D5C0] active:bg-[#E6D5C0] rounded-full transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:active:bg-transparent text-[#651A1A]"
-                                >
-                                  <ChevronRight className="w-5 h-5" />
-                                </button>
-                              </div>
-                            )}
-                          />
-                        </div>
-
-                        {/* Divider (Desktop) */}
-                        <div className="hidden lg:block w-px h-64 bg-[#E6D5C0] opacity-50"></div>
-
-                        {/* Right Side: Date Info. Oculto en móvil: el bloque de 4 líneas
-                            empujaba los tramos horarios fuera de pantalla. Debajo hay una
-                            confirmación de una línea. */}
-                        <div className="hidden lg:w-1/3 lg:flex flex-col items-center lg:items-start justify-center text-center lg:text-left">
-                          {deliveryDate ? (
-                            <>
-                              <p className="text-xs uppercase tracking-widest text-[#651A1A] font-bold mb-2">{c.deliveryDateLabel}</p>
-                              <p className="text-4xl lg:text-5xl font-black font-serif text-[#1a1a1a] mb-2">
-                                {deliveryDate.getDate()}
-                              </p>
-                              <p className="text-xl lg:text-2xl font-serif text-[#1a1a1a] mb-1 capitalize">
-                                {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', { month: 'long' })}
-                              </p>
-                              <p className="text-lg text-gray-600 font-medium capitalize">
-                                {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', { weekday: 'long' })}
-                              </p>
-                              <p className="text-sm text-gray-400 mt-2">
-                                {deliveryDate.getFullYear()}
-                              </p>
-                            </>
-                          ) : (
-                            <div className="text-gray-400 flex flex-col items-center lg:items-start">
-                              <p className="mb-2">{c.selectDatePlaceholder}</p>
-                              <div className="w-12 h-1 bg-gray-200 rounded-full"></div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Confirmación compacta de la fecha en móvil */}
-                      {deliveryDate && (
-                        <div className="lg:hidden -mt-3 mb-2 flex items-center gap-3 rounded-xl border border-[#E6D5C0] bg-[#FFFCF8] px-4 py-3">
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#651A1A] text-sm font-black text-white">
-                            {deliveryDate.getDate()}
-                          </span>
-                          <p className="text-sm font-bold capitalize text-[#1a1a1a]">
-                            {deliveryDate.toLocaleDateString(locale === 'en' ? 'en-GB' : 'de-CH', {
-                              weekday: 'long',
-                              day: 'numeric',
-                              month: 'long',
-                            })}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Time Slot Picker */}
-                    <div>
-                      <label className="block text-sm font-bold mb-3">{c.chooseTimeLabel}</label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {timeSlots.map((slot) => {
-                          const available = isSlotAvailable(slot)
-                          return (
-                            <button
-                              key={slot}
-                              type="button"
-                              disabled={!available}
-                              onClick={() => {
-                                setDeliveryTime(slot)
-                                setDeliveryError("")
-                              }}
-                              className={`relative p-4 rounded-xl border-2 transition-all duration-200 ${!available
-                                ? "border-gray-200 bg-gray-50 opacity-50 cursor-not-allowed"
-                                : deliveryTime === slot
-                                  ? "border-[#651A1A] bg-[#F5E6D3] shadow-md [@media(hover:hover)]:hover:scale-105"
-                                  : "border-gray-300 bg-white hover:border-gray-400 [@media(hover:hover)]:hover:scale-105"
-                                }`}
-                            >
-                              {/* El check iba en una insignia absoluta que en móvil caía
-                                  encima del propio texto de la hora. Ahora sustituye al
-                                  icono del reloj. */}
-                              <div className="flex items-center justify-center gap-2">
-                                {available && deliveryTime === slot ? (
-                                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#651A1A]">
-                                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                  </span>
-                                ) : (
-                                  <svg className={`w-5 h-5 shrink-0 ${available ? "text-[#651A1A]" : "text-gray-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                  </svg>
-                                )}
-                                <span className={`font-bold text-sm ${available ? "" : "text-gray-400 line-through"}`}>{slot}</span>
-                              </div>
-                              {!available && (
-                                <p className="text-[0.65rem] text-gray-400 mt-1">{c.slotUnavailable}</p>
-                              )}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="sticky bottom-0 -mx-4 mt-4 border-t border-gray-200 bg-white px-4 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-10px_28px_-20px_rgba(0,0,0,0.45)] lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:px-0 lg:pt-0 lg:pb-0 lg:shadow-none">
-                    {/* El error vive dentro de la barra sticky: fuera quedaba
-                        tapado por la propia barra justo donde aparece. */}
-                    {(deliveryError || paymentInitError) && (
-                      <div role="alert" aria-live="polite" className="mb-3 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm flex items-start gap-2">
-                        <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                        <span>{deliveryError || paymentInitError}</span>
-                      </div>
-                    )}
-                    <div className="mb-2 flex items-center justify-between lg:hidden">
-                      <span className="text-sm text-gray-500">{c.total}</span>
-                      <PriceDisplay
-                        amount={finalPrice}
-                        className={`text-base font-black ${discount > 0 ? 'text-green-600' : ''}`}
-                        currencyClassName="text-[0.55em] opacity-80"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={isInitializingPayment}
-                      className="w-full bg-black text-white py-4 rounded-lg font-black text-base tracking-tight transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.99] disabled:bg-gray-400 disabled:cursor-not-allowed disabled:active:scale-100"
-                    >
+                    <button type="submit" disabled={isInitializingPayment} className={primaryButton}>
                       {isInitializingPayment ? (
                         <span className="inline-flex items-center justify-center gap-2">
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
@@ -1360,20 +1257,22 @@ function CheckoutContent() {
               )}
 
               {/* Payment Section */}
-              {showPayment && clientSecret && (
+              {step === 3 && clientSecret && (
                 <div>
                   <button
-                    onClick={() => {
-                      setShowPayment(false)
-                      setClientSecret("")
-                    }}
+                    type="button"
+                    onClick={() => goToStep(2)}
                     className="text-sm text-gray-600 hover:text-black mb-4 flex items-center gap-2"
                   >
                     <ChevronRight className="w-4 h-4 rotate-180" />
-                    {c.backToDelivery}
+                    {c.backToDetails}
                   </button>
 
-                  <h2 className="text-xl font-black mb-4">{c.paymentTitle}</h2>
+                  <h2 className="text-xl font-black mb-2">{c.paymentTitle}</h2>
+                  <p className="mb-5 flex items-center gap-2 text-sm capitalize text-gray-600">
+                    <Truck className="h-4 w-4 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
+                    {deliverySummary}
+                  </p>
                   <Elements
                     stripe={stripePromise}
                     options={{
@@ -1381,7 +1280,7 @@ function CheckoutContent() {
                       appearance: stripeAppearance,
                     }}
                   >
-                    <PaymentForm clientSecret={clientSecret} amount={finalPrice} />
+                    <PaymentForm amount={paymentAmount} />
                   </Elements>
                 </div>
               )}
@@ -1395,28 +1294,7 @@ function CheckoutContent() {
             <h2 className="text-xl font-black mb-6">{c.orderSummary}</h2>
 
             {/* Cart Items */}
-            <div className="space-y-4 mb-6">
-              {cartItems.map((item) => (
-                  <div key={item.id} className="flex gap-4">
-                    <div className="w-20 h-20 bg-[#F5E6D3] rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-sm">{item.name}</h3>
-                      <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
-                      <p className="text-xs text-gray-900 font-bold mt-1">{c.qty} {item.quantity}</p>
-                    </div>
-                    <div className="font-bold">
-                      <PriceDisplay amount={item.price * item.quantity} className="text-base" currencyClassName="text-[0.6em] opacity-80" />
-                    </div>
-                  </div>
-              ))}
-
-            </div>
+            <div className="mb-6">{orderLines("w-20 h-20")}</div>
 
             {/* Discount Code */}
             <div className="mb-6">{discountCodeBlock}</div>
@@ -1431,11 +1309,7 @@ function CheckoutContent() {
               </div>
               {discount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-green-700 font-bold">
-                    {hasCodeDiscount
-                      ? (totalPrice >= 100 ? "15% Rabatt (HolaSwitzerland)" : "10% Rabatt (HolaSwitzerland)")
-                      : "10% Rabatt"}
-                  </span>
+                  <span className="text-green-700 font-bold">{discountLabel}</span>
                   <span className="text-green-600 font-bold flex items-center">
                     -<PriceDisplay amount={discount} className="text-base font-bold" currencyClassName="text-[0.5em] opacity-80" />
                   </span>

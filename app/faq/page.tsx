@@ -18,7 +18,7 @@ const content = {
             },
             {
                 q: "Wie lange im Voraus muss ich bestellen?",
-                a: "Mindestens 36 Stunden. Jeder Cheesecake wird frisch für dich gebacken — deshalb brauchen wir etwas Vorlaufzeit. Dein Wunschdatum wählst du im Checkout.",
+                a: "Mindestens 24 Stunden. Jeder Cheesecake wird frisch für dich gebacken — deshalb brauchen wir etwas Vorlaufzeit. Dein Wunschdatum wählst du im Checkout.",
             },
             {
                 q: "Wie lange ist der Cheesecake haltbar?",
@@ -50,7 +50,7 @@ const content = {
             },
             {
                 q: "How far in advance do I need to order?",
-                a: "At least 36 hours. Every cheesecake is freshly baked for you — that's why we need a little lead time. You choose your preferred date in the checkout.",
+                a: "At least 24 hours. Every cheesecake is freshly baked for you — that's why we need a little lead time. You choose your preferred date in the checkout.",
             },
             {
                 q: "How long does the cheesecake keep?",

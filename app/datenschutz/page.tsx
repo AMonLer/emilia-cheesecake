@@ -11,7 +11,7 @@ export default function DatenschutzPage() {
             <main className="pt-32 pb-20">
                 <div className="container mx-auto px-4 max-w-2xl">
                     <h1 className="text-xl font-bold mb-2 tracking-tight text-gray-900">Datenschutzerklärung</h1>
-                    <p className="text-xs text-gray-400 mb-8">Stand: Juni 2026</p>
+                    <p className="text-xs text-gray-400 mb-8">Stand: September 2026</p>
 
                     <div className="space-y-6 text-sm text-gray-500 leading-relaxed">
                         <section>
@@ -51,9 +51,13 @@ export default function DatenschutzPage() {
                                 analysieren und unsere Werbung zu verbessern: Google Analytics und Google Ads (Google
                                 Ireland Ltd.), Meta Pixel (Meta Platforms Ireland Ltd.) und Microsoft Clarity (Microsoft
                                 Ireland Operations Ltd.). Diese Dienste verwenden Cookies und ähnliche Technologien und
-                                können Informationen über Ihre Nutzung der Website in die USA übertragen. Sie können das
-                                Speichern von Cookies in den Einstellungen Ihres Browsers jederzeit einschränken oder
-                                deaktivieren.
+                                können Informationen über Ihre Nutzung der Website in die USA übertragen. Beim ersten
+                                Besuch fragen wir Sie in einem Hinweis, ob Sie diese Cookies akzeptieren oder ablehnen.
+                                Lehnen Sie ab, setzt Microsoft Clarity keine Cookies und Google sowie Meta erhalten das
+                                Signal, dass keine Einwilligung vorliegt; auch unsere serverseitige Kaufmeldung an Meta
+                                entfällt dann. Ihre Wahl können Sie jederzeit über den Link „Cookie-Einstellungen“ am
+                                Ende jeder Seite ändern. Zusätzlich können Sie Cookies in den Einstellungen Ihres
+                                Browsers einschränken oder deaktivieren.
                             </p>
                         </section>
 

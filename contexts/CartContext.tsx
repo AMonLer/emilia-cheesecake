@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
+import { products } from "@/lib/products"
 
 interface CartItem {
   id: string
@@ -17,9 +18,25 @@ interface CartContextType {
   setIsCartOpen: (open: boolean) => void
   addToCart: (item: CartItem) => void
   updateQuantity: (id: string, quantity: number) => void
+  updateSize: (id: string, size: CartSize) => void
   removeItem: (id: string) => void
   totalPrice: number
   cartItemCount: number
+}
+
+export type CartSize = "2-3" | "8-10"
+
+// Catalogue items are added as `${slug}-${size}-${timestamp}`. The checkout
+// upsell has a special price, so it is not a catalogue item and stays fixed.
+export function productSlugForItem(item: { id: string }): string | null {
+  if (item.id.includes('upsell')) return null
+  const slug = item.id.split('-')[0]
+  return products[slug] ? slug : null
+}
+
+// The 2-3 size has its own photo of the cake in its box, named by slug.
+export function cartImageFor(slug: string, size: CartSize): string {
+  return size === "2-3" ? `/${slug}3.jpeg` : products[slug].images[0]
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -84,9 +101,29 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity < 1) return
-    setCartItems(cartItems.map(item =>
+    setCartItems(items => items.map(item =>
       item.id === id ? { ...item, quantity: newQuantity } : item
     ))
+  }
+
+  // Buyers tapped the size in the cart expecting to change it. Switching keeps
+  // the quantity and folds into an existing line of the same cake and size.
+  const updateSize = (id: string, size: CartSize) => {
+    setCartItems(items => {
+      const target = items.find(item => item.id === id)
+      const slug = target ? productSlugForItem(target) : null
+      const price = slug ? products[slug].prices[size] : undefined
+      if (!target || !slug || !price || target.size === size) return items
+      const twin = items.find(item => item.id !== id && item.size === size && productSlugForItem(item) === slug)
+      if (twin) {
+        return items
+          .filter(item => item.id !== id)
+          .map(item => item.id === twin.id ? { ...item, quantity: item.quantity + target.quantity } : item)
+      }
+      return items.map(item =>
+        item.id === id ? { ...item, size, price, image: cartImageFor(slug, size) } : item
+      )
+    })
   }
 
   const removeItem = (id: string) => {
@@ -106,6 +143,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setIsCartOpen,
       addToCart,
       updateQuantity,
+      updateSize,
       removeItem,
       totalPrice,
       cartItemCount,

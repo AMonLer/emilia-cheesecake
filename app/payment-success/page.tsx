@@ -6,6 +6,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { loadStripe } from "@stripe/stripe-js"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { trackEvent } from "@/lib/tracking"
 
 declare global {
   interface Window {
@@ -18,7 +19,18 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY 
 
 // TWINT y otros métodos con redirección siempre vuelven a esta página, se haya
 // pagado o no. Hay que verificar el PaymentIntent antes de dar las gracias.
-type PaymentStatus = 'checking' | 'succeeded' | 'processing'
+type PaymentStatus = 'checking' | 'succeeded' | 'processing' | 'slow'
+
+// TWINT often hands the buyer back (redirect_status=pending) before it has told
+// Stripe the payment went through: the intent is still `requires_action` for a
+// few seconds. This page used to read that as a failure and send paying
+// customers back to the checkout, where one tapped "pay" again. Only a definite
+// failure goes back now; anything in between waits here.
+const FAILED_STATUSES = new Set(['requires_payment_method', 'canceled'])
+const FAST_POLLS = 20        // every 2 s for the first 40 s
+const FAST_POLL_MS = 2_000
+const SLOW_POLL_MS = 5_000
+const GIVE_UP_AFTER_MS = 10 * 60_000
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams()
@@ -28,6 +40,8 @@ function PaymentSuccessContent() {
   const [status, setStatus] = useState<PaymentStatus>('checking')
   const [foryouCode, setForyouCode] = useState<string | null>(null)
   const confirmedRef = useRef(false)
+  // Bumped by "check again" to restart the polling after it gave up.
+  const [checkRound, setCheckRound] = useState(0)
 
   useEffect(() => {
     const paymentIntent = searchParams.get('payment_intent')
@@ -79,10 +93,12 @@ function PaymentSuccessContent() {
         })
       }
 
+      trackEvent('purchase')
       localStorage.removeItem('emilia-cart')
       localStorage.removeItem('emilia-cart-timestamp')
       localStorage.removeItem('emilia-order-value')
       sessionStorage.removeItem('emilia-checkout-form')
+      sessionStorage.removeItem('emilia-payment-intent')
     }
 
     // Atajo SOLO para desarrollo: ?demo=1 muestra el bloque sin pago real
@@ -100,8 +116,15 @@ function PaymentSuccessContent() {
 
     let cancelled = false
     let attempts = 0
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const startedAt = Date.now()
+    let reportedPending = false
+    let inFlight = false
 
     const verify = async () => {
+      if (inFlight) return
+      inFlight = true
+      clearTimeout(timer)
       try {
         const stripe = await stripePromise
         if (!stripe || cancelled) return
@@ -110,24 +133,43 @@ function PaymentSuccessContent() {
 
         if (!pi || pi.status === 'succeeded' || pi.status === 'requires_capture') {
           confirmSuccess()
-        } else if (pi.status === 'processing') {
-          // TWINT puede tardar unos segundos en confirmar: reintentar hasta ~1 min
-          setStatus('processing')
-          if (attempts++ < 20) setTimeout(verify, 3000)
-        } else {
-          // requires_payment_method / requires_action / canceled: pago no completado.
-          // El carrito y los datos del formulario siguen guardados.
+        } else if (FAILED_STATUSES.has(pi.status)) {
+          // Pago rechazado o cancelado. El carrito y los datos del formulario
+          // siguen guardados.
           router.replace('/checkout?payment=failed')
+        } else if (Date.now() - startedAt >= GIVE_UP_AFTER_MS) {
+          // Still unconfirmed: say so plainly and keep the buyer away from paying twice.
+          setStatus('slow')
+        } else {
+          // processing / requires_action: TWINT is still confirming.
+          setStatus('processing')
+          if (!reportedPending) {
+            reportedPending = true
+            trackEvent('payment_pending')
+          }
+          timer = setTimeout(verify, attempts++ < FAST_POLLS ? FAST_POLL_MS : SLOW_POLL_MS)
         }
       } catch {
         // Si no se puede verificar, no bloqueamos al cliente (sin conversiones)
         if (!cancelled) setStatus('succeeded')
+      } finally {
+        inFlight = false
       }
     }
     verify()
 
-    return () => { cancelled = true }
-  }, [searchParams, router])
+    // Phones pause timers in background tabs: check as soon as the page is back.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !confirmedRef.current) verify()
+    }
+    document.addEventListener('visibilitychange', onVisible)
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [searchParams, router, checkRound])
 
   if (status === 'checking') {
     return (
@@ -137,7 +179,8 @@ function PaymentSuccessContent() {
     )
   }
 
-  const isPending = status === 'processing'
+  const isSlow = status === 'slow'
+  const isPending = status === 'processing' || isSlow
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center px-4 py-12">
@@ -161,16 +204,25 @@ function PaymentSuccessContent() {
         </div>
         <div className="space-y-6 mb-12 animate-slide-up">
           <h1 className="text-3xl md:text-4xl font-medium tracking-[0.2em] text-black uppercase">
-            {isPending ? ps.pendingTitle : ps.title}
+            {isSlow ? ps.slowTitle : isPending ? ps.pendingTitle : ps.title}
           </h1>
           <div className="w-12 h-0.5 bg-[#651A1A] mx-auto opacity-50" />
           <p className="text-gray-500 font-light tracking-wide text-lg leading-relaxed max-w-md mx-auto">
-            {isPending ? ps.pendingMessage : ps.message}
+            {isSlow ? ps.slowMessage : isPending ? ps.pendingMessage : ps.message}
           </p>
-          {isPending && (
+          {isPending && !isSlow && (
             <div className="flex justify-center">
               <div className="w-8 h-8 border-2 border-[#651A1A]/20 border-t-[#651A1A] rounded-full animate-spin" />
             </div>
+          )}
+          {isSlow && (
+            <button
+              type="button"
+              onClick={() => { setStatus('processing'); setCheckRound((n) => n + 1) }}
+              className="mx-auto block rounded-full border border-[#651A1A] px-6 py-2.5 text-sm font-bold text-[#651A1A] transition-colors hover:bg-[#651A1A] hover:text-white"
+            >
+              {ps.checkAgain}
+            </button>
           )}
         </div>
 

@@ -250,9 +250,12 @@ ${productsText}
 
       console.log('✅ Emails enviados correctamente')
 
-      // Meta CAPI: Purchase (server-side, deduplicates with browser pixel via eventId)
-      const eventId = `purchase-${paymentIntent.id}`
-      await sendMetaCAPI('Purchase', eventId, amount, metadata.customerEmail)
+      // Meta CAPI: Purchase (server-side, deduplicates with browser pixel via eventId).
+      // Not sent when the buyer declined tracking in the cookie banner.
+      if (metadata.trackingConsent !== 'denied') {
+        const eventId = `purchase-${paymentIntent.id}`
+        await sendMetaCAPI('Purchase', eventId, amount, metadata.customerEmail)
+      }
 
       // Crear pedido en Notion (calendario móvil)
       await createOrderInNotion({

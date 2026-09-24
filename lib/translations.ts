@@ -27,6 +27,20 @@ export type Translations = {
     discount: string
     offer: string
     persons: string
+    remove: string
+    decrease: string
+    increase: string
+  }
+  delivery: {
+    earliest: string
+    tomorrow: string
+  }
+  consent: {
+    text: string
+    accept: string
+    decline: string
+    learnMore: string
+    settings: string
   }
   marquee: string
   products: {
@@ -146,12 +160,13 @@ export type Translations = {
   relatedProducts: {
     title: string
     add: string
+    addAria: (name: string) => string
   }
   checkout: {
     emptyCart: string
     continueShopping: string
     breadcrumbCart: string
-    breadcrumbInfo: string
+    breadcrumbDetails: string
     breadcrumbPayment: string
     contact: string
     contactGift: string
@@ -169,17 +184,16 @@ export type Translations = {
     postalCodePlaceholder: string
     formError: string
     postalCodeError: string
-    continueToDelivery: string
-    backToAddress: string
     deliveryTitle: string
+    deliveryQuestion: string
     deliveryNotice: string
     chooseDateLabel: string
-    deliveryDateLabel: string
-    selectDatePlaceholder: string
+    moreDates: string
     chooseTimeLabel: string
     deliveryError: string
+    continueToDetails: string
     continueToPayment: string
-    backToDelivery: string
+    backToDetails: string
     paymentTitle: string
     orderSummary: string
     qty: string
@@ -201,6 +215,7 @@ export type Translations = {
     slotUnavailable: string
     slotExpired: string
     dateUnavailable: string
+    orderChanged: string
     change: string
     persons: string
   }
@@ -209,6 +224,9 @@ export type Translations = {
     message: string
     pendingTitle: string
     pendingMessage: string
+    slowTitle: string
+    slowMessage: string
+    checkAgain: string
     backHome: string
     questions: string
     contactUs: string
@@ -244,6 +262,20 @@ export const translations: Record<Locale, Translations> = {
       discount: 'Rabatt (10%)',
       offer: 'ANGEBOT',
       persons: 'Personen',
+      remove: 'Entfernen',
+      decrease: 'Menge verringern',
+      increase: 'Menge erhöhen',
+    },
+    delivery: {
+      earliest: 'Früheste Lieferung',
+      tomorrow: 'morgen',
+    },
+    consent: {
+      text: 'Wir verwenden Cookies für Statistik und Werbung (Microsoft Clarity, Google, Meta), um unsere Seite zu verbessern.',
+      accept: 'Akzeptieren',
+      decline: 'Ablehnen',
+      learnMore: 'Mehr erfahren',
+      settings: 'Cookie-Einstellungen',
     },
     marquee: '10% RABATT AB 100 CHF • GRATIS VERSAND',
     products: {
@@ -363,12 +395,13 @@ export const translations: Record<Locale, Translations> = {
     relatedProducts: {
       title: 'PASST PERFEKT DAZU',
       add: 'DAZU',
+      addAria: (name) => `${name} (8–10 Personen) in den Warenkorb`,
     },
     checkout: {
       emptyCart: 'Ihr Warenkorb ist leer',
       continueShopping: 'Weiter einkaufen',
       breadcrumbCart: 'Warenkorb',
-      breadcrumbInfo: 'Informationen',
+      breadcrumbDetails: 'Angaben',
       breadcrumbPayment: 'Zahlung',
       contact: 'Kontakt',
       contactGift: 'Deine Daten',
@@ -386,17 +419,16 @@ export const translations: Record<Locale, Translations> = {
       postalCodePlaceholder: 'Postleitzahl',
       formError: 'Bitte füllen Sie alle Pflichtfelder aus (rot markiert).',
       postalCodeError: 'Leider liefern wir nur im Umkreis von 10km um Zürich Zentrum. Ihre Postleitzahl liegt ausserhalb unseres Liefergebiets.',
-      continueToDelivery: 'Weiter zur Lieferzeit',
-      backToAddress: 'Zurück zur Adresse',
       deliveryTitle: 'Lieferung',
-      deliveryNotice: 'Bestellungen benötigen mindestens 36 Stunden Vorlaufzeit. Alle Käsekuchen werden frisch für Sie gebacken.',
-      chooseDateLabel: 'Lieferdatum wählen',
-      deliveryDateLabel: 'Lieferdatum',
-      selectDatePlaceholder: 'Bitte wählen Sie ein Datum',
-      chooseTimeLabel: 'Gewünschte Lieferzeit',
+      deliveryQuestion: 'Wann sollen wir liefern?',
+      deliveryNotice: 'Alle Käsekuchen werden frisch für Sie gebacken. Deshalb brauchen wir mindestens 24 Stunden Vorlaufzeit.',
+      chooseDateLabel: 'Lieferdatum',
+      moreDates: 'Anderes Datum',
+      chooseTimeLabel: 'Lieferzeit',
       deliveryError: 'Bitte wählen Sie Lieferdatum und -zeit.',
+      continueToDetails: 'Weiter zu den Angaben',
       continueToPayment: 'Weiter zur Zahlung',
-      backToDelivery: 'Zurück zur Lieferzeit',
+      backToDetails: 'Zurück zu den Angaben',
       paymentTitle: 'Zahlung',
       orderSummary: 'Bestellübersicht',
       qty: 'Menge:',
@@ -416,8 +448,9 @@ export const translations: Record<Locale, Translations> = {
       paymentInitError: 'Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.',
       paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – Ihre Angaben sind gespeichert. Bitte versuchen Sie es erneut.',
       slotUnavailable: 'Für dieses Datum nicht verfügbar',
-      slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 36 Stunden Vorlaufzeit. Bitte wählen Sie einen neuen Termin.',
+      slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 24 Stunden Vorlaufzeit. Bitte wählen Sie einen neuen Termin.',
       dateUnavailable: 'Dieses Lieferdatum ist nicht mehr verfügbar. Bitte wählen Sie ein anderes Datum.',
+      orderChanged: 'Ihre Bestellung hat sich geändert. Bitte bestätigen Sie sie noch einmal.',
       change: 'Ändern',
       persons: 'Personen',
     },
@@ -425,7 +458,10 @@ export const translations: Record<Locale, Translations> = {
       title: 'Vielen Dank',
       message: 'Ihre Bestellung ist bestätigt. Wir backen Ihren Kuchen frisch für Ihren Liefertermin.',
       pendingTitle: 'Zahlung wird bestätigt',
-      pendingMessage: 'Ihre Zahlung wird gerade verarbeitet. Das dauert in der Regel nur einen Moment – diese Seite aktualisiert sich automatisch.',
+      pendingMessage: 'Ihre Zahlung wird gerade bestätigt. Das dauert in der Regel nur einen Moment – diese Seite aktualisiert sich automatisch. Bitte nicht erneut bezahlen.',
+      slowTitle: 'Bestätigung ausstehend',
+      slowMessage: 'Die Bestätigung dauert länger als üblich. Sobald die Zahlung eingegangen ist, erhalten Sie eine E-Mail. Bitte nicht erneut bezahlen – bei Fragen sind wir gerne für Sie da.',
+      checkAgain: 'Erneut prüfen',
       backHome: 'Zurück zur Startseite',
       questions: 'Fragen?',
       contactUs: 'Kontaktieren Sie uns',
@@ -459,6 +495,20 @@ export const translations: Record<Locale, Translations> = {
       discount: 'Discount (10%)',
       offer: 'OFFER',
       persons: 'persons',
+      remove: 'Remove',
+      decrease: 'Decrease quantity',
+      increase: 'Increase quantity',
+    },
+    delivery: {
+      earliest: 'Earliest delivery',
+      tomorrow: 'tomorrow',
+    },
+    consent: {
+      text: 'We use cookies for statistics and advertising (Microsoft Clarity, Google, Meta) to improve our site.',
+      accept: 'Accept',
+      decline: 'Decline',
+      learnMore: 'Learn more',
+      settings: 'Cookie settings',
     },
     marquee: '10% DISCOUNT FROM CHF 100 • FREE DELIVERY',
     products: {
@@ -578,12 +628,13 @@ export const translations: Record<Locale, Translations> = {
     relatedProducts: {
       title: 'PAIRS PERFECTLY WITH',
       add: 'ADD',
+      addAria: (name) => `Add ${name} (8–10 persons) to cart`,
     },
     checkout: {
       emptyCart: 'Your cart is empty',
       continueShopping: 'Continue shopping',
       breadcrumbCart: 'Cart',
-      breadcrumbInfo: 'Information',
+      breadcrumbDetails: 'Details',
       breadcrumbPayment: 'Payment',
       contact: 'Contact',
       contactGift: 'Your details',
@@ -601,17 +652,16 @@ export const translations: Record<Locale, Translations> = {
       postalCodePlaceholder: 'Postal code',
       formError: 'Please fill in all required fields (highlighted in red).',
       postalCodeError: 'Unfortunately we only deliver within 10km of Zurich city centre. Your postal code is outside our delivery area.',
-      continueToDelivery: 'Continue to Delivery',
-      backToAddress: 'Back to address',
       deliveryTitle: 'Delivery',
-      deliveryNotice: 'Orders require at least 36 hours\' notice. All cheesecakes are freshly baked for you.',
-      chooseDateLabel: 'Choose delivery date',
-      deliveryDateLabel: 'Delivery date',
-      selectDatePlaceholder: 'Please select a date',
-      chooseTimeLabel: 'Preferred delivery time',
+      deliveryQuestion: 'When should we deliver?',
+      deliveryNotice: 'Every cheesecake is freshly baked for you, so we need at least 24 hours\' notice.',
+      chooseDateLabel: 'Delivery date',
+      moreDates: 'Other date',
+      chooseTimeLabel: 'Delivery time',
       deliveryError: 'Please select a delivery date and time.',
+      continueToDetails: 'Continue to your details',
       continueToPayment: 'Continue to Payment',
-      backToDelivery: 'Back to delivery',
+      backToDetails: 'Back to your details',
       paymentTitle: 'Payment',
       orderSummary: 'Order Summary',
       qty: 'Qty:',
@@ -631,8 +681,9 @@ export const translations: Record<Locale, Translations> = {
       paymentInitError: 'Error starting payment. Please try again.',
       paymentFailedNotice: 'Your payment was not completed. Don\'t worry – your details are saved. Please try again.',
       slotUnavailable: 'Not available for this date',
-      slotExpired: 'Your delivery slot no longer meets the 36-hour lead time. Please pick a new one.',
+      slotExpired: 'Your delivery slot no longer meets the 24-hour lead time. Please pick a new one.',
       dateUnavailable: 'This delivery date is no longer available. Please choose another date.',
+      orderChanged: 'Your order has changed. Please confirm it once more.',
       change: 'Change',
       persons: 'persons',
     },
@@ -640,7 +691,10 @@ export const translations: Record<Locale, Translations> = {
       title: 'Thank You',
       message: 'Your order is confirmed. We bake your cake fresh for your delivery date.',
       pendingTitle: 'Confirming your payment',
-      pendingMessage: 'Your payment is being processed. This usually only takes a moment – this page will update automatically.',
+      pendingMessage: 'Your payment is being confirmed. This usually only takes a moment – this page will update automatically. Please do not pay again.',
+      slowTitle: 'Confirmation pending',
+      slowMessage: 'Confirmation is taking longer than usual. We will email you as soon as the payment arrives. Please do not pay again – if you have questions, we are happy to help.',
+      checkAgain: 'Check again',
       backHome: 'Back to Home',
       questions: 'Questions?',
       contactUs: 'Contact us',

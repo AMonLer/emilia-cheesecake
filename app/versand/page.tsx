@@ -19,7 +19,7 @@ const content = {
             {
                 icon: Clock,
                 title: "Lieferzeit",
-                text: "Alle Käsekuchen werden frisch auf Bestellung gebacken. Deshalb benötigen wir mindestens 36 Stunden Vorlaufzeit. Dein Wunschdatum und das Lieferzeitfenster wählst du bequem im Checkout.",
+                text: "Alle Käsekuchen werden frisch auf Bestellung gebacken. Deshalb benötigen wir mindestens 24 Stunden Vorlaufzeit. Dein Wunschdatum und das Lieferzeitfenster wählst du bequem im Checkout.",
             },
             {
                 icon: Snowflake,
@@ -46,7 +46,7 @@ const content = {
             {
                 icon: Clock,
                 title: "Delivery time",
-                text: "All cheesecakes are freshly baked to order. That's why we need at least 36 hours' notice. You can choose your preferred date and delivery window conveniently in the checkout.",
+                text: "All cheesecakes are freshly baked to order. That's why we need at least 24 hours' notice. You can choose your preferred date and delivery window conveniently in the checkout.",
             },
             {
                 icon: Snowflake,

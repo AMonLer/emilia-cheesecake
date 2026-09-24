@@ -5,6 +5,7 @@ import { useState } from "react"
 import ContactModal from "./ContactModal"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
+import { OPEN_CONSENT_EVENT } from "@/lib/tracking"
 
 export default function Footer() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
@@ -102,10 +103,18 @@ export default function Footer() {
           <div className="border-t border-white/10 pt-8">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-[#F5E6D3]/40">
               <p>{f.copyright}</p>
-              <div className="flex gap-6 text-xs">
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs">
                 <Link href="/datenschutz" className="hover:text-white transition-colors">{f.privacy}</Link>
                 <Link href="/agb" className="hover:text-white transition-colors">{f.terms}</Link>
                 <Link href="/impressum" className="hover:text-white transition-colors">{f.imprint}</Link>
+                {/* The choice made in the cookie banner can be changed at any time. */}
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new Event(OPEN_CONSENT_EVENT))}
+                  className="hover:text-white transition-colors"
+                >
+                  {t.consent.settings}
+                </button>
               </div>
             </div>
           </div>

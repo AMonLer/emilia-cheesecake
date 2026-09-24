@@ -7,6 +7,7 @@ import Image from "next/image"
 import { Check, CheckCircle, CreditCard, Sparkles } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
+import EarliestDelivery from "@/components/EarliestDelivery"
 
 declare global {
   interface Window {
@@ -147,6 +148,8 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                         )}
                     </button>
                 </div>
+
+                <EarliestDelivery className="mb-3 text-xs text-black/70" />
 
                 <button
                     onClick={addToCart}
@@ -324,6 +327,8 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                     </button>
                 </div>
             </div>
+
+            <EarliestDelivery className="-mt-4 mb-4 text-sm text-black/70" />
 
             <button
                 onClick={addToCart}

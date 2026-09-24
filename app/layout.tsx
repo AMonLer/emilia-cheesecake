@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/CartContext"
 import { LanguageProvider } from "@/contexts/LanguageContext"
 import Script from "next/script"
+import CookieConsent from "@/components/CookieConsent"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -61,7 +62,9 @@ export default function RootLayout({
     <html lang="de">
       <head>
         <meta name="facebook-domain-verification" content="4jyvx65rk5n9vu0w54te5prj9kdalu" />
-        {/* Google Analytics + Google Ads */}
+        {/* Google Analytics + Google Ads. A visitor who declined in the cookie
+            banner (localStorage "emilia-consent", see lib/tracking.ts) is marked
+            as denied before anything is configured. */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-JL27DJQJKH"
           strategy="afterInteractive"
@@ -70,6 +73,11 @@ export default function RootLayout({
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            try {
+              if (localStorage.getItem('emilia-consent') === 'denied') {
+                gtag('consent', 'default', { ad_storage: 'denied', analytics_storage: 'denied', ad_user_data: 'denied', ad_personalization: 'denied' });
+              }
+            } catch (e) {}
             gtag('js', new Date());
             gtag('config', 'G-JL27DJQJKH');
             gtag('config', 'AW-17759330762');
@@ -87,6 +95,9 @@ export default function RootLayout({
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+            try {
+              if (localStorage.getItem('emilia-consent') === 'denied') fbq('consent', 'revoke');
+            } catch (e) {}
             fbq('init', '26409977948633382');
             fbq('track', 'PageView');
           `}
@@ -104,6 +115,12 @@ export default function RootLayout({
               t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
               y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
             })(window, document, "clarity", "script", "v0ghuxofc9");
+            try {
+              var consent = localStorage.getItem('emilia-consent');
+              if (consent === 'granted' || consent === 'denied') {
+                clarity('consentv2', { ad_Storage: consent, analytics_Storage: consent });
+              }
+            } catch (e) {}
           `}
         </Script>
       </head>
@@ -111,6 +128,7 @@ export default function RootLayout({
         <LanguageProvider>
           <CartProvider>
             {children}
+            <CookieConsent />
             <Analytics />
           </CartProvider>
         </LanguageProvider>

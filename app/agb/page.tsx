@@ -11,7 +11,7 @@ export default function AgbPage() {
             <main className="pt-32 pb-20">
                 <div className="container mx-auto px-4 max-w-2xl">
                     <h1 className="text-xl font-bold mb-2 tracking-tight text-gray-900">Allgemeine Geschäftsbedingungen (AGB)</h1>
-                    <p className="text-xs text-gray-400 mb-8">Stand: Juni 2026</p>
+                    <p className="text-xs text-gray-400 mb-8">Stand: September 2026</p>
 
                     <div className="space-y-6 text-sm text-gray-500 leading-relaxed">
                         <section>
@@ -25,8 +25,8 @@ export default function AgbPage() {
                         <section>
                             <h2 className="font-semibold text-gray-900 mb-1">2. Angebot und Vertragsabschluss</h2>
                             <p>
-                                Alle Käsekuchen werden frisch auf Bestellung gebacken. Bestellungen benötigen eine
-                                Vorlaufzeit von mindestens 36 Stunden. Mit dem Abschluss des Bestellvorgangs und der
+                                Alle Käsekuchen werden frisch auf Bestellung gebacken. Bestellungen sind bis spätestens
+                                24 Stunden vor Beginn des gewählten Lieferzeitfensters möglich. Mit dem Abschluss des Bestellvorgangs und der
                                 erfolgreichen Zahlung kommt der Vertrag zustande. Sie erhalten eine Bestellbestätigung
                                 per E-Mail.
                             </p>
@@ -56,10 +56,9 @@ export default function AgbPage() {
                         <section>
                             <h2 className="font-semibold text-gray-900 mb-1">5. Stornierung und Rückgabe</h2>
                             <p>
-                                Da es sich um frisch hergestellte, verderbliche Lebensmittel handelt, ist eine Rückgabe
-                                ausgeschlossen. Eine Stornierung ist bis 36 Stunden vor dem vereinbarten Liefertermin
-                                möglich; kontaktieren Sie uns dazu unter{" "}
-                                <a href="mailto:info@emilialab.com" className="hover:text-gray-900 transition-colors">info@emilialab.com</a>.
+                                Jeder Käsekuchen wird eigens für Ihre Bestellung frisch gebacken und ist ein verderbliches
+                                Lebensmittel. Stornierung und Rückgabe sind daher nach Abschluss der Bestellung
+                                ausgeschlossen. Bei Problemen mit Ihrer Lieferung gilt Ziffer 6.
                             </p>
                         </section>
 
