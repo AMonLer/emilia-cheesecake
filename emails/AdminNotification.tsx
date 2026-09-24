@@ -31,6 +31,8 @@ interface AdminNotificationEmailProps {
   postalCode: string
   deliveryDate: string
   deliveryTime: string
+  deliveryNote?: string
+  newsletter?: boolean
 }
 
 export default function AdminNotificationEmail({
@@ -49,6 +51,8 @@ export default function AdminNotificationEmail({
   postalCode = '',
   deliveryDate = '',
   deliveryTime = '',
+  deliveryNote = '',
+  newsletter = false,
 }: AdminNotificationEmailProps) {
   return (
     <Html>
@@ -108,6 +112,16 @@ export default function AdminNotificationEmail({
               <Text style={detailText}>
                 <strong>Uhrzeit:</strong> {deliveryTime}
               </Text>
+              {deliveryNote && (
+                <Text style={detailText}>
+                  <strong>Hinweis:</strong> {deliveryNote}
+                </Text>
+              )}
+              {newsletter && (
+                <Text style={detailText}>
+                  <strong>Newsletter:</strong> möchte Neuigkeiten per E-Mail
+                </Text>
+              )}
             </Section>
 
             {/* Products */}

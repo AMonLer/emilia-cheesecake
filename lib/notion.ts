@@ -22,6 +22,7 @@ export type OrderForNotion = {
   foryouCode?: string
   deliveryDate: string // "dd.mm.yyyy" from toLocaleDateString('de-CH')
   deliveryTime: string // "HH:MM - HH:MM"
+  deliveryNote?: string
   amount: number
   items: Array<{ name: string; size?: string; quantity: number; price: number }>
 }
@@ -65,6 +66,7 @@ export async function createOrderInNotion(order: OrderForNotion) {
     order.recipientName
       ? `Geschenk für ${order.recipientIsCompany ? 'Firma ' : ''}${order.recipientName}${order.recipientPhone ? ` · Tel. ${order.recipientPhone}` : ''}`
       : '',
+    order.deliveryNote ? `Hinweis: ${order.deliveryNote}` : '',
   ]
     .filter(Boolean)
     .join(', ')

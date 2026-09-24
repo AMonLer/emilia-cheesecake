@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { ChevronRight, ChevronDown, X, Gift, ShoppingBag, Truck } from "lucide-react"
+import { ChevronRight, ChevronDown, X, Gift, Plus, ShoppingBag, Truck } from "lucide-react"
 import { useCart, productSlugForItem } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/icons/PaymentIcons"
@@ -34,6 +34,8 @@ const FORM_STORAGE_KEY = 'emilia-checkout-form'
 // The PaymentIntent this tab is paying. /payment-success clears it once paid.
 const PAYMENT_STORAGE_KEY = 'emilia-payment-intent'
 const PAID_STATUSES = new Set(['succeeded', 'processing', 'requires_capture'])
+// Also enforced by the payment API (Stripe metadata values are limited).
+const DELIVERY_NOTE_MAX = 200
 
 type StoredPaymentIntent = { id: string; clientSecret: string; order: string }
 
@@ -150,6 +152,8 @@ function CheckoutContent() {
   const [recipientIsCompany, setRecipientIsCompany] = useState(false)
   const [recipientCompany, setRecipientCompany] = useState("")
   const [recipientPhone, setRecipientPhone] = useState("")
+  const [deliveryNote, setDeliveryNote] = useState("")
+  const [newsletter, setNewsletter] = useState(false)
   const [deliveryDate, setDeliveryDate] = useState<Date | null>(null)
   const [deliveryTime, setDeliveryTime] = useState("")
   // Delivery comes first: buyers used to type their whole address and only then
@@ -269,6 +273,8 @@ function CheckoutContent() {
         if (typeof d.recipientIsCompany === 'boolean') setRecipientIsCompany(d.recipientIsCompany)
         if (d.recipientCompany) setRecipientCompany(d.recipientCompany)
         if (d.recipientPhone) setRecipientPhone(d.recipientPhone)
+        if (d.deliveryNote) setDeliveryNote(d.deliveryNote)
+        if (typeof d.newsletter === 'boolean') setNewsletter(d.newsletter)
         if (typeof d.isGift === 'boolean') setIsGift(d.isGift)
         if (d.appliedDiscountCode) {
           setAppliedDiscountCode(d.appliedDiscountCode)
@@ -324,11 +330,12 @@ function CheckoutContent() {
       sessionStorage.setItem(FORM_STORAGE_KEY, JSON.stringify({
         email, phone, firstName, lastName, address, city, postalCode,
         isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode,
+        deliveryNote, newsletter,
         deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
         deliveryTime,
       }))
     } catch { }
-  }, [formRestored, email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryDate, deliveryTime])
+  }, [formRestored, email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryNote, newsletter, deliveryDate, deliveryTime])
 
   // Si el reloj avanza mientras el checkout está abierto, lo ya elegido puede dejar de
   // cumplir la antelación. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
@@ -550,6 +557,8 @@ function CheckoutContent() {
             discountCode: appliedDiscountCode,
             subtotal: totalPrice,
             trackingConsent: readConsent() ?? 'unset',
+            deliveryNote: deliveryNote.trim(),
+            newsletter,
             items: cartItems.map(item => ({
               name: item.name,
               quantity: item.quantity,
@@ -635,35 +644,55 @@ function CheckoutContent() {
     ? `${deliveryDate.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long' })}${deliveryTime ? ` · ${deliveryTime}` : ''}`
     : ''
 
+  // Every field has a visible label. Placeholders alone vanished while typing
+  // and were cut off in the half-width recipient fields ("Vorname des Emp…").
+  const clearMissing = (field: string) => {
+    if (!missingFields.has(field)) return
+    const m = new Set(missingFields)
+    m.delete(field)
+    setMissingFields(m)
+  }
+  const inputClass = (field?: string, extraError = false) =>
+    `w-full border rounded-lg px-4 py-3 text-base placeholder:text-gray-400 focus:outline-none ${(field && missingFields.has(field)) || extraError ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`
+  const fieldLabel = (htmlFor: string, text: string) => (
+    <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-semibold text-gray-800">{text}</label>
+  )
+
   // Nombre y apellidos del comprador. En un pedido normal van dentro de la dirección
   // de entrega (comprador = destinatario); en un regalo suben a "Deine Daten", porque
   // la dirección pasa a ser la de quien recibe.
   const nameFields = (
     <div className="grid grid-cols-2 gap-4">
-      <input
-        type="text"
-        name="firstName"
-        placeholder={c.firstNamePlaceholder}
-        value={firstName}
-        onChange={(e) => { setFirstName(e.target.value); if (missingFields.has('firstName')) { const m = new Set(missingFields); m.delete('firstName'); setMissingFields(m) } }}
-        data-error={missingFields.has('firstName')}
-        autoComplete="given-name"
-        autoCapitalize="words"
-        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('firstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-        required
-      />
-      <input
-        type="text"
-        name="lastName"
-        placeholder={c.lastNamePlaceholder}
-        value={lastName}
-        onChange={(e) => { setLastName(e.target.value); if (missingFields.has('lastName')) { const m = new Set(missingFields); m.delete('lastName'); setMissingFields(m) } }}
-        data-error={missingFields.has('lastName')}
-        autoComplete="family-name"
-        autoCapitalize="words"
-        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('lastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-        required
-      />
+      <div>
+        {fieldLabel('firstName', c.labelFirstName)}
+        <input
+          id="firstName"
+          type="text"
+          name="firstName"
+          value={firstName}
+          onChange={(e) => { setFirstName(e.target.value); clearMissing('firstName') }}
+          data-error={missingFields.has('firstName')}
+          autoComplete="given-name"
+          autoCapitalize="words"
+          className={inputClass('firstName')}
+          required
+        />
+      </div>
+      <div>
+        {fieldLabel('lastName', c.labelLastName)}
+        <input
+          id="lastName"
+          type="text"
+          name="lastName"
+          value={lastName}
+          onChange={(e) => { setLastName(e.target.value); clearMissing('lastName') }}
+          data-error={missingFields.has('lastName')}
+          autoComplete="family-name"
+          autoCapitalize="words"
+          className={inputClass('lastName')}
+          required
+        />
+      </div>
     </div>
   )
 
@@ -673,8 +702,8 @@ function CheckoutContent() {
     <>
       <div className="grid grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1">
         {([
-          { company: false, label: 'Person' },
-          { company: true, label: locale === 'de' ? 'Firma' : 'Company' },
+          { company: false, label: c.recipientPerson },
+          { company: true, label: c.recipientCompany },
         ] as const).map(({ company, label }) => (
           <button
             key={label}
@@ -689,58 +718,67 @@ function CheckoutContent() {
       </div>
 
       {recipientIsCompany ? (
-        <input
-          type="text"
-          name="recipientCompany"
-          placeholder={locale === 'de' ? 'Firmenname' : 'Company name'}
-          value={recipientCompany}
-          onChange={(e) => { setRecipientCompany(e.target.value); if (missingFields.has('recipientCompany')) { const m = new Set(missingFields); m.delete('recipientCompany'); setMissingFields(m) } }}
-          data-error={missingFields.has('recipientCompany')}
-          autoComplete="organization"
-          autoCapitalize="words"
-          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientCompany') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-        />
+        <div>
+          {fieldLabel('recipientCompany', c.labelCompany)}
+          <input
+            id="recipientCompany"
+            type="text"
+            name="recipientCompany"
+            value={recipientCompany}
+            onChange={(e) => { setRecipientCompany(e.target.value); clearMissing('recipientCompany') }}
+            data-error={missingFields.has('recipientCompany')}
+            autoComplete="organization"
+            autoCapitalize="words"
+            className={inputClass('recipientCompany')}
+          />
+        </div>
       ) : (
         <div className="grid grid-cols-2 gap-4">
-          <input
-            type="text"
-            name="recipientFirstName"
-            placeholder={locale === 'de' ? 'Vorname des Empfängers' : "Recipient's first name"}
-            value={recipientFirstName}
-            onChange={(e) => { setRecipientFirstName(e.target.value); if (missingFields.has('recipientFirstName')) { const m = new Set(missingFields); m.delete('recipientFirstName'); setMissingFields(m) } }}
-            data-error={missingFields.has('recipientFirstName')}
-            autoComplete="off"
-            autoCapitalize="words"
-            className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientFirstName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-          />
-          <input
-            type="text"
-            name="recipientLastName"
-            placeholder={locale === 'de' ? 'Nachname des Empfängers' : "Recipient's last name"}
-            value={recipientLastName}
-            onChange={(e) => { setRecipientLastName(e.target.value); if (missingFields.has('recipientLastName')) { const m = new Set(missingFields); m.delete('recipientLastName'); setMissingFields(m) } }}
-            data-error={missingFields.has('recipientLastName')}
-            autoComplete="off"
-            autoCapitalize="words"
-            className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('recipientLastName') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-          />
+          <div>
+            {fieldLabel('recipientFirstName', c.labelFirstName)}
+            <input
+              id="recipientFirstName"
+              type="text"
+              name="recipientFirstName"
+              value={recipientFirstName}
+              onChange={(e) => { setRecipientFirstName(e.target.value); clearMissing('recipientFirstName') }}
+              data-error={missingFields.has('recipientFirstName')}
+              autoComplete="off"
+              autoCapitalize="words"
+              className={inputClass('recipientFirstName')}
+            />
+          </div>
+          <div>
+            {fieldLabel('recipientLastName', c.labelLastName)}
+            <input
+              id="recipientLastName"
+              type="text"
+              name="recipientLastName"
+              value={recipientLastName}
+              onChange={(e) => { setRecipientLastName(e.target.value); clearMissing('recipientLastName') }}
+              data-error={missingFields.has('recipientLastName')}
+              autoComplete="off"
+              autoCapitalize="words"
+              className={inputClass('recipientLastName')}
+            />
+          </div>
         </div>
       )}
 
-      <input
-        type="tel"
-        placeholder={locale === 'de' ? 'Telefon (optional)' : 'Phone (optional)'}
-        value={recipientPhone}
-        onChange={(e) => setRecipientPhone(e.target.value)}
-        autoComplete="off"
-        inputMode="tel"
-        className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black"
-      />
-      <p className="text-xs text-gray-500 leading-snug">
-        {locale === 'de'
-          ? 'Telefon nur für Rückfragen zur Lieferung — die Überraschung bleibt sicher.'
-          : 'Phone only for delivery questions — the surprise stays safe.'}
-      </p>
+      <div>
+        {fieldLabel('recipientPhone', c.labelRecipientPhone)}
+        <input
+          id="recipientPhone"
+          type="tel"
+          value={recipientPhone}
+          onChange={(e) => setRecipientPhone(e.target.value)}
+          autoComplete="off"
+          inputMode="tel"
+          placeholder={c.phonePlaceholder}
+          className={inputClass()}
+        />
+        <p className="mt-1.5 text-xs text-gray-500 leading-snug">{c.recipientPhoneHint}</p>
+      </div>
     </>
   )
 
@@ -798,31 +836,31 @@ function CheckoutContent() {
     </div>
   )
 
+  // Quiet, on-brand offer: it sits right before the pay button, so it should
+  // not shout (it used to be a pink "limited time!" box).
   const upsellBlock = (
-    <div className="p-4 bg-pink-50 rounded-lg">
-      <h3 className="font-bold text-sm mb-2">{c.upsellTitle}</h3>
-      <div className="flex gap-3 items-center">
-        <img
-          src="/original3.jpeg"
-          alt="Angebot"
-          className="w-16 h-16 rounded-lg object-cover"
-        />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold">CLASSIC (2-3 Personen)</p>
-          <p className="text-xs text-gray-600">(10% RABATT)</p>
-          <p className="text-sm">
-            <span className="font-bold whitespace-nowrap"><PriceDisplay amount={14.31} showCurrency={false} className="text-sm" /> CHF</span>{" "}
-            <span className="text-gray-500 line-through whitespace-nowrap"><PriceDisplay amount={15.90} showCurrency={false} className="text-sm" /> CHF</span>
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleAddUpsellProduct}
-          className="shrink-0 px-4 py-2 bg-black text-white rounded-lg font-bold text-sm transition-[background-color,transform] duration-150 hover:bg-gray-900 active:bg-gray-800 active:scale-[0.97]"
-        >
-          {c.upsellAdd}
-        </button>
+    <div className="flex items-center gap-3 rounded-xl border border-[#E6D5C0] bg-[#FFFCF8] p-3">
+      <img
+        src="/original3.jpeg"
+        alt="CLASSIC 2–3"
+        className="h-12 w-12 shrink-0 rounded-lg object-cover"
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-bold text-[#651A1A]">{c.upsellTitle}</p>
+        <p className="text-xs text-gray-600">{c.upsellItem}</p>
+        <p className="mt-0.5 text-sm">
+          <span className="font-bold whitespace-nowrap"><PriceDisplay amount={14.31} showCurrency={false} className="text-sm" /> CHF</span>{" "}
+          <span className="text-gray-400 line-through whitespace-nowrap"><PriceDisplay amount={15.90} showCurrency={false} className="text-xs" /></span>
+        </p>
       </div>
+      <button
+        type="button"
+        onClick={handleAddUpsellProduct}
+        aria-label={`${c.upsellAdd}: ${c.upsellItem}`}
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#651A1A] text-[#651A1A] transition-colors hover:bg-[#651A1A] hover:text-white active:bg-[#651A1A] active:text-white"
+      >
+        <Plus className="h-4 w-4" strokeWidth={2.25} />
+      </button>
     </div>
   )
 
@@ -1085,39 +1123,34 @@ function CheckoutContent() {
                     </button>
                   </div>
 
-                  {/* Gift option */}
+                  {/* Gift option: one compact row. As a big card with a long paragraph
+                      it pushed the form half a screen down for everyone who is not
+                      buying a gift, which is most people. */}
                   {SHOW_GIFT_OPTION && (
                     <div className="mb-8">
                       <button
                         type="button"
+                        role="switch"
+                        aria-checked={isGift}
                         onClick={() => setIsGift(!isGift)}
-                        aria-pressed={isGift}
-                        className={`w-full text-left rounded-2xl border-2 p-5 transition-all duration-300 ${isGift ? "border-[#651A1A] bg-[#F5E6D3] shadow-[0_8px_24px_-14px_rgba(101,26,26,0.4)]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
+                        className={`w-full text-left rounded-2xl border-2 px-4 py-3.5 transition-colors duration-200 ${isGift ? "border-[#651A1A] bg-[#F5E6D3]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
                       >
-                        <div className="flex items-center gap-4">
-                          <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full border transition-colors duration-300 ${isGift ? "border-[#651A1A] bg-[#651A1A] text-white" : "border-[#651A1A]/20 bg-[#FBF6EF] text-[#651A1A]"}`}>
+                        <div className="flex items-center gap-3">
+                          <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${isGift ? "bg-[#651A1A] text-white" : "bg-[#FBF6EF] text-[#651A1A]"}`}>
                             <Gift className="h-5 w-5" strokeWidth={1.5} />
-                          </div>
-                          <div className="flex-1">
-                            <p className={`font-black text-base tracking-tight transition-colors duration-300 ${isGift ? "text-[#651A1A]" : "text-[#1a1a1a]"}`}>
-                              {locale === 'de' ? 'Mach es persönlich. Sende eine Nachricht mit dem Kuchen.' : 'Make it personal. Send a message with the cake.'}
-                            </p>
-                            <p className={`text-sm leading-snug transition-colors duration-300 ${isGift ? "text-[#651A1A]/70" : "text-gray-600"}`}>
-                              {locale === 'de'
-                                ? 'Video, Foto oder Nachricht. Wir fügen einen QR-Code hinzu, um deine Überraschung zu sehen.'
-                                : 'Video, photo or message. We will add a QR to see your surprise.'}
-                            </p>
-                          </div>
-                          <div className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-300 ${isGift ? "bg-[#651A1A]" : "bg-gray-300"}`}>
-                            <div className={`absolute top-1 h-5 w-5 rounded-full shadow transition-all duration-300 ${isGift ? "left-6 bg-white" : "left-1 bg-white"}`} />
-                          </div>
+                          </span>
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-[0.95rem] font-black tracking-tight text-[#1a1a1a]">{c.giftTitle}</span>
+                            <span className="block text-xs leading-snug text-gray-600">{c.giftSubtitle}</span>
+                          </span>
+                          <span className={`relative h-7 w-12 shrink-0 rounded-full transition-colors duration-200 ${isGift ? "bg-[#651A1A]" : "bg-gray-300"}`}>
+                            <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-200 ${isGift ? "left-6" : "left-1"}`} />
+                          </span>
                         </div>
                         {isGift && (
-                          <div className="mt-4 rounded-xl bg-white/60 px-4 py-3 text-sm text-[#651A1A] leading-relaxed">
-                            {locale === 'de'
-                              ? 'Nach der Bezahlung kannst du dein Video, Foto oder deine Nachricht hinzufügen. Wir fügen deinen persönlichen QR-Code hinzu. Zum Geburtstag, als Dankeschön, eine Reise-Überraschung oder einfach so. Einfach scannen und alles auf unserer Seite ansehen.'
-                              : 'After payment you can add your video, photo or message. We add your personal QR code. For a birthday, a thank you, a trip surprise, or just because. They scan it to see everything on our page.'}
-                          </div>
+                          <p className="mt-3 border-t border-[#651A1A]/15 pt-3 text-xs leading-relaxed text-[#651A1A]">
+                            {c.giftActiveNote}
+                          </p>
                         )}
                       </button>
                     </div>
@@ -1128,35 +1161,52 @@ function CheckoutContent() {
                     <div className="mb-4">
                       <h2 className="text-xl font-black">{isGift ? c.contactGift : c.contact}</h2>
                     </div>
-                    {/* En un regalo, el nombre de quien envía vive aquí, con su email y
-                        teléfono — no en la dirección, que es del destinatario. */}
-                    {isGift && <div className="mb-4">{nameFields}</div>}
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder={c.emailPlaceholder}
-                      value={email}
-                      onChange={(e) => { setEmail(e.target.value); if (missingFields.has('email')) { const m = new Set(missingFields); m.delete('email'); setMissingFields(m) } }}
-                      data-error={missingFields.has('email')}
-                      autoComplete="email"
-                      inputMode="email"
-                      autoCapitalize="off"
-                      autoCorrect="off"
-                      className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('email') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-                      required
-                    />
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder={c.phonePlaceholder}
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      autoComplete="tel"
-                      inputMode="tel"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 text-base focus:outline-none focus:border-black mt-4"
-                    />
+                    <div className="space-y-4">
+                      {/* En un regalo, el nombre de quien envía vive aquí, con su email y
+                          teléfono — no en la dirección, que es del destinatario. */}
+                      {isGift && nameFields}
+                      <div>
+                        {fieldLabel('email', c.labelEmail)}
+                        <input
+                          id="email"
+                          type="email"
+                          name="email"
+                          placeholder={c.emailPlaceholder}
+                          value={email}
+                          onChange={(e) => { setEmail(e.target.value); clearMissing('email') }}
+                          data-error={missingFields.has('email')}
+                          autoComplete="email"
+                          inputMode="email"
+                          autoCapitalize="off"
+                          autoCorrect="off"
+                          className={inputClass('email')}
+                          required
+                        />
+                      </div>
+                      <div>
+                        {fieldLabel('phone', c.labelPhone)}
+                        <input
+                          id="phone"
+                          type="tel"
+                          name="phone"
+                          placeholder={c.phonePlaceholder}
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          autoComplete="tel"
+                          inputMode="tel"
+                          className={inputClass()}
+                        />
+                      </div>
+                    </div>
+                    {/* It used to be a checkbox that saved nothing: now the choice
+                        travels with the order and shows up in the order notice. */}
                     <label className="flex items-center gap-2.5 mt-3 py-1.5 cursor-pointer">
-                      <input type="checkbox" className="h-5 w-5 shrink-0 cursor-pointer accent-[#651A1A]" />
+                      <input
+                        type="checkbox"
+                        checked={newsletter}
+                        onChange={(e) => setNewsletter(e.target.checked)}
+                        className="h-5 w-5 shrink-0 cursor-pointer accent-[#651A1A]"
+                      />
                       <span className="text-sm">{c.newsletter}</span>
                     </label>
                   </div>
@@ -1170,49 +1220,60 @@ function CheckoutContent() {
 
                       {!isGift && nameFields}
 
-                      <input
-                        type="text"
-                        name="address"
-                        placeholder={c.addressPlaceholder}
-                        value={address}
-                        onChange={(e) => { setAddress(e.target.value); if (missingFields.has('address')) { const m = new Set(missingFields); m.delete('address'); setMissingFields(m) } }}
-                        data-error={missingFields.has('address')}
-                        autoComplete="street-address"
-                        autoCapitalize="words"
-                        className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('address') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
-                        required
-                      />
-
-                      <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        {fieldLabel('address', c.labelAddress)}
                         <input
+                          id="address"
                           type="text"
-                          name="city"
-                          placeholder={c.cityPlaceholder}
-                          value={city}
-                          onChange={(e) => { setCity(e.target.value); if (missingFields.has('city')) { const m = new Set(missingFields); m.delete('city'); setMissingFields(m) } }}
-                          data-error={missingFields.has('city')}
-                          autoComplete="address-level2"
+                          name="address"
+                          placeholder={c.addressPlaceholder}
+                          value={address}
+                          onChange={(e) => { setAddress(e.target.value); clearMissing('address') }}
+                          data-error={missingFields.has('address')}
+                          autoComplete="street-address"
                           autoCapitalize="words"
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${missingFields.has('city') ? 'border-red-500 focus:border-red-500' : 'border-gray-300 focus:border-black'}`}
+                          className={inputClass('address')}
                           required
                         />
-                        <input
-                          type="text"
-                          name="postalCode"
-                          placeholder={c.postalCodePlaceholder}
-                          value={postalCode}
-                          onChange={(e) => {
-                            setPostalCode(e.target.value)
-                            setPostalCodeError("")
-                            if (missingFields.has('postalCode')) { const m = new Set(missingFields); m.delete('postalCode'); setMissingFields(m) }
-                          }}
-                          data-error={missingFields.has('postalCode') || !!postalCodeError}
-                          autoComplete="postal-code"
-                          inputMode="numeric"
-                          className={`w-full border rounded-lg px-4 py-3 text-base focus:outline-none ${postalCodeError || missingFields.has('postalCode') ? "border-red-500 focus:border-red-500" : "border-gray-300 focus:border-black"
-                            }`}
-                          required
-                        />
+                      </div>
+
+                      {/* PLZ before Ort, as on every Swiss address. */}
+                      <div className="grid grid-cols-[7.5rem_1fr] gap-4">
+                        <div>
+                          {fieldLabel('postalCode', c.labelPostalCode)}
+                          <input
+                            id="postalCode"
+                            type="text"
+                            name="postalCode"
+                            value={postalCode}
+                            onChange={(e) => {
+                              setPostalCode(e.target.value)
+                              setPostalCodeError("")
+                              clearMissing('postalCode')
+                            }}
+                            data-error={missingFields.has('postalCode') || !!postalCodeError}
+                            autoComplete="postal-code"
+                            inputMode="numeric"
+                            maxLength={4}
+                            className={inputClass('postalCode', !!postalCodeError)}
+                            required
+                          />
+                        </div>
+                        <div>
+                          {fieldLabel('city', c.labelCity)}
+                          <input
+                            id="city"
+                            type="text"
+                            name="city"
+                            value={city}
+                            onChange={(e) => { setCity(e.target.value); clearMissing('city') }}
+                            data-error={missingFields.has('city')}
+                            autoComplete="address-level2"
+                            autoCapitalize="words"
+                            className={inputClass('city')}
+                            required
+                          />
+                        </div>
                       </div>
 
                       {/* Solo se entrega en Suiza: el país es un dato, no un campo */}
@@ -1223,6 +1284,23 @@ function CheckoutContent() {
                           {postalCodeError}
                         </div>
                       )}
+
+                      {/* Doorbell, floor, door code: in Zurich flats the courier needs
+                          it, and a gift recipient is not waiting at the door. */}
+                      <div>
+                        {fieldLabel('deliveryNote', c.labelDeliveryNote)}
+                        <input
+                          id="deliveryNote"
+                          type="text"
+                          name="deliveryNote"
+                          placeholder={c.deliveryNotePlaceholder}
+                          value={deliveryNote}
+                          onChange={(e) => setDeliveryNote(e.target.value)}
+                          maxLength={DELIVERY_NOTE_MAX}
+                          autoComplete="off"
+                          className={inputClass()}
+                        />
+                      </div>
                     </div>
                   </div>
 

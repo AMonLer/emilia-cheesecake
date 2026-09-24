@@ -162,6 +162,13 @@ async function main() {
   assert.equal(body.amount, 51.3, 'The API returns what Stripe will charge')
   assert.equal(stripeCalls.create.at(-1).metadata.deliveryTime, '09:00 - 12:00')
   assert.equal(stripeCalls.create.at(-1).metadata.trackingConsent, 'unset')
+  // Delivery note and newsletter opt-in travel with the order; the note is capped for Stripe.
+  await request({ deliveryDate: FUTURE_DAY, deliveryNote: '  Klingel Muster, 3. Stock  ', newsletter: true })
+  assert.equal(stripeCalls.create.at(-1).metadata.deliveryNote, 'Klingel Muster, 3. Stock')
+  assert.equal(stripeCalls.create.at(-1).metadata.newsletter, 'yes')
+  await request({ deliveryDate: FUTURE_DAY, deliveryNote: 'x'.repeat(500), newsletter: 'yes' })
+  assert.equal(stripeCalls.create.at(-1).metadata.deliveryNote.length, 200)
+  assert.equal(stripeCalls.create.at(-1).metadata.newsletter, '', 'Only an explicit tick counts as opt-in')
 
   // --- Previous PaymentIntent of this tab: never two chargeable intents
   // Unpaid → cancelled before a new one is created.

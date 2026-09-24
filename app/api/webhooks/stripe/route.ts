@@ -63,6 +63,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 
+// Telegram parses the order notice as HTML: a customer text with "&" or "<"
+// (a company like "Müller & Co", a delivery note) made it reject the whole
+// message, and the order notice never arrived.
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const signature = req.headers.get('stripe-signature')
@@ -92,6 +98,9 @@ export async function POST(req: NextRequest) {
       // Obtener los metadatos del pedido
       const metadata = paymentIntent.metadata
       const amount = paymentIntent.amount / 100 // Convertir de centavos a francos
+      const tg = (key: string) => escapeHtml(metadata[key] || '')
+      const deliveryNote = metadata.deliveryNote || ''
+      const wantsNewsletter = metadata.newsletter === 'yes'
 
       // Parsear items una sola vez: Telegram, rango del sticker For You y Notion
       let items: any[] = []
@@ -137,7 +146,7 @@ export async function POST(req: NextRequest) {
 
       // Regalo: si el cliente lo marcó, hay que pegar el sticker con su código
       const giftBlock = isGift
-        ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${metadata.recipientName || '—'}${metadata.recipientPhone ? ` · Tel: ${metadata.recipientPhone}` : ''}\n`
+        ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${tg('recipientName') || '—'}${metadata.recipientPhone ? ` · Tel: ${tg('recipientPhone')}` : ''}\n`
         : ''
 
       // Enviar notificación por Telegram
@@ -147,13 +156,13 @@ ${giftBlock}
 💰 <b>Total:</b> CHF ${amount.toFixed(2)}
 
 👤 <b>Cliente:</b>
-${metadata.customerName || 'N/A'}
-${metadata.customerEmail || 'N/A'}
-📱 ${metadata.customerPhone || 'N/A'}
+${tg('customerName') || 'N/A'}
+${tg('customerEmail') || 'N/A'}
+📱 ${tg('customerPhone') || 'N/A'}${wantsNewsletter ? '\n📰 Quiere recibir el newsletter' : ''}
 
 📍 <b>Dirección de Entrega:</b>
-${metadata.address || ''}
-${metadata.postalCode || ''} ${metadata.city || ''}
+${tg('address')}
+${tg('postalCode')} ${tg('city')}${deliveryNote ? `\n📝 <b>Nota:</b> ${escapeHtml(deliveryNote)}` : ''}
 
 📅 <b>Entrega:</b>
 Fecha: ${metadata.deliveryDate || 'N/A'}
@@ -180,6 +189,7 @@ ${productsText}
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
           foryouEditUrl: foryouCode ? forYouEditUrl(foryouCode, paymentIntent.id) : undefined,
+          deliveryNote,
         })
       )
 
@@ -208,6 +218,8 @@ ${productsText}
           recipientPhone: metadata.recipientPhone || '',
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
+          deliveryNote,
+          newsletter: wantsNewsletter,
         })
       )
 
@@ -242,6 +254,7 @@ ${productsText}
         recipientPhone: metadata.recipientPhone || '',
         deliveryDate: metadata.deliveryDate || '',
         deliveryTime: metadata.deliveryTime || '',
+        deliveryNote,
         amount,
         items,
       })

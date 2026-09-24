@@ -220,17 +220,30 @@ export type Translations = {
     contact: string
     contactGift: string
     signIn: string
+    labelEmail: string
     emailPlaceholder: string
+    labelPhone: string
     phonePlaceholder: string
     newsletter: string
     deliveryAddress: string
     deliveryAddressGift: string
     country: string
-    firstNamePlaceholder: string
-    lastNamePlaceholder: string
+    labelFirstName: string
+    labelLastName: string
+    labelAddress: string
     addressPlaceholder: string
-    cityPlaceholder: string
-    postalCodePlaceholder: string
+    labelPostalCode: string
+    labelCity: string
+    recipientPerson: string
+    recipientCompany: string
+    labelCompany: string
+    labelRecipientPhone: string
+    recipientPhoneHint: string
+    labelDeliveryNote: string
+    deliveryNotePlaceholder: string
+    giftTitle: string
+    giftSubtitle: string
+    giftActiveNote: string
     formError: string
     postalCodeError: string
     deliveryTitle: string
@@ -254,6 +267,7 @@ export type Translations = {
     free: string
     total: string
     upsellTitle: string
+    upsellItem: string
     upsellAdd: string
     processing: string
     payNow: string
@@ -298,8 +312,8 @@ export const translations: Record<Locale, Translations> = {
     cart: {
       title: 'Warenkorb',
       items: 'ARTIKEL',
-      empty: 'Ihr Warenkorb ist leer',
-      emptyDesc: 'Entdecken Sie unsere handgemachten Käsekuchen.',
+      empty: 'Dein Warenkorb ist leer',
+      emptyDesc: 'Entdecke unsere handgemachten Käsekuchen.',
       shop: 'Einkaufen',
       subtotal: 'Zwischensumme',
       shipping: 'Versand',
@@ -496,7 +510,7 @@ export const translations: Record<Locale, Translations> = {
       addAria: (name) => `${name} (8–10 Personen) in den Warenkorb`,
     },
     checkout: {
-      emptyCart: 'Ihr Warenkorb ist leer',
+      emptyCart: 'Dein Warenkorb ist leer',
       continueShopping: 'Weiter einkaufen',
       breadcrumbCart: 'Warenkorb',
       breadcrumbDetails: 'Angaben',
@@ -504,26 +518,39 @@ export const translations: Record<Locale, Translations> = {
       contact: 'Kontakt',
       contactGift: 'Deine Daten',
       signIn: 'Anmelden',
-      emailPlaceholder: 'E-Mail',
-      phonePlaceholder: 'Handynummer (z.B. +41 79 123 45 67)',
-      newsletter: 'Senden Sie mir Neuigkeiten und Angebote per E-Mail',
+      labelEmail: 'E-Mail',
+      emailPlaceholder: 'name@beispiel.ch',
+      labelPhone: 'Handynummer (optional)',
+      phonePlaceholder: '+41 79 123 45 67',
+      newsletter: 'Ja, schickt mir Neuigkeiten und Angebote per E-Mail',
       deliveryAddress: 'Lieferadresse',
       deliveryAddressGift: 'Wohin liefern wir den Kuchen?',
       country: 'Schweiz',
-      firstNamePlaceholder: 'Vorname',
-      lastNamePlaceholder: 'Nachname',
-      addressPlaceholder: 'Adresse',
-      cityPlaceholder: 'Stadt',
-      postalCodePlaceholder: 'Postleitzahl',
-      formError: 'Bitte füllen Sie alle Pflichtfelder aus (rot markiert).',
-      postalCodeError: 'Leider liefern wir nur im Umkreis von 10km um Zürich Zentrum. Ihre Postleitzahl liegt ausserhalb unseres Liefergebiets.',
+      labelFirstName: 'Vorname',
+      labelLastName: 'Nachname',
+      labelAddress: 'Strasse und Hausnummer',
+      addressPlaceholder: 'z.B. Bahnhofstrasse 12',
+      labelPostalCode: 'PLZ',
+      labelCity: 'Ort',
+      recipientPerson: 'Person',
+      recipientCompany: 'Firma',
+      labelCompany: 'Firmenname',
+      labelRecipientPhone: 'Telefon der beschenkten Person (optional)',
+      recipientPhoneHint: 'Nur für Rückfragen zur Lieferung – die Überraschung bleibt sicher.',
+      labelDeliveryNote: 'Hinweis für die Lieferung (optional)',
+      deliveryNotePlaceholder: 'z.B. Klingel „Muster“, 3. Stock',
+      giftTitle: 'Es ist ein Geschenk',
+      giftSubtitle: 'Mit persönlicher Video-, Foto- oder Textbotschaft – inklusive',
+      giftActiveNote: 'Nach der Zahlung fügst du Video, Foto oder Nachricht hinzu. Sie öffnet sich über den Code beim Kuchen.',
+      formError: 'Bitte füll alle Pflichtfelder aus (rot markiert).',
+      postalCodeError: 'Leider liefern wir nur im Umkreis von 10 km um Zürich Zentrum. Deine Postleitzahl liegt ausserhalb unseres Liefergebiets.',
       deliveryTitle: 'Lieferung',
       deliveryQuestion: 'Wann sollen wir liefern?',
-      deliveryNotice: 'Alle Käsekuchen werden frisch für Sie gebacken. Deshalb brauchen wir mindestens 24 Stunden Vorlaufzeit.',
+      deliveryNotice: 'Jeder Käsekuchen wird frisch für dich gebacken. Deshalb brauchen wir mindestens 24 Stunden Vorlaufzeit.',
       chooseDateLabel: 'Lieferdatum',
       moreDates: 'Anderes Datum',
       chooseTimeLabel: 'Lieferzeit',
-      deliveryError: 'Bitte wählen Sie Lieferdatum und -zeit.',
+      deliveryError: 'Bitte wähle Lieferdatum und -zeit.',
       continueToDetails: 'Weiter zu den Angaben',
       continueToPayment: 'Weiter zur Zahlung',
       backToDetails: 'Zurück zu den Angaben',
@@ -537,33 +564,34 @@ export const translations: Record<Locale, Translations> = {
       shipping: 'Versand',
       free: 'Gratis',
       total: 'Gesamt',
-      upsellTitle: 'Zeitlich begrenztes Angebot! Füge mehr hinzu und spare',
+      upsellTitle: 'Noch ein kleiner dazu?',
+      upsellItem: 'CLASSIC 2–3 Pers. · −10%',
       upsellAdd: 'Hinzufügen',
-      processing: 'Wird verarbeitet...',
+      processing: 'Wird verarbeitet…',
       payNow: 'Jetzt bezahlen',
-      paymentError: 'Bei der Zahlungsabwicklung ist ein Fehler aufgetreten',
-      unexpectedError: 'Ein unerwarteter Fehler ist aufgetreten',
-      paymentInitError: 'Fehler beim Starten der Zahlung. Bitte versuchen Sie es erneut.',
-      paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – Ihre Angaben sind gespeichert. Bitte versuchen Sie es erneut.',
+      paymentError: 'Bei der Zahlung ist ein Fehler aufgetreten.',
+      unexpectedError: 'Ein unerwarteter Fehler ist aufgetreten.',
+      paymentInitError: 'Die Zahlung konnte nicht gestartet werden. Bitte versuch es noch einmal.',
+      paymentFailedNotice: 'Die Zahlung wurde nicht abgeschlossen. Keine Sorge – deine Angaben sind gespeichert. Bitte versuch es noch einmal.',
       slotUnavailable: 'Für dieses Datum nicht verfügbar',
-      slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 24 Stunden Vorlaufzeit. Bitte wählen Sie einen neuen Termin.',
-      dateUnavailable: 'Dieses Lieferdatum ist nicht mehr verfügbar. Bitte wählen Sie ein anderes Datum.',
-      orderChanged: 'Ihre Bestellung hat sich geändert. Bitte bestätigen Sie sie noch einmal.',
+      slotExpired: 'Die gewählte Lieferzeit liegt jetzt innerhalb der 24 Stunden Vorlaufzeit. Bitte wähle einen neuen Termin.',
+      dateUnavailable: 'Dieses Lieferdatum ist nicht mehr verfügbar. Bitte wähle ein anderes Datum.',
+      orderChanged: 'Deine Bestellung hat sich geändert. Bitte bestätige sie noch einmal.',
       change: 'Ändern',
       persons: 'Personen',
     },
     paymentSuccess: {
       title: 'Vielen Dank',
-      message: 'Ihre Bestellung ist bestätigt. Wir backen Ihren Kuchen frisch für Ihren Liefertermin.',
+      message: 'Deine Bestellung ist bestätigt. Wir backen deinen Kuchen frisch für deinen Liefertermin.',
       pendingTitle: 'Zahlung wird bestätigt',
-      pendingMessage: 'Ihre Zahlung wird gerade bestätigt. Das dauert in der Regel nur einen Moment – diese Seite aktualisiert sich automatisch. Bitte nicht erneut bezahlen.',
+      pendingMessage: 'Deine Zahlung wird gerade bestätigt. Das dauert meist nur einen Moment – diese Seite aktualisiert sich automatisch. Bitte nicht erneut bezahlen.',
       slowTitle: 'Bestätigung ausstehend',
-      slowMessage: 'Die Bestätigung dauert länger als üblich. Sobald die Zahlung eingegangen ist, erhalten Sie eine E-Mail. Bitte nicht erneut bezahlen – bei Fragen sind wir gerne für Sie da.',
+      slowMessage: 'Die Bestätigung dauert länger als üblich. Sobald die Zahlung eingegangen ist, bekommst du eine E-Mail. Bitte nicht erneut bezahlen – bei Fragen sind wir gerne für dich da.',
       checkAgain: 'Erneut prüfen',
       backHome: 'Zurück zur Startseite',
       questions: 'Fragen?',
-      contactUs: 'Kontaktieren Sie uns',
-      loading: 'Laden...',
+      contactUs: 'Schreib uns',
+      loading: 'Laden…',
     },
   },
   en: {
@@ -786,19 +814,32 @@ export const translations: Record<Locale, Translations> = {
       contact: 'Contact',
       contactGift: 'Your details',
       signIn: 'Sign in',
-      emailPlaceholder: 'Email',
-      phonePlaceholder: 'Phone number (e.g. +41 79 123 45 67)',
-      newsletter: 'Send me news and offers by email',
-      deliveryAddress: 'Delivery Address',
+      labelEmail: 'Email',
+      emailPlaceholder: 'name@example.com',
+      labelPhone: 'Mobile number (optional)',
+      phonePlaceholder: '+41 79 123 45 67',
+      newsletter: 'Yes, send me news and offers by email',
+      deliveryAddress: 'Delivery address',
       deliveryAddressGift: 'Where should we deliver the cake?',
       country: 'Switzerland',
-      firstNamePlaceholder: 'First name',
-      lastNamePlaceholder: 'Last name',
-      addressPlaceholder: 'Address',
-      cityPlaceholder: 'City',
-      postalCodePlaceholder: 'Postal code',
+      labelFirstName: 'First name',
+      labelLastName: 'Last name',
+      labelAddress: 'Street and number',
+      addressPlaceholder: 'e.g. Bahnhofstrasse 12',
+      labelPostalCode: 'Postcode',
+      labelCity: 'City',
+      recipientPerson: 'Person',
+      recipientCompany: 'Company',
+      labelCompany: 'Company name',
+      labelRecipientPhone: 'Recipient\'s phone (optional)',
+      recipientPhoneHint: 'Only for delivery questions – the surprise stays safe.',
+      labelDeliveryNote: 'Delivery note (optional)',
+      deliveryNotePlaceholder: 'e.g. doorbell "Smith", 3rd floor',
+      giftTitle: 'It\'s a gift',
+      giftSubtitle: 'With a personal video, photo or note – included',
+      giftActiveNote: 'After payment you add your video, photo or note. It opens with the code that comes with the cake.',
       formError: 'Please fill in all required fields (highlighted in red).',
-      postalCodeError: 'Unfortunately we only deliver within 10km of Zurich city centre. Your postal code is outside our delivery area.',
+      postalCodeError: 'Unfortunately we only deliver within 10 km of Zurich city centre. Your postcode is outside our delivery area.',
       deliveryTitle: 'Delivery',
       deliveryQuestion: 'When should we deliver?',
       deliveryNotice: 'Every cheesecake is freshly baked for you, so we need at least 24 hours\' notice.',
@@ -807,10 +848,10 @@ export const translations: Record<Locale, Translations> = {
       chooseTimeLabel: 'Delivery time',
       deliveryError: 'Please select a delivery date and time.',
       continueToDetails: 'Continue to your details',
-      continueToPayment: 'Continue to Payment',
+      continueToPayment: 'Continue to payment',
       backToDetails: 'Back to your details',
       paymentTitle: 'Payment',
-      orderSummary: 'Order Summary',
+      orderSummary: 'Order summary',
       qty: 'Qty:',
       discountCodePlaceholder: 'Discount code',
       applyCode: 'Apply',
@@ -819,13 +860,14 @@ export const translations: Record<Locale, Translations> = {
       shipping: 'Shipping',
       free: 'Free',
       total: 'Total',
-      upsellTitle: 'Limited time offer! Add more and save',
+      upsellTitle: 'Add a small one?',
+      upsellItem: 'CLASSIC 2–3 pers. · −10%',
       upsellAdd: 'Add',
-      processing: 'Processing...',
+      processing: 'Processing…',
       payNow: 'Pay now',
-      paymentError: 'An error occurred during payment processing',
-      unexpectedError: 'An unexpected error occurred',
-      paymentInitError: 'Error starting payment. Please try again.',
+      paymentError: 'An error occurred during payment.',
+      unexpectedError: 'An unexpected error occurred.',
+      paymentInitError: 'The payment could not be started. Please try again.',
       paymentFailedNotice: 'Your payment was not completed. Don\'t worry – your details are saved. Please try again.',
       slotUnavailable: 'Not available for this date',
       slotExpired: 'Your delivery slot no longer meets the 24-hour lead time. Please pick a new one.',

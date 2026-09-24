@@ -29,6 +29,7 @@ interface OrderConfirmationEmailProps {
   deliveryTime: string
   // Gift orders: signed link to create or change the For You message.
   foryouEditUrl?: string
+  deliveryNote?: string
 }
 
 export default function OrderConfirmationEmail({
@@ -42,6 +43,7 @@ export default function OrderConfirmationEmail({
   deliveryDate = '',
   deliveryTime = '',
   foryouEditUrl,
+  deliveryNote = '',
 }: OrderConfirmationEmailProps) {
   return (
     <Html>
@@ -127,6 +129,11 @@ export default function OrderConfirmationEmail({
               <Text style={detailText}>
                 <strong>Lieferzeit:</strong> {deliveryTime}
               </Text>
+              {deliveryNote && (
+                <Text style={detailText}>
+                  <strong>Hinweis für die Lieferung:</strong> {deliveryNote}
+                </Text>
+              )}
             </Section>
 
             {foryouEditUrl && (

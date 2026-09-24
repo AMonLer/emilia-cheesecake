@@ -113,6 +113,9 @@ export async function POST(req: NextRequest) {
         discountPercent: discountPercent ? String(discountPercent) : '',
         subtotal: subtotal ? subtotal.toFixed(2) : '',
         shippingCost: totals.shipping ? totals.shipping.toFixed(2) : '',
+        // Doorbell, floor, door code… for the courier (Stripe caps metadata values).
+        deliveryNote: String(orderData?.deliveryNote || '').trim().slice(0, 200),
+        newsletter: orderData?.newsletter === true ? 'yes' : '',
         // The webhook skips the Meta server event when the buyer declined tracking.
         trackingConsent: orderData?.trackingConsent === 'denied' ? 'denied' : orderData?.trackingConsent === 'granted' ? 'granted' : 'unset',
         items: JSON.stringify(orderData?.items || []),
