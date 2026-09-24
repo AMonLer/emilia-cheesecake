@@ -5,7 +5,8 @@ import { createPortal } from "react-dom"
 import Link from "next/link"
 import Image from "next/image"
 import PriceDisplay from "@/components/PriceDisplay"
-import { ShoppingCart, X, Check, ChevronLeft, ChevronRight, Sparkles } from "lucide-react"
+import { ShoppingCart, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { MonthlySpecialBadge, MonthlySpecialSash } from "@/components/MonthlySpecialBadge"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useScrollLock } from "@/lib/useScrollLock"
@@ -22,8 +23,6 @@ interface ProductCardProps {
     tag?: {
         label: string
         subLabel?: string
-        bgColor: string
-        textColor: string
     }
     /** En móvil muestra una fila compacta (foto pequeña + nombre + precio +
         botón de carrito) en vez de la tarjeta vertical: compra más rápida en
@@ -105,7 +104,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
         <>
             {/* Fila compacta (solo móvil, solo si compact): compra rápida */}
             {compact && (
-                <Link href={href} className={`md:hidden flex items-center gap-3 bg-[#F5E6D3] rounded-2xl p-2.5 cursor-pointer ${className}`}>
+                <Link href={href} className={`md:hidden flex items-center gap-3 bg-[#F5E6D3] rounded-2xl p-2.5 cursor-pointer ${tag ? 'ring-2 ring-[#D4AF85] shadow-[0_10px_24px_-16px_rgba(101,26,26,0.7)]' : ''} ${className}`}>
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl">
                         <Image
                             src={image1}
@@ -116,13 +115,8 @@ export default function ProductCard({ href, image1, image2, name, description, p
                         />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
+                        {tag && <MonthlySpecialBadge size="sm" label={tag.label} className="mb-1.5" />}
                         <h3 className="font-black text-sm tracking-tight">{name}</h3>
-                        {tag && (
-                            <p className="mt-0.5 flex items-center gap-1 text-[9px] font-black tracking-[0.12em] uppercase text-[#651A1A]">
-                                <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
-                                {tag.label}
-                            </p>
-                        )}
                         {priceSmall && (
                             <div className="flex items-baseline gap-1 mt-0.5 text-[#651A1A]">
                                 <span className="text-xs font-medium opacity-60">{locale === 'de' ? 'ab' : 'from'}</span>
@@ -142,21 +136,9 @@ export default function ProductCard({ href, image1, image2, name, description, p
                 </Link>
             )}
 
-            <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${className}`}>
+            <Link href={href} className={`bg-[#F5E6D3] rounded-2xl overflow-hidden group cursor-pointer flex-col ${compact ? 'hidden md:flex' : 'flex'} ${tag ? 'ring-2 ring-[#D4AF85] shadow-[0_14px_30px_-18px_rgba(101,26,26,0.75)]' : ''} ${className}`}>
                 <div className="relative h-48 md:h-80">
-                    {tag && (
-                        <div className={`absolute top-2 left-2 md:top-3 z-10 ${tag.bgColor} ${tag.textColor} rounded-xl px-2 py-1 md:px-2.5 md:py-1.5 shadow-lg shadow-black/25 text-left border border-[#651A1A]/20`}>
-                            <span className="flex items-center gap-1 text-[8px] md:text-[10px] font-black tracking-[0.12em] md:tracking-[0.18em] uppercase leading-none whitespace-nowrap">
-                                <Sparkles className="h-2 w-2 md:h-3 md:w-3 shrink-0" strokeWidth={2.5} />
-                                {tag.label}
-                            </span>
-                            {tag.subLabel && (
-                                <span className="hidden md:block mt-1 text-[9px] font-medium italic opacity-80 leading-none">
-                                    {tag.subLabel}
-                                </span>
-                            )}
-                        </div>
-                    )}
+                    {tag && <MonthlySpecialSash label={tag.label} subLabel={tag.subLabel} />}
 
                     {/* Desktop hover effect */}
                     <div className="relative w-full h-full hidden md:block">

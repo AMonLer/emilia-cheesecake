@@ -57,7 +57,7 @@ export default function BestellenPage() {
     priceSmall: number
     priceLarge: number
     description: string
-    tag?: { label: string; subLabel?: string; bgColor: string; textColor: string }
+    tag?: { label: string; subLabel?: string }
   }> = [
     {
       id: "hippo",
@@ -68,7 +68,7 @@ export default function BestellenPage() {
       priceSmall: 17.90,
       priceLarge: 45.90,
       description: p.hippo,
-      tag: { label: p.monthlySpecial, subLabel: p.limited, bgColor: "bg-[#F5E6D3]", textColor: "text-[#651A1A]" }
+      tag: { label: p.monthlySpecial, subLabel: p.limited }
     },
     {
       id: "clasica",

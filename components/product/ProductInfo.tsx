@@ -4,10 +4,11 @@ import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
-import { Check, CheckCircle, CreditCard, Gift, Sparkles } from "lucide-react"
+import { Check, CheckCircle, CreditCard, Gift } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
 import EarliestDelivery from "@/components/EarliestDelivery"
+import { MonthlySpecialBadge } from "@/components/MonthlySpecialBadge"
 
 declare global {
   interface Window {
@@ -61,13 +62,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         return (
             <div className="flex flex-col justify-center h-full">
                 {product.limited && (
-                    <span className="inline-flex flex-col items-start gap-1 rounded-xl bg-[#F5E6D3] text-[#651A1A] border border-[#651A1A]/20 px-3 py-1.5 mb-2 shadow-sm">
-                        <span className="flex items-center gap-1.5 text-[9px] font-black tracking-[0.15em] uppercase leading-none whitespace-nowrap">
-                            <Sparkles className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
-                            {t.products.monthlySpecial}
-                        </span>
-                        <span className="text-[9px] font-medium italic opacity-80 leading-none">{t.products.limited}</span>
-                    </span>
+                    <MonthlySpecialBadge size="sm" label={t.products.monthlySpecial} subLabel={t.products.limited} className="mb-2.5" />
                 )}
                 <h1 className="text-xl font-black tracking-tight leading-tight text-black mb-2">
                     {product.name}
@@ -235,11 +230,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
         <div className="flex flex-col h-full justify-center">
             <div className="mb-4">
                 {product.limited && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5E6D3] text-[#651A1A] border border-[#651A1A]/20 px-3 py-1.5 mb-3 shadow-sm">
-                        <Sparkles className="h-3 w-3 shrink-0" strokeWidth={2.5} />
-                        <span className="text-[11px] font-black tracking-[0.2em] uppercase leading-none">{t.products.monthlySpecial}</span>
-                        <span className="text-[11px] font-medium italic opacity-80 leading-none">· {t.products.limited}</span>
-                    </span>
+                    <MonthlySpecialBadge label={t.products.monthlySpecial} subLabel={t.products.limited} className="mb-3" />
                 )}
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-black">
                     {product.name}
