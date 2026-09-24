@@ -173,7 +173,8 @@ export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
   }
 }
 
-export async function getForYouMessage(code: string): Promise<ForYouMessage | null> {
+// strict: throw on Notion errors instead of answering "no such code".
+export async function getForYouMessage(code: string, strict = false): Promise<ForYouMessage | null> {
   if (!notion || !foryouDataSourceId) return null
   try {
     const res = await (notion as any).dataSources.query({
@@ -182,19 +183,42 @@ export async function getForYouMessage(code: string): Promise<ForYouMessage | nu
       page_size: 1,
     })
     const page = res.results[0]
-    if (!page) return null
-    const props = page.properties
-    return {
-      code,
-      message: props.Message?.rich_text?.[0]?.plain_text || '',
-      videoUrl: props['Video URL']?.url || '',
-      fileUrl: props['File URL']?.url || '',
-      fileName: props['File Name']?.rich_text?.[0]?.plain_text || '',
-    }
+    return page ? forYouMessageFromPage(page, code) : null
   } catch (err) {
     console.error('Error leyendo mensaje For You de Notion:', err)
+    if (strict) throw err
     return null
   }
+}
+
+function forYouMessageFromPage(page: any, code?: string): ForYouMessage {
+  const props = page.properties
+  const text = (prop: any) => (prop?.rich_text || prop?.title || []).map((t: any) => t.plain_text).join('')
+  return {
+    code: code ?? text(props.Code).trim(),
+    message: text(props.Message),
+    videoUrl: props['Video URL']?.url || '',
+    fileUrl: props['File URL']?.url || '',
+    fileName: text(props['File Name']),
+    paymentIntentId: text(props['Stripe ID']).trim(),
+  }
+}
+
+/** Every code handed out, with its message (empty if the buyer has not written one yet). */
+export async function listForYouMessages(): Promise<ForYouMessage[]> {
+  const messages: ForYouMessage[] = []
+  if (!notion || !foryouDataSourceId) return messages
+  let cursor: string | undefined
+  do {
+    const res = await (notion as any).dataSources.query({
+      data_source_id: foryouDataSourceId,
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
+    })
+    for (const page of res.results) messages.push(forYouMessageFromPage(page))
+    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined
+  } while (cursor)
+  return messages
 }
 
 /** Todos los códigos de sticker ya entregados (haya mensaje grabado o solo reserva). */

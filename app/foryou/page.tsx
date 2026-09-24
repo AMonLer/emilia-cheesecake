@@ -3,17 +3,20 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function ForYouPage() {
   const [code, setCode] = useState("")
   const [error, setError] = useState("")
   const router = useRouter()
+  const { t } = useLanguage()
+  const f = t.forYouPages
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     const trimmed = code.trim().toUpperCase()
     if (!trimmed) {
-      setError("Please enter your code.")
+      setError(f.codeMissing)
       return
     }
     router.push(`/foryou/${trimmed}`)
@@ -41,14 +44,14 @@ export default function ForYouPage() {
 
         {/* Heading */}
         <p className="text-xs tracking-[0.35em] text-[#651A1A]/60 font-bold uppercase mb-4">
-          Someone is thinking of you
+          {f.landingEyebrow}
         </p>
         <h1 className="text-4xl md:text-5xl font-black text-[#651A1A] tracking-tight leading-[0.95] mb-4">
-          A message<br />
-          <span className="font-serif italic font-medium text-5xl md:text-6xl">is waiting</span>
+          {f.landingTitle1}<br />
+          <span className="font-serif italic font-medium text-5xl md:text-6xl">{f.landingTitle2}</span>
         </h1>
         <p className="text-[#651A1A]/60 font-light text-base mb-12 max-w-xs leading-relaxed">
-          Enter the code on your sticker to unlock your personal message.
+          {f.landingDesc}
         </p>
 
         {/* Code input */}
@@ -60,7 +63,7 @@ export default function ForYouPage() {
             maxLength={4}
             value={code}
             onChange={(e) => { setCode(e.target.value); setError("") }}
-            placeholder="Enter your code"
+            placeholder={f.codePlaceholder}
             className="w-full text-center text-lg font-black tracking-[0.25em] uppercase border-2 border-[#651A1A]/20 rounded-2xl px-6 py-4 focus:outline-none focus:border-[#651A1A] bg-white text-[#651A1A] placeholder:text-[#651A1A]/30 placeholder:font-light placeholder:tracking-normal placeholder:normal-case transition-colors"
             autoComplete="off"
             spellCheck={false}
@@ -72,13 +75,13 @@ export default function ForYouPage() {
             type="submit"
             className="w-full bg-[#651A1A] text-white py-4 rounded-2xl font-black text-sm tracking-[0.2em] uppercase hover:bg-[#4A1313] transition-colors duration-300 shadow-lg shadow-[#651A1A]/20"
           >
-            Open my message
+            {f.openMessage}
           </button>
         </form>
 
         {/* Footer */}
         <p className="mt-16 text-xs text-[#651A1A]/30 tracking-wider">
-          emilialab.com · Handcrafted in Zürich
+          emilialab.com · {f.handcrafted}
         </p>
       </div>
     </div>

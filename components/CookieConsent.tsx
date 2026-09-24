@@ -12,8 +12,9 @@ import {
   type TrackingConsent,
 } from "@/lib/tracking"
 
-// Checkout and confirmation keep the bottom of the screen for the pay button.
-const HIDDEN_ON = ["/checkout", "/payment-success", "/admin"]
+// Checkout and confirmation keep the bottom of the screen for the pay button;
+// the For You pages are a gift being opened, not the shop.
+const HIDDEN_ON = ["/checkout", "/payment-success", "/admin", "/foryou"]
 
 export default function CookieConsent() {
   const pathname = usePathname()

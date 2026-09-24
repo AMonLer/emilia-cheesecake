@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Menu, X, ShoppingBag, ChevronLeft } from 'lucide-react'
+import { Menu, X, ShoppingBag, ChevronLeft, Gift } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCart, productSlugForItem } from '@/contexts/CartContext'
 import { useLanguage } from '@/contexts/LanguageContext'
@@ -396,6 +396,10 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                     </div>
                     )
                   })}
+                  <p className="flex items-start gap-2 text-xs leading-snug text-gray-500">
+                    <Gift className="mt-0.5 h-4 w-4 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
+                    {t.forYou.hint}
+                  </p>
                 </div>
               )}
             </div>

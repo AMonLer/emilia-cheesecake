@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
-import { Check, CheckCircle, CreditCard, Sparkles } from "lucide-react"
+import { Check, CheckCircle, CreditCard, Gift, Sparkles } from "lucide-react"
 import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/PaymentIcons"
 import PriceDisplay from "@/components/PriceDisplay"
 import EarliestDelivery from "@/components/EarliestDelivery"
@@ -178,6 +178,13 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 <ApplePayIcon className="h-6 w-auto" />
                             </div>
                         </div>
+                    </div>
+                    <div className="h-px bg-gray-200 w-full"></div>
+                    <div className="flex items-center gap-2">
+                        <div className="bg-[#651A1A]/10 p-1.5 rounded-full flex-shrink-0">
+                            <Gift className="w-4 h-4 text-[#651A1A]" />
+                        </div>
+                        <span className="text-xs text-[#651A1A] leading-snug">{t.forYou.hint}</span>
                     </div>
                 </div>
 
@@ -357,6 +364,13 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             <ApplePayIcon className="h-8 w-auto" />
                         </div>
                     </div>
+                </div>
+                <div className="h-px bg-gray-200 w-full"></div>
+                <div className="flex items-center gap-3">
+                    <div className="bg-[#651A1A]/10 p-2 rounded-full flex-shrink-0">
+                        <Gift className="w-5 h-5 text-[#651A1A]" />
+                    </div>
+                    <span className="text-sm text-[#651A1A] leading-snug">{t.forYou.hint}</span>
                 </div>
             </div>
 

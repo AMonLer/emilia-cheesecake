@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { createForYouSession, forYouCookieName, FORYOU_SESSION_SECONDS, isForYouCode, verifyForYouSession } from '@/lib/foryou-auth'
+import { createForYouSession, forYouCookieName, forYouCookieOptions, isForYouCode, verifyForYouSession } from '@/lib/foryou-auth'
 import { getForYouMessage } from '@/lib/foryou-store'
+import { getForYouOrder } from '@/lib/foryou-order'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -11,8 +12,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code') || ''
   const session = verifyForYouSession(req.cookies.get(forYouCookieName(code))?.value, code)
-  const message = session ? await getForYouMessage(code) : null
-  return NextResponse.json({ authorized: Boolean(session), message }, { headers: { 'Cache-Control': 'no-store' } })
+  const [message, order] = session
+    ? await Promise.all([getForYouMessage(code), getForYouOrder(session.paymentIntentId)])
+    : [null, null]
+  // Until when a saved message may still be changed (start of the delivery slot).
+  const editableUntil = order?.editableUntil ?? null
+  return NextResponse.json({ authorized: Boolean(session), message, editableUntil }, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 // The payment ID alone is not proof of ownership. Verify Stripe's client secret
@@ -37,13 +42,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ code: null, pending: intent.metadata?.isGift === 'yes' })
     }
     const response = NextResponse.json({ code }, { headers: { 'Cache-Control': 'no-store' } })
-    response.cookies.set(forYouCookieName(code), createForYouSession(code, intent.id), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: FORYOU_SESSION_SECONDS,
-    })
+    response.cookies.set(forYouCookieName(code), createForYouSession(code, intent.id), forYouCookieOptions)
     return response
   } catch (error: any) {
     console.error('Error retrieving For You code:', error)

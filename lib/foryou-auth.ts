@@ -38,3 +38,19 @@ export function verifyForYouSession(token: string | undefined, code: string, now
     return null
   }
 }
+
+export const forYouCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+  maxAge: FORYOU_SESSION_SECONDS,
+}
+
+// Link for the order e-mails. The only other way into the editor was the button
+// on the confirmation page, in the browser that paid: a buyer who left (or whose
+// in-app browser reloaded when picking a video) could never come back.
+export function forYouEditUrl(code: string, paymentIntentId: string, now = Date.now()): string {
+  const token = createForYouSession(code, paymentIntentId, now)
+  return `https://www.emilialab.com/api/foryou/edit?code=${code}&t=${encodeURIComponent(token)}`
+}

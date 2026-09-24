@@ -3,6 +3,7 @@ import path from 'path'
 import {
   saveForYouMessage as saveInNotion,
   getForYouMessage as getFromNotion,
+  listForYouMessages as listFromNotion,
   listUsedForYouCodes as listUsedFromNotion,
   reserveForYouCode as reserveInNotion,
   type ForYouMessage,
@@ -38,10 +39,16 @@ export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
   }
 }
 
-export async function getForYouMessage(code: string): Promise<ForYouMessage | null> {
-  if (useNotion) return getFromNotion(code)
+export async function getForYouMessage(code: string, strict = false): Promise<ForYouMessage | null> {
+  if (useNotion) return getFromNotion(code, strict)
   if (process.env.NODE_ENV === 'production') return null
   return readLocal()[code] ?? null
+}
+
+export async function listForYouMessages(): Promise<ForYouMessage[]> {
+  if (useNotion) return listFromNotion()
+  if (process.env.NODE_ENV === 'production') return []
+  return Object.values(readLocal())
 }
 
 /** Códigos de sticker ya entregados, para no repetir al asignar el siguiente. */

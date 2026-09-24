@@ -9,6 +9,7 @@ import {
   Text,
   Hr,
   Font,
+  Button,
 } from '@react-email/components'
 
 interface OrderConfirmationEmailProps {
@@ -26,6 +27,8 @@ interface OrderConfirmationEmailProps {
   postalCode: string
   deliveryDate: string
   deliveryTime: string
+  // Gift orders: signed link to create or change the For You message.
+  foryouEditUrl?: string
 }
 
 export default function OrderConfirmationEmail({
@@ -38,6 +41,7 @@ export default function OrderConfirmationEmail({
   postalCode = '',
   deliveryDate = '',
   deliveryTime = '',
+  foryouEditUrl,
 }: OrderConfirmationEmailProps) {
   return (
     <Html>
@@ -124,6 +128,23 @@ export default function OrderConfirmationEmail({
                 <strong>Lieferzeit:</strong> {deliveryTime}
               </Text>
             </Section>
+
+            {foryouEditUrl && (
+              <Section style={foryouBox}>
+                <Heading as="h2" style={foryouTitle}>
+                  Ihre persönliche Botschaft
+                </Heading>
+                <Text style={foryouText}>
+                  Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht
+                  hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen.
+                  Sie können die Botschaft bis zum Beginn der Lieferung jederzeit
+                  ändern.
+                </Text>
+                <Button href={foryouEditUrl} style={foryouButton}>
+                  Botschaft erstellen
+                </Button>
+              </Section>
+            )}
 
             <Text style={paragraph}>
               Ihre Bestellung wird frisch für Sie zubereitet und pünktlich
@@ -289,4 +310,37 @@ const footer = {
 const footerText = {
   color: '#888888',
   fontSize: '12px',
+}
+
+const foryouBox = {
+  backgroundColor: '#682f2e',
+  borderRadius: '8px',
+  padding: '24px',
+  margin: '24px 0',
+  textAlign: 'center' as const,
+}
+
+const foryouTitle = {
+  color: '#dec181',
+  fontSize: '20px',
+  fontWeight: 'bold',
+  margin: '0 0 12px',
+}
+
+const foryouText = {
+  color: '#f5e6d3',
+  fontSize: '15px',
+  lineHeight: '24px',
+  margin: '0 0 20px',
+}
+
+const foryouButton = {
+  backgroundColor: '#dec181',
+  color: '#682f2e',
+  borderRadius: '999px',
+  padding: '14px 28px',
+  fontSize: '14px',
+  fontWeight: 'bold',
+  textDecoration: 'none',
+  display: 'inline-block',
 }

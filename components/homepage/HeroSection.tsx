@@ -3,6 +3,13 @@
 import Link from "next/link"
 import Image from "next/image"
 import { useLanguage } from "@/contexts/LanguageContext"
+import EarliestDelivery from "@/components/EarliestDelivery"
+import { products } from "@/lib/products"
+
+// Cheapest cake, so the hero can say "ab 15.90 CHF" without hard-coding it.
+const FROM_PRICE = Math.min(
+  ...Object.values(products).flatMap((product: any) => Object.values(product.prices) as number[])
+).toFixed(2)
 
 export default function HeroSection() {
   const { t } = useLanguage()
@@ -14,8 +21,10 @@ export default function HeroSection() {
       <div className="lg:hidden">
         {/* Image - Full width with button positioned at bottom */}
         {/* svh, not dvh: dvh grows when the mobile URL bar collapses mid-scroll,
-            which visibly stretches the hero and reflows the page under the user. */}
-        <div className="relative h-[85svh] min-h-[480px] w-full">
+            which visibly stretches the hero and reflows the page under the user.
+            Not full height: at 85svh nobody scrolled on (no home page view below
+            16% depth), so the first cakes now peek in underneath. */}
+        <div className="relative h-[66svh] min-h-[440px] w-full">
           <Image
             src="/Generated Image November 30, 2025 - 9_03PM.jpeg"
             alt="San Sebastian Cheesecake von Emilia"
@@ -28,8 +37,11 @@ export default function HeroSection() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent z-10"></div>
 
           {/* Content positioned at bottom of image */}
-          <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-10 px-6 z-20 text-center">
-            <h1 className="text-4xl font-black text-white leading-[0.95] mb-8 drop-shadow-lg">
+          <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center justify-end pb-7 px-6 z-20 text-center">
+            <span className="mb-3 text-[10px] font-bold uppercase tracking-[0.3em] text-white/85 drop-shadow">
+              {h.eyebrow}
+            </span>
+            <h1 className="text-4xl font-black text-white leading-[0.95] mb-6 drop-shadow-lg">
               WHERE MEMORIES
               <br />
               ARE BAKED
@@ -39,8 +51,9 @@ export default function HeroSection() {
                 {h.cta}
               </button>
             </Link>
-            <p className="text-[11px] text-white/80 tracking-wide mt-4">
-              {h.trust}
+            <EarliestDelivery tone="light" className="mt-4 justify-center text-xs text-white/90 drop-shadow" />
+            <p className="text-[11px] text-white/80 tracking-wide mt-1.5">
+              {h.fromPrice(FROM_PRICE)} · {h.trust}
             </p>
           </div>
         </div>
@@ -70,8 +83,9 @@ export default function HeroSection() {
                 {h.cta}
               </button>
             </Link>
-            <p className="text-xs text-[#651A1A]/60 tracking-wide mt-5">
-              {h.trust}
+            <EarliestDelivery className="mt-5 text-sm text-[#651A1A]/80" />
+            <p className="text-xs text-[#651A1A]/60 tracking-wide mt-2">
+              {h.fromPrice(FROM_PRICE)} · {h.trust}
             </p>
           </div>
         </div>

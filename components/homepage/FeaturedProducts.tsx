@@ -9,9 +9,12 @@ export default function FeaturedProducts() {
     const p = t.products
 
     return (
-        <section className="py-16 bg-white">
+        <section className="pt-10 pb-12 md:py-16 bg-white">
             <div className="container mx-auto px-4">
-                <Reveal className="text-center mb-12 max-w-3xl mx-auto">
+                {/* First thing under the hero: shown as soon as any of it is on screen.
+                    With the default threshold it stayed invisible while peeking in,
+                    so the space under the hero looked like the end of the page. */}
+                <Reveal amount={0} className="text-center mb-8 md:mb-12 max-w-3xl mx-auto">
                     <h2 className="text-4xl md:text-5xl lg:text-7xl font-black mb-6 tracking-tighter leading-[0.95] text-[#651A1A]">
                         {p.heading} <br className="md:hidden" />
                         <span className="font-serif italic font-medium capitalize text-5xl md:text-6xl lg:text-8xl text-[#651A1A]/90 tracking-normal md:ml-1 mt-2 md:mt-0 inline-block py-1">Cheesecakes</span>
@@ -22,7 +25,7 @@ export default function FeaturedProducts() {
                 </Reveal>
 
                 {/* Mobile: 2-column vertical grid */}
-                <Reveal delay={100} className="md:hidden grid grid-cols-2 gap-2">
+                <Reveal amount={0} delay={100} className="md:hidden grid grid-cols-2 gap-2">
                     <ProductCard
                         className="w-full"
                         href="/product/hippo"

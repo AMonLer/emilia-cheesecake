@@ -247,6 +247,11 @@ function PaymentSuccessContent() {
             >
               {locale === 'de' ? 'Nachricht erstellen' : 'Create your message'}
             </Link>
+            <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
+              {locale === 'de'
+                ? 'Den Link bekommst du auch per E-Mail. Du kannst die Nachricht bis zur Lieferung ändern.'
+                : 'You also get the link by e-mail and can change your message until delivery.'}
+            </p>
           </div>
         )}
 

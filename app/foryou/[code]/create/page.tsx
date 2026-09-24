@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024 // 100 MB
 const MAX_FILE_BYTES = 25 * 1024 * 1024 // 25 MB
@@ -56,11 +57,28 @@ async function uploadToCloudinary(
   })
 }
 
+type Draft = { message: string; videoUrl: string; fileUrl: string; fileName: string }
+
+// Unsaved work survives a reload: in-app browsers (Instagram, TWINT) often
+// reload the page when the buyer comes back from picking a video, and one
+// buyer lost her whole message that way.
+const draftKey = (code: string) => `emilia-foryou-draft-${code}`
+
+function readDraft(code: string): Draft | null {
+  try {
+    const draft = JSON.parse(localStorage.getItem(draftKey(code)) || 'null')
+    return draft && (draft.message || draft.videoUrl || draft.fileUrl) ? draft : null
+  } catch {
+    return null
+  }
+}
+
 export default function CreateForYouMessage({ params }: { params: { code: string } }) {
   // El comprador nunca necesita ver el código: viaja en la URL y en su sesión.
   // El código impreso lo pega la tienda y lo usa quien recibe la tarta.
   const code = params.code.toUpperCase()
-
+  const { locale, t } = useLanguage()
+  const f = t.forYouPages
   const [message, setMessage] = useState("")
   const [videoUrl, setVideoUrl] = useState("")
   const [fileUrl, setFileUrl] = useState("")
@@ -72,6 +90,11 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   const [done, setDone] = useState(false)
   const [authorized, setAuthorized] = useState<boolean | null>(null)
   const [alreadySaved, setAlreadySaved] = useState(false)
+  // A saved message stays editable until the delivery slot starts.
+  const [editableUntil, setEditableUntil] = useState<number | null>(null)
+  const [hasSavedContent, setHasSavedContent] = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -80,26 +103,57 @@ export default function CreateForYouMessage({ params }: { params: { code: string
       .then((data) => {
         if (cancelled) return
         setAuthorized(data.authorized === true)
-        // El mensaje se graba una sola vez: si ya existe contenido, el editor
-        // no se muestra y cualquier cambio pasa por soporte.
         const existing = data.message
-        if (existing && (existing.message || existing.videoUrl || existing.fileUrl)) {
+        const saved = Boolean(existing && (existing.message || existing.videoUrl || existing.fileUrl))
+        const deadline = typeof data.editableUntil === 'number' ? data.editableUntil : null
+        setHasSavedContent(saved)
+        setEditableUntil(deadline)
+        if (saved && !(deadline && Date.now() < deadline)) {
           setAlreadySaved(true)
+          return
         }
+        // Unsaved work first, then what was saved before.
+        const draft = readDraft(code)
+        const start = draft ?? (saved ? existing : null)
+        if (start) {
+          setMessage(start.message || "")
+          setVideoUrl(start.videoUrl || "")
+          setFileUrl(start.fileUrl || "")
+          setFileName(start.fileName || "")
+        }
+        if (draft) setDraftRestored(true)
+        setLoaded(true)
       })
       .catch(() => { if (!cancelled) setAuthorized(false) })
     return () => { cancelled = true }
   }, [code])
 
+  useEffect(() => {
+    if (!loaded || done) return
+    try {
+      if (message || videoUrl || fileUrl) {
+        localStorage.setItem(draftKey(code), JSON.stringify({ message, videoUrl, fileUrl, fileName }))
+      } else {
+        localStorage.removeItem(draftKey(code))
+      }
+    } catch { }
+  }, [loaded, done, code, message, videoUrl, fileUrl, fileName])
+
   const videoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const deadlineLabel = editableUntil
+    ? new Date(editableUntil).toLocaleString(locale === 'en' ? 'en-GB' : 'de-CH', {
+        weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Zurich',
+      })
+    : ''
 
   const handleVideo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     setError("")
     if (file.size > MAX_VIDEO_BYTES) {
-      setError("The video is too large (max 100 MB). Try a shorter clip.")
+      setError(f.videoTooLarge)
       return
     }
     try {
@@ -107,7 +161,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
       const res = await uploadToCloudinary(file, setVideoProgress, code)
       setVideoUrl(res.secureUrl)
     } catch {
-      setError("The video could not be uploaded. Please try again.")
+      setError(f.videoFailed)
     } finally {
       setVideoProgress(null)
     }
@@ -118,7 +172,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
     if (!file) return
     setError("")
     if (file.size > MAX_FILE_BYTES) {
-      setError("The file is too large (max 25 MB).")
+      setError(f.fileTooLarge)
       return
     }
     try {
@@ -127,7 +181,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
       setFileUrl(res.secureUrl)
       setFileName(file.name)
     } catch {
-      setError("The file could not be uploaded. Please try again.")
+      setError(f.fileFailed)
     } finally {
       setFileProgress(null)
     }
@@ -135,7 +189,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
 
   const handleSubmit = async () => {
     if (!message.trim() && !videoUrl && !fileUrl) {
-      setError("Add a message, a video or a photo first.")
+      setError(f.nothingToSave)
       return
     }
     setError("")
@@ -151,24 +205,26 @@ export default function CreateForYouMessage({ params }: { params: { code: string
         return
       }
       if (!res.ok) throw new Error("save failed")
+      try { localStorage.removeItem(draftKey(code)) } catch { }
       setDone(true)
     } catch {
-      setError("Could not save your message. Please try again.")
+      setError(f.saveFailed)
     } finally {
       setSaving(false)
     }
   }
 
   const uploading = videoProgress !== null || fileProgress !== null
+  const supportLink = <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a>
 
   if (authorized !== true) {
     return (
       <main className="min-h-screen bg-[#FAF6F1] flex flex-col items-center justify-center px-6 text-center text-[#651A1A]">
-        <h1 className="text-3xl font-bold mb-4">{authorized === null ? 'Loading…' : 'Open this page after checkout'}</h1>
+        <h1 className="text-3xl font-bold mb-4">{authorized === null ? f.loading : f.notAuthorizedTitle}</h1>
         {authorized === false && <>
-          <p className="max-w-md mb-6">To create or edit your message, use the link on your payment confirmation page in the browser where you placed your order.</p>
-          <Link href={`/foryou/${code}`} className="underline underline-offset-4">View the message</Link>
-          <p className="mt-8 text-sm text-[#651A1A]/50">Having trouble? <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a></p>
+          <p className="max-w-md mb-6">{f.notAuthorizedText}</p>
+          <Link href={`/foryou/${code}`} className="underline underline-offset-4">{f.viewMessage}</Link>
+          <p className="mt-8 text-sm text-[#651A1A]/50">{f.trouble} {supportLink}</p>
         </>}
       </main>
     )
@@ -177,12 +233,11 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   if (alreadySaved) {
     return (
       <main className="min-h-screen bg-[#FAF6F1] flex flex-col items-center justify-center px-6 text-center text-[#651A1A]">
-        <h1 className="text-3xl font-bold mb-4">Your message is saved</h1>
+        <h1 className="text-3xl font-bold mb-4">{f.lockedTitle}</h1>
         <p className="max-w-md font-light leading-relaxed">
-          It travels with your cake. If you&apos;d like to change it, write to us at{' '}
-          <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a>{' '}
-          and we&apos;ll take care of it.
+          {f.lockedText} {supportLink} {f.lockedTextEnd}
         </p>
+        <Link href={`/foryou/${code}`} className="mt-8 underline underline-offset-4">{f.preview}</Link>
       </main>
     )
   }
@@ -204,17 +259,28 @@ export default function CreateForYouMessage({ params }: { params: { code: string
           </div>
 
           <p className="text-[#F5E6D3]/60 text-xs tracking-[0.35em] uppercase font-bold mb-3">
-            Message saved
+            {f.savedEyebrow}
           </p>
           <h1 className="text-5xl font-black text-white tracking-tight leading-[0.95] mb-6">
-            All <span className="font-serif italic font-medium text-[#F5E6D3]">set.</span>
+            {f.savedTitle1} <span className="font-serif italic font-medium text-[#F5E6D3]">{f.savedTitle2}</span>
           </h1>
           <p className="text-white/60 font-light leading-relaxed max-w-xs text-sm">
-            We print the card and add it to your cake. They scan it — and your message opens.
+            {f.savedText}
           </p>
+          {deadlineLabel && (
+            <p className="mt-4 text-white/60 font-light leading-relaxed max-w-xs text-sm">
+              {f.savedEditHint(deadlineLabel)}
+            </p>
+          )}
+          <Link
+            href={`/foryou/${code}`}
+            className="mt-8 rounded-full border border-white/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-[#651A1A]"
+          >
+            {f.preview}
+          </Link>
 
           <p className="mt-10 text-xs text-white/30 tracking-wider">
-            emilialab.com · Handcrafted in Zürich
+            emilialab.com · {f.handcrafted}
           </p>
         </div>
       </div>
@@ -236,27 +302,36 @@ export default function CreateForYouMessage({ params }: { params: { code: string
             style={{ filter: "brightness(0) saturate(100%) invert(14%) sepia(60%) saturate(800%) hue-rotate(320deg) brightness(70%)" }}
           />
           <h1 className="text-4xl md:text-5xl font-black text-[#651A1A] tracking-tight leading-[0.95] mb-3">
-            Leave a message<br />
-            <span className="font-serif italic font-medium text-5xl md:text-6xl">they&apos;ll never forget</span>
+            {f.editorTitle1}<br />
+            <span className="font-serif italic font-medium text-5xl md:text-6xl">{f.editorTitle2}</span>
           </h1>
           <p className="text-[#651A1A]/60 font-light max-w-sm leading-relaxed">
-            Write a note, record a video or add a photo. We&apos;ll keep it safe behind your code.
+            {f.editorDesc}
           </p>
+          {hasSavedContent && deadlineLabel && (
+            <p className="mt-4 rounded-full bg-[#651A1A]/5 px-4 py-2 text-sm text-[#651A1A]">
+              {f.editableUntil(deadlineLabel)}
+            </p>
+          )}
+          {draftRestored && (
+            <p className="mt-3 text-sm text-[#651A1A]/70">{f.draftRestored}</p>
+          )}
         </div>
 
         <div className="space-y-5">
           {/* Message */}
           <div>
-            <label className="block text-xs font-bold tracking-[0.2em] uppercase text-[#651A1A]/60 mb-2">
-              Your message
+            <label htmlFor="foryou-message" className="block text-xs font-bold tracking-[0.2em] uppercase text-[#651A1A]/60 mb-2">
+              {f.messageLabel}
             </label>
             <textarea
+              id="foryou-message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={4}
               maxLength={2000}
-              placeholder="Write something from the heart…"
-              className="w-full rounded-2xl border-2 border-[#651A1A]/15 bg-white px-5 py-4 text-[#651A1A] placeholder:text-[#651A1A]/30 focus:outline-none focus:border-[#651A1A] transition-colors resize-none"
+              placeholder={f.messagePlaceholder}
+              className="w-full rounded-2xl border-2 border-[#651A1A]/15 bg-white px-5 py-4 text-base text-[#651A1A] placeholder:text-[#651A1A]/30 focus:outline-none focus:border-[#651A1A] transition-colors resize-none"
             />
           </div>
 
@@ -265,19 +340,19 @@ export default function CreateForYouMessage({ params }: { params: { code: string
             <input ref={videoInputRef} type="file" accept="video/*" onChange={handleVideo} className="hidden" />
             {videoUrl ? (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[#651A1A]">🎬 Video added</span>
-                <button onClick={() => { setVideoUrl(""); if (videoInputRef.current) videoInputRef.current.value = "" }} className="text-xs text-[#651A1A]/50 underline">Remove</button>
+                <span className="text-sm font-medium text-[#651A1A]">🎬 {f.videoAdded}</span>
+                <button onClick={() => { setVideoUrl(""); if (videoInputRef.current) videoInputRef.current.value = "" }} className="text-xs text-[#651A1A]/50 underline">{f.remove}</button>
               </div>
             ) : videoProgress !== null ? (
               <div>
-                <p className="text-sm text-[#651A1A] mb-2">Uploading video… {videoProgress}%</p>
+                <p className="text-sm text-[#651A1A] mb-2">{f.uploadingVideo(videoProgress)}</p>
                 <div className="h-2 w-full rounded-full bg-[#651A1A]/10 overflow-hidden">
                   <div className="h-full bg-[#651A1A] transition-all" style={{ width: `${videoProgress}%` }} />
                 </div>
               </div>
             ) : (
               <button onClick={() => videoInputRef.current?.click()} disabled={uploading} className="w-full text-left text-sm font-medium text-[#651A1A]/70 hover:text-[#651A1A] disabled:opacity-40">
-                🎬 Add a video <span className="text-[#651A1A]/40">· up to 100 MB</span>
+                🎬 {f.addVideo} <span className="text-[#651A1A]/40">· {f.videoLimit}</span>
               </button>
             )}
           </div>
@@ -287,38 +362,38 @@ export default function CreateForYouMessage({ params }: { params: { code: string
             <input ref={fileInputRef} type="file" accept="image/*,application/pdf" onChange={handleFile} className="hidden" />
             {fileUrl ? (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-[#651A1A] truncate">📎 {fileName || "File added"}</span>
-                <button onClick={() => { setFileUrl(""); setFileName(""); if (fileInputRef.current) fileInputRef.current.value = "" }} className="text-xs text-[#651A1A]/50 underline shrink-0 ml-3">Remove</button>
+                <span className="text-sm font-medium text-[#651A1A] truncate">📎 {fileName || f.fileAdded}</span>
+                <button onClick={() => { setFileUrl(""); setFileName(""); if (fileInputRef.current) fileInputRef.current.value = "" }} className="text-xs text-[#651A1A]/50 underline shrink-0 ml-3">{f.remove}</button>
               </div>
             ) : fileProgress !== null ? (
               <div>
-                <p className="text-sm text-[#651A1A] mb-2">Uploading… {fileProgress}%</p>
+                <p className="text-sm text-[#651A1A] mb-2">{f.uploadingFile(fileProgress)}</p>
                 <div className="h-2 w-full rounded-full bg-[#651A1A]/10 overflow-hidden">
                   <div className="h-full bg-[#651A1A] transition-all" style={{ width: `${fileProgress}%` }} />
                 </div>
               </div>
             ) : (
               <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="w-full text-left text-sm font-medium text-[#651A1A]/70 hover:text-[#651A1A] disabled:opacity-40">
-                📎 Add a photo or PDF <span className="text-[#651A1A]/40">· up to 25 MB</span>
+                📎 {f.addFile} <span className="text-[#651A1A]/40">· {f.fileLimit}</span>
               </button>
             )}
           </div>
 
-          {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+          {error && <p role="alert" className="text-red-600 text-sm text-center">{error}</p>}
 
           <button
             onClick={handleSubmit}
             disabled={saving || uploading}
             className="w-full bg-[#651A1A] text-white py-4 rounded-2xl font-black text-sm tracking-[0.2em] uppercase hover:bg-[#4A1313] transition-colors duration-300 shadow-lg shadow-[#651A1A]/20 disabled:opacity-50"
           >
-            {saving ? "Saving…" : uploading ? "Uploading…" : "Save my message"}
+            {saving ? f.saving : uploading ? f.uploadingShort : hasSavedContent ? f.saveChanges : f.save}
           </button>
         </div>
 
         <p className="mt-12 text-center text-xs text-[#651A1A]/30 tracking-wider">
-          Having trouble? <a href="mailto:info@emilialab.com" className="underline underline-offset-2">info@emilialab.com</a>
+          {f.trouble} {supportLink}
           <br />
-          emilialab.com · Handcrafted in Zürich
+          emilialab.com · {f.handcrafted}
         </p>
       </div>
     </div>

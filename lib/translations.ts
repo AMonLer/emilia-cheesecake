@@ -9,6 +9,7 @@ export type Translations = {
     eyebrow: string
     cta: string
     trust: string
+    fromPrice: (price: string) => string
   }
   cart: {
     title: string
@@ -67,12 +68,6 @@ export type Translations = {
     title1: string
     titleSerif: string
     desc: string
-    step1Title: string
-    step1Desc: string
-    step2Title: string
-    step2Desc: string
-    step3Title: string
-    step3Desc: string
     cta: string
     ctaNote: string
     flowLabel: string
@@ -80,16 +75,70 @@ export type Translations = {
     flowStep2: string
     flowStep3: string
     flowNote: string
-    examplesLabel: string
-    birthdayLabel: string
-    thankYouLabel: string
-    pauseExamples: string
-    playExamples: string
-    previewLabel: string
     previewImageAlt: string
-    thankYouImageAlt: string
-    previewMessage: string
-    previewMessage2: string
+    hint: string
+  }
+  forYouPages: {
+    landingEyebrow: string
+    landingTitle1: string
+    landingTitle2: string
+    landingDesc: string
+    codePlaceholder: string
+    codeMissing: string
+    openMessage: string
+    messageForYou: string
+    downloadFile: string
+    photoAlt: string
+    defaultEyebrow: string
+    defaultTitle: string
+    defaultText: string
+    defaultNote: string
+    notFoundTitle: string
+    notFoundText: string
+    enterCode: string
+    ctaTitle: string
+    ctaButton: string
+    handcrafted: string
+    loading: string
+    notAuthorizedTitle: string
+    notAuthorizedText: string
+    viewMessage: string
+    trouble: string
+    lockedTitle: string
+    lockedText: string
+    lockedTextEnd: string
+    editorTitle1: string
+    editorTitle2: string
+    editorDesc: string
+    editableUntil: (date: string) => string
+    draftRestored: string
+    messageLabel: string
+    messagePlaceholder: string
+    addVideo: string
+    videoLimit: string
+    videoAdded: string
+    uploadingVideo: (percent: number) => string
+    addFile: string
+    fileLimit: string
+    fileAdded: string
+    uploadingFile: (percent: number) => string
+    remove: string
+    videoTooLarge: string
+    videoFailed: string
+    fileTooLarge: string
+    fileFailed: string
+    nothingToSave: string
+    saveFailed: string
+    save: string
+    saveChanges: string
+    saving: string
+    uploadingShort: string
+    savedEyebrow: string
+    savedTitle1: string
+    savedTitle2: string
+    savedText: string
+    savedEditHint: (date: string) => string
+    preview: string
   }
   experience: {
     locationLabel: string
@@ -244,6 +293,7 @@ export const translations: Record<Locale, Translations> = {
       eyebrow: 'San Sebastian Cheesecake · Zürich',
       cta: 'JETZT BESTELLEN',
       trust: 'Frisch auf Bestellung gebacken · Lieferung in Zürich & Umgebung',
+      fromPrice: (price) => `ab ${price} CHF`,
     },
     cart: {
       title: 'Warenkorb',
@@ -302,12 +352,6 @@ export const translations: Record<Locale, Translations> = {
       title1: 'Der Lieblingskuchen.',
       titleSerif: 'Deine persönliche Botschaft.',
       desc: 'Zum Geburtstag oder einfach als Dankeschön: Mach dein Geschenk persönlich. Ergänze ein Video, Foto oder eine Nachricht, die dein Lieblingsmensch über den Code beim Kuchen öffnet.',
-      step1Title: 'Kuchen als Geschenk wählen',
-      step1Desc: 'Wähle deinen Kuchen und im Checkout die Option „Mach es persönlich“.',
-      step2Title: 'Botschaft gestalten',
-      step2Desc: 'Füge nach der Zahlung dein Video, Foto oder deine Nachricht hinzu.',
-      step3Title: 'Moment verschenken',
-      step3Desc: 'Dein Lieblingsmensch erhält den Kuchen und öffnet deine Botschaft mit dem beiliegenden Code.',
       cta: 'Geschenk personalisieren',
       ctaNote: 'Wähle zuerst deinen Kuchen. Deine Botschaft fügst du nach der Zahlung hinzu.',
       flowLabel: 'So geht’s:',
@@ -315,16 +359,70 @@ export const translations: Record<Locale, Translations> = {
       flowStep2: 'Bezahlen',
       flowStep3: 'Botschaft hinzufügen',
       flowNote: 'Video, Foto oder Nachricht',
-      examplesLabel: 'Anlass für die Beispielnachricht wählen',
-      birthdayLabel: 'Geburtstag',
-      thankYouLabel: 'Dankeschön',
-      pauseExamples: 'Beispiele pausieren',
-      playExamples: 'Beispiele abspielen',
-      previewLabel: 'Eine Nachricht für dich',
       previewImageAlt: 'Eine Mutter mit ihrer Tochter',
-      thankYouImageAlt: 'Zwei Frauen vor einer grünen Berglandschaft',
-      previewMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniesse jeden Bissen.',
-      previewMessage2: 'Danke, dass du immer für mich da bist. Dieser Kuchen ist für dich.',
+      hint: 'Als Geschenk? Füge im Checkout eine Video-, Foto- oder Textbotschaft hinzu – inklusive.',
+    },
+    forYouPages: {
+      landingEyebrow: 'Jemand denkt an dich',
+      landingTitle1: 'Eine Nachricht',
+      landingTitle2: 'wartet auf dich',
+      landingDesc: 'Gib den Code von deinem Sticker ein, um deine persönliche Nachricht zu öffnen.',
+      codePlaceholder: 'Code eingeben',
+      codeMissing: 'Bitte gib deinen Code ein.',
+      openMessage: 'Nachricht öffnen',
+      messageForYou: 'Eine Nachricht für dich',
+      downloadFile: 'Datei herunterladen',
+      photoAlt: 'Ein Foto für dich',
+      defaultEyebrow: 'Für dich',
+      defaultTitle: 'Jemand hat an dich gedacht',
+      defaultText: 'Dieser Käsekuchen wurde frisch für dich gebacken – mit viel Liebe und den besten Zutaten. Geniess jeden Bissen.',
+      defaultNote: 'Kommt noch eine persönliche Nachricht dazu, erscheint sie hier.',
+      notFoundTitle: 'Code nicht gefunden',
+      notFoundText: 'Bitte prüfe den Code auf deinem Sticker und versuch es noch einmal.',
+      enterCode: 'Code eingeben',
+      ctaTitle: 'Selbst jemandem eine Freude machen?',
+      ctaButton: 'Kuchen entdecken',
+      handcrafted: 'Handgemacht in Zürich',
+      loading: 'Laden…',
+      notAuthorizedTitle: 'Öffne den Link aus deiner E-Mail',
+      notAuthorizedText: 'Um deine Nachricht zu erstellen oder zu ändern, öffne den Link in deiner Bestellbestätigung per E-Mail – auf jedem Gerät.',
+      viewMessage: 'Nachricht ansehen',
+      trouble: 'Probleme?',
+      lockedTitle: 'Deine Nachricht ist gespeichert',
+      lockedText: 'Sie ist mit deinem Kuchen unterwegs. Möchtest du sie noch ändern, schreib uns an',
+      lockedTextEnd: 'und wir kümmern uns darum.',
+      editorTitle1: 'Hinterlasse eine Nachricht,',
+      editorTitle2: 'die bleibt',
+      editorDesc: 'Schreib ein paar Zeilen, nimm ein Video auf oder füge ein Foto hinzu. Wir bewahren alles sicher hinter deinem Code auf.',
+      editableUntil: (date) => `Du kannst deine Nachricht bis ${date} ändern.`,
+      draftRestored: 'Wir haben deinen Entwurf wiederhergestellt.',
+      messageLabel: 'Deine Nachricht',
+      messagePlaceholder: 'Schreib etwas von Herzen…',
+      addVideo: 'Video hinzufügen',
+      videoLimit: 'bis 100 MB',
+      videoAdded: 'Video hinzugefügt',
+      uploadingVideo: (percent) => `Video wird hochgeladen… ${percent}%`,
+      addFile: 'Foto oder PDF hinzufügen',
+      fileLimit: 'bis 25 MB',
+      fileAdded: 'Datei hinzugefügt',
+      uploadingFile: (percent) => `Wird hochgeladen… ${percent}%`,
+      remove: 'Entfernen',
+      videoTooLarge: 'Das Video ist zu gross (max. 100 MB). Versuch es mit einem kürzeren Clip.',
+      videoFailed: 'Das Video konnte nicht hochgeladen werden. Bitte versuch es noch einmal.',
+      fileTooLarge: 'Die Datei ist zu gross (max. 25 MB).',
+      fileFailed: 'Die Datei konnte nicht hochgeladen werden. Bitte versuch es noch einmal.',
+      nothingToSave: 'Füge zuerst eine Nachricht, ein Video oder ein Foto hinzu.',
+      saveFailed: 'Deine Nachricht konnte nicht gespeichert werden. Bitte versuch es noch einmal.',
+      save: 'Nachricht speichern',
+      saveChanges: 'Änderungen speichern',
+      saving: 'Wird gespeichert…',
+      uploadingShort: 'Wird hochgeladen…',
+      savedEyebrow: 'Nachricht gespeichert',
+      savedTitle1: 'Alles',
+      savedTitle2: 'bereit.',
+      savedText: 'Wir legen den Code zu deinem Kuchen. Die beschenkte Person scannt ihn – und deine Nachricht öffnet sich.',
+      savedEditHint: (date) => `Du kannst sie bis ${date} über den Link in deiner E-Mail ändern.`,
+      preview: 'Ansehen, was sie sehen',
     },
     experience: {
       locationLabel: 'AUS ZÜRICH',
@@ -477,6 +575,7 @@ export const translations: Record<Locale, Translations> = {
       eyebrow: 'San Sebastian Cheesecake · Zurich',
       cta: 'ORDER NOW',
       trust: 'Freshly baked to order · Delivery in Zurich & surroundings',
+      fromPrice: (price) => `from CHF ${price}`,
     },
     cart: {
       title: 'Cart',
@@ -535,12 +634,6 @@ export const translations: Record<Locale, Translations> = {
       title1: 'Their favourite cake.',
       titleSerif: 'Your personal message.',
       desc: 'Make their birthday or your thank-you a little more personal. Add a video, photo or note they can open with the code included with their cake.',
-      step1Title: 'Choose a cake to gift',
-      step1Desc: 'Pick your cake and choose "Make it personal" at checkout.',
-      step2Title: 'Create your message',
-      step2Desc: 'Add your video, photo or note after payment.',
-      step3Title: 'Gift the moment',
-      step3Desc: 'They receive their cake and open your message with the code included.',
       cta: 'Personalise your gift',
       ctaNote: 'Choose your cake first. Add your message after checkout.',
       flowLabel: 'How it works:',
@@ -548,16 +641,70 @@ export const translations: Record<Locale, Translations> = {
       flowStep2: 'Pay',
       flowStep3: 'Add your message',
       flowNote: 'Video, photo or note',
-      examplesLabel: 'Choose a message example',
-      birthdayLabel: 'Birthday',
-      thankYouLabel: 'Thank you',
-      pauseExamples: 'Pause examples',
-      playExamples: 'Play examples',
-      previewLabel: 'A message for you',
       previewImageAlt: 'A mother with her daughter',
-      thankYouImageAlt: 'Two women together in a green mountain landscape',
-      previewMessage: 'Happy birthday, Mum! Wish I could be there. Enjoy every bite.',
-      previewMessage2: 'Thank you for always being there. This one\'s for you.',
+      hint: 'A gift? Add a video, photo or note at checkout – included.',
+    },
+    forYouPages: {
+      landingEyebrow: 'Someone is thinking of you',
+      landingTitle1: 'A message',
+      landingTitle2: 'is waiting',
+      landingDesc: 'Enter the code on your sticker to unlock your personal message.',
+      codePlaceholder: 'Enter your code',
+      codeMissing: 'Please enter your code.',
+      openMessage: 'Open my message',
+      messageForYou: 'A message for you',
+      downloadFile: 'Download file',
+      photoAlt: 'A photo for you',
+      defaultEyebrow: 'For you',
+      defaultTitle: 'Someone was thinking of you',
+      defaultText: 'This cheesecake was freshly baked for you – with lots of love and the best ingredients. Enjoy every bite.',
+      defaultNote: 'If a personal message is added, it will appear here.',
+      notFoundTitle: 'Code not found',
+      notFoundText: 'Please check the code on your sticker and try again.',
+      enterCode: 'Enter code',
+      ctaTitle: 'Want to make someone\'s day?',
+      ctaButton: 'Discover our cakes',
+      handcrafted: 'Handcrafted in Zürich',
+      loading: 'Loading…',
+      notAuthorizedTitle: 'Open the link from your e-mail',
+      notAuthorizedText: 'To create or change your message, open the link in your order confirmation e-mail – on any device.',
+      viewMessage: 'View the message',
+      trouble: 'Having trouble?',
+      lockedTitle: 'Your message is saved',
+      lockedText: 'It travels with your cake. If you\'d like to change it, write to us at',
+      lockedTextEnd: 'and we\'ll take care of it.',
+      editorTitle1: 'Leave a message',
+      editorTitle2: 'they\'ll never forget',
+      editorDesc: 'Write a note, record a video or add a photo. We\'ll keep it safe behind your code.',
+      editableUntil: (date) => `You can change your message until ${date}.`,
+      draftRestored: 'We restored your draft.',
+      messageLabel: 'Your message',
+      messagePlaceholder: 'Write something from the heart…',
+      addVideo: 'Add a video',
+      videoLimit: 'up to 100 MB',
+      videoAdded: 'Video added',
+      uploadingVideo: (percent) => `Uploading video… ${percent}%`,
+      addFile: 'Add a photo or PDF',
+      fileLimit: 'up to 25 MB',
+      fileAdded: 'File added',
+      uploadingFile: (percent) => `Uploading… ${percent}%`,
+      remove: 'Remove',
+      videoTooLarge: 'The video is too large (max 100 MB). Try a shorter clip.',
+      videoFailed: 'The video could not be uploaded. Please try again.',
+      fileTooLarge: 'The file is too large (max 25 MB).',
+      fileFailed: 'The file could not be uploaded. Please try again.',
+      nothingToSave: 'Add a message, a video or a photo first.',
+      saveFailed: 'Could not save your message. Please try again.',
+      save: 'Save my message',
+      saveChanges: 'Save changes',
+      saving: 'Saving…',
+      uploadingShort: 'Uploading…',
+      savedEyebrow: 'Message saved',
+      savedTitle1: 'All',
+      savedTitle2: 'set.',
+      savedText: 'We add the code to your cake. They scan it – and your message opens.',
+      savedEditHint: (date) => `You can change it until ${date} with the link in your e-mail.`,
+      preview: 'See what they\'ll see',
     },
     experience: {
       locationLabel: 'FROM ZURICH',

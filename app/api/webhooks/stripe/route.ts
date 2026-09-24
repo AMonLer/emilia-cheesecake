@@ -7,6 +7,8 @@ import AdminNotificationEmail from '@/emails/AdminNotification'
 import { createOrderInNotion } from '@/lib/notion'
 import { forYouRangeForItems, nextFreeForYouCode } from '@/lib/foryou-code'
 import { listUsedForYouCodes, reserveForYouCode } from '@/lib/foryou-store'
+import { forYouEditUrl } from '@/lib/foryou-auth'
+import { sendTelegramMessage } from '@/lib/telegram'
 import crypto from 'crypto'
 
 const META_PIXEL_ID = '26409977948633382'
@@ -60,39 +62,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 })
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-
-// Función para enviar mensaje por Telegram
-async function sendTelegramMessage(message: string) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN
-  const chatId = process.env.TELEGRAM_CHAT_ID
-
-  if (!botToken || !chatId) {
-    console.warn('Telegram no configurado')
-    return
-  }
-
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: message,
-        parse_mode: 'HTML',
-      }),
-    })
-
-    if (!response.ok) {
-      console.error('Error enviando mensaje de Telegram:', await response.text())
-    } else {
-      console.log('✅ Mensaje de Telegram enviado')
-    }
-  } catch (error) {
-    console.error('Error al enviar mensaje de Telegram:', error)
-  }
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.text()
@@ -210,6 +179,7 @@ ${productsText}
           postalCode: metadata.postalCode || '',
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
+          foryouEditUrl: foryouCode ? forYouEditUrl(foryouCode, paymentIntent.id) : undefined,
         })
       )
 
