@@ -19,10 +19,10 @@ export default function EmiliaPage() {
       <HeroSection />
       <Marquee />
       <FeaturedProducts />
-      <ReviewsSection />
       <ForYouCard />
       <QualitySection />
       <ProductExperienceSection />
+      <ReviewsSection />
       <PhotoGallerySection />
       <Footer />
     </div>

@@ -5,20 +5,21 @@ import { Instagram } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Reveal from "@/components/ui/Reveal"
 
-const galleryItemsRow1 = [
-    { src: "/IG1.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG2.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG3.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG4.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG5.jpg", alt: "Pistachio Cheesecake" },
-]
+const INSTAGRAM_URL = "https://www.instagram.com/emilia.cheesecake/"
 
-const galleryItemsRow2 = [
-    { src: "/IG6.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG7.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG8.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG9.jpg", alt: "Emilia Cheesecake" },
-    { src: "/IG1.jpg", alt: "Pistachio Cheesecake" },
+// Editorial grid of Instagram posts: one hero tile and a frame of smaller
+// ones, still (the two auto-scrolling rows felt busy and dated). The last
+// four only show from tablet up, to keep the phone version short.
+const tiles = [
+    { src: "/IG2.jpg", alt: "Emilia Cheesecake vor der bordeauxroten Emilia-Box", hero: true },
+    { src: "/IG6.jpg", alt: "Ein Stück San Sebastian Cheesecake mit cremigem Kern" },
+    { src: "/IG3.jpg", alt: "Angeschnittener San Sebastian Cheesecake von oben" },
+    { src: "/IG8.jpg", alt: "Der cremige Kern eines Emilia Cheesecakes" },
+    { src: "/IG4.jpg", alt: "Classic Cheesecake auf einem goldenen Teller" },
+    { src: "/IG7.jpg", alt: "Drei kleine Cheesecakes: Schoggi, Classic und Pistachio", desktopOnly: true },
+    { src: "/IG5.jpg", alt: "Pistachio Cheesecake mit gehackten Pistazien", desktopOnly: true },
+    { src: "/IG1.jpg", alt: "Nahaufnahme eines Emilia Cheesecakes", desktopOnly: true },
+    { src: "/IG9.jpg", alt: "Lotus Cheesecake von Emilia", desktopOnly: true },
 ]
 
 export default function PhotoGallerySection() {
@@ -26,98 +27,60 @@ export default function PhotoGallerySection() {
     const g = t.gallery
 
     return (
-        <section className="py-24 relative overflow-hidden bg-[#F8EBDD]">
-            <div className="absolute top-0 inset-x-0 h-32 bg-gradient-to-b from-white/60 to-transparent pointer-events-none z-10" />
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-gradient-to-b from-[#EEC8B7]/40 to-transparent rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none" />
+        <section aria-labelledby="gallery-heading" className="bg-white py-16 md:py-24">
+            <div className="container mx-auto max-w-6xl px-4">
+                <Reveal className="mb-10 text-center md:mb-14">
+                    <a
+                        href={INSTAGRAM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mb-4 inline-block text-xs font-bold uppercase tracking-[0.25em] text-[#651A1A]/70 transition-colors hover:text-[#651A1A]"
+                    >
+                        @emilia.cheesecake
+                    </a>
+                    <h2 id="gallery-heading" className="text-4xl font-black leading-[0.95] tracking-tighter text-[#651A1A] md:text-5xl lg:text-7xl">
+                        {g.heading}{" "}
+                        <span className="font-serif font-medium italic tracking-normal text-[#651A1A]/90">{g.accent}</span>
+                    </h2>
+                    <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-[#651A1A]/75">{g.intro}</p>
+                </Reveal>
 
-            <Reveal className="container mx-auto px-4 mb-16 text-center relative z-20">
-                <h2 className="text-4xl md:text-5xl lg:text-7xl font-black tracking-tighter leading-[0.95] text-[#651A1A] mb-2 uppercase">
-                    {g.heading} <span className="text-[#651A1A]">Kreationen</span>
-                </h2>
-                <div className="w-24 h-1.5 bg-[#D4AF85] mx-auto rounded-full mt-6 opacity-80" />
-            </Reveal>
+                <Reveal delay={100} className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+                    {tiles.map((tile) => (
+                        <a
+                            key={tile.src}
+                            href={INSTAGRAM_URL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`${tile.alt} – ${g.viewOnInstagram}`}
+                            className={`group relative block aspect-[4/5] overflow-hidden rounded-2xl bg-[#F5E6D3] ${tile.hero ? 'col-span-2 row-span-2 md:aspect-auto' : ''} ${tile.desktopOnly ? 'hidden md:block' : ''}`}
+                        >
+                            <Image
+                                src={tile.src}
+                                alt={tile.alt}
+                                fill
+                                sizes={tile.hero ? "(max-width: 768px) 100vw, 560px" : "(max-width: 768px) 50vw, 280px"}
+                                className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                            />
+                            <span className="absolute inset-0 flex items-end justify-start bg-gradient-to-t from-[#651A1A]/60 via-transparent to-transparent p-4 opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100">
+                                <Instagram className="h-5 w-5 text-white" strokeWidth={1.75} aria-hidden="true" />
+                            </span>
+                        </a>
+                    ))}
+                </Reveal>
 
-            {/* Scrolling Banners */}
-            {/* Marquee keyframes live in globals.css so prefers-reduced-motion can disable them */}
-            <div className="relative w-full overflow-hidden py-4 z-20 flex flex-col gap-6 md:gap-10">
-                {/* Row 1 - Left */}
-                <div className="scroll-container w-full overflow-hidden">
-                    <div className="flex w-max animate-scroll-left">
-                        {[...galleryItemsRow1, ...galleryItemsRow1, ...galleryItemsRow1].map((item, index) => (
-                            <div
-                                key={index}
-                                className="w-[260px] md:w-[320px] px-3 md:px-5 flex-shrink-0 group cursor-pointer"
-                            >
-                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl md:rounded-[2rem] shadow-lg shadow-[#651A1A]/10 transition-all duration-500 group-hover:-translate-y-2 border border-white/50">
-                                    <Image
-                                        src={item.src}
-                                        alt={item.alt}
-                                        fill
-                                        sizes="(max-width: 768px) 260px, 320px"
-                                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">
-                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex flex-col items-center gap-2">
-                                            <Instagram className="w-8 h-8 text-white drop-shadow-md" strokeWidth={1.5} />
-                                            <span className="text-white text-xs font-semibold tracking-wider uppercase drop-shadow-md">{g.viewOnInstagram}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Row 2 - Right */}
-                <div className="scroll-container w-full overflow-hidden">
-                    <div className="flex w-max animate-scroll-right">
-                        {[...galleryItemsRow2, ...galleryItemsRow2, ...galleryItemsRow2].map((item, index) => (
-                            <div
-                                key={index}
-                                className="w-[260px] md:w-[320px] px-3 md:px-5 flex-shrink-0 group cursor-pointer"
-                            >
-                                <div className="relative aspect-[4/5] overflow-hidden rounded-2xl md:rounded-[2rem] shadow-lg shadow-[#651A1A]/10 transition-all duration-500 group-hover:-translate-y-2 border border-white/50">
-                                    <Image
-                                        src={item.src}
-                                        alt={item.alt}
-                                        fill
-                                        sizes="(max-width: 768px) 260px, 320px"
-                                        className="object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#651A1A]/70 via-[#651A1A]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end justify-center pb-8 backdrop-blur-[1px]">
-                                        <div className="transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 flex flex-col items-center gap-2">
-                                            <Instagram className="w-8 h-8 text-white drop-shadow-md" strokeWidth={1.5} />
-                                            <span className="text-white text-xs font-semibold tracking-wider uppercase drop-shadow-md">{g.viewOnInstagram}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            <div className="text-center mt-16 relative z-30">
-                <a
-                    href="https://www.instagram.com/emilia.cheesecake/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex flex-col items-center gap-4 group"
-                >
-                    <div className="p-6 rounded-full bg-white shadow-xl shadow-[#651A1A]/10 group-hover:shadow-2xl group-hover:shadow-[#651A1A]/20 group-hover:-translate-y-2 transition-all duration-500">
-                        <div className="bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 rounded-lg p-px group-hover:scale-110 transition-transform duration-500">
-                            <div className="bg-white rounded-lg p-2">
-                                <Instagram className="w-8 h-8 text-[#651A1A]" strokeWidth={2} />
-                            </div>
-                        </div>
-                    </div>
-                    <span className="text-sm font-bold tracking-[0.2em] uppercase text-[#651A1A] group-hover:text-black transition-colors border-b-2 border-transparent group-hover:border-[#651A1A]/30 pb-1">
+                <div className="mt-10 text-center">
+                    <a
+                        href={INSTAGRAM_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full border border-[#651A1A] px-7 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-[#651A1A] transition-colors hover:bg-[#651A1A] hover:text-white active:bg-[#651A1A] active:text-white"
+                    >
+                        <Instagram className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                         {g.followUs}
-                    </span>
-                </a>
+                    </a>
+                </div>
             </div>
-
-            <div className="absolute bottom-0 inset-x-0 h-40 bg-gradient-to-t from-white/80 to-transparent pointer-events-none z-10" />
         </section>
     )
 }

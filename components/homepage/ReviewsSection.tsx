@@ -4,10 +4,9 @@ import { ArrowUpRight } from "lucide-react"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { customerReviews, GOOGLE_REVIEWS_URL } from "@/lib/reviews"
 
-// Customer words right under the cakes, where people decide. It replaces the
-// two influencer videos further down, which almost nobody scrolled to. No
-// average score shown on purpose: 4.3 from 7 reviews undersells the cakes;
-// add it here once there are enough reviews.
+// Real customer words, right above the Instagram gallery. They replace the
+// two influencer videos. No average score shown on purpose: 4.3 from 7
+// reviews undersells the cakes; add it here once there are enough reviews.
 export default function ReviewsSection() {
     const { t } = useLanguage()
     const r = t.reviews

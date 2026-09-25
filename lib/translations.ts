@@ -152,6 +152,8 @@ export type Translations = {
   }
   gallery: {
     heading: string
+    accent: string
+    intro: string
     viewOnInstagram: string
     followUs: string
   }
@@ -450,7 +452,9 @@ export const translations: Record<Locale, Translations> = {
       allOnGoogle: 'Alle Rezensionen auf Google',
     },
     gallery: {
-      heading: 'Unsere',
+      heading: 'UNSERE',
+      accent: 'Kreationen',
+      intro: 'Frisch aus unserer Küche – mehr Momente auf Instagram.',
       viewOnInstagram: 'Auf Instagram ansehen',
       followUs: 'Folge uns auf Instagram',
     },
@@ -747,7 +751,9 @@ export const translations: Record<Locale, Translations> = {
       allOnGoogle: 'All reviews on Google',
     },
     gallery: {
-      heading: 'Our',
+      heading: 'OUR',
+      accent: 'Creations',
+      intro: 'Fresh from our kitchen – more moments on Instagram.',
       viewOnInstagram: 'View on Instagram',
       followUs: 'Follow us on Instagram',
     },
