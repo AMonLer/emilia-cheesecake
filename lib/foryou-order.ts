@@ -1,22 +1,16 @@
 import Stripe from 'stripe'
-import { isDeliverySlot, parseDeliveryDate, slotStart } from './delivery-dates'
+import { parseDeliveryDate } from './delivery-dates'
 
 // The order behind a For You code, read from its Stripe PaymentIntent metadata.
 export type ForYouOrder = {
   deliveryDay: Date | null
-  // A saved message can be changed until the delivery slot starts: before that
-  // the recipient cannot have scanned the code, so it never changes under them.
-  editableUntil: number | null
   customerEmail: string
   customerFirstName: string
 }
 
 export function forYouOrderFromMetadata(metadata: Record<string, string | undefined>): ForYouOrder {
-  const deliveryDay = parseDeliveryDate(metadata.deliveryDate)
-  const slot = metadata.deliveryTime
   return {
-    deliveryDay,
-    editableUntil: deliveryDay && isDeliverySlot(slot) ? slotStart(deliveryDay, slot).getTime() : null,
+    deliveryDay: parseDeliveryDate(metadata.deliveryDate),
     customerEmail: metadata.customerEmail || '',
     customerFirstName: (metadata.customerName || '').trim().split(/\s+/)[0] || '',
   }

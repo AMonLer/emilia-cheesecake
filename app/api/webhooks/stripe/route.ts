@@ -196,7 +196,10 @@ ${productsText}
           postalCode: metadata.postalCode || '',
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
-          foryouEditUrl: foryouCode ? forYouEditUrl(foryouCode, paymentIntent.id) : undefined,
+          // Made in the checkout: final, so the button shows it instead of opening the editor.
+          foryouUrl: foryouCode
+            ? gift ? `https://www.emilialab.com/foryou/${foryouCode}` : forYouEditUrl(foryouCode, paymentIntent.id)
+            : undefined,
           foryouReady: Boolean(foryouCode && gift),
           deliveryNote,
         })

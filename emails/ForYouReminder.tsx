@@ -45,7 +45,7 @@ export default function ForYouReminderEmail({
             </Text>
             <Text style={paragraph}>
               Mit dem Link unten fügen Sie in einer Minute eine Nachricht, ein Video oder ein Foto
-              hinzu. Sie können sie bis zum Beginn der Lieferung ändern.
+              hinzu.
             </Text>
             <Section style={buttonRow}>
               <Button href={editUrl} style={button}>

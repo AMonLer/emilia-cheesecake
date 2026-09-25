@@ -32,7 +32,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   // El comprador nunca necesita ver el código: viaja en la URL y en su sesión.
   // El código impreso lo pega la tienda y lo usa quien recibe la tarta.
   const code = params.code.toUpperCase()
-  const { locale, t } = useLanguage()
+  const { t } = useLanguage()
   const f = t.forYouPages
   const [message, setMessage] = useState("")
   const [videoUrl, setVideoUrl] = useState("")
@@ -44,10 +44,8 @@ export default function CreateForYouMessage({ params }: { params: { code: string
   const [saving, setSaving] = useState(false)
   const [done, setDone] = useState(false)
   const [authorized, setAuthorized] = useState<boolean | null>(null)
+  // A gift message is final once saved.
   const [alreadySaved, setAlreadySaved] = useState(false)
-  // A saved message stays editable until the delivery slot starts.
-  const [editableUntil, setEditableUntil] = useState<number | null>(null)
-  const [hasSavedContent, setHasSavedContent] = useState(false)
   const [draftRestored, setDraftRestored] = useState(false)
   const [loaded, setLoaded] = useState(false)
 
@@ -59,24 +57,18 @@ export default function CreateForYouMessage({ params }: { params: { code: string
         if (cancelled) return
         setAuthorized(data.authorized === true)
         const existing = data.message
-        const saved = Boolean(existing && (existing.message || existing.videoUrl || existing.fileUrl))
-        const deadline = typeof data.editableUntil === 'number' ? data.editableUntil : null
-        setHasSavedContent(saved)
-        setEditableUntil(deadline)
-        if (saved && !(deadline && Date.now() < deadline)) {
+        if (existing && (existing.message || existing.videoUrl || existing.fileUrl)) {
           setAlreadySaved(true)
           return
         }
-        // Unsaved work first, then what was saved before.
         const draft = readDraft(code)
-        const start = draft ?? (saved ? existing : null)
-        if (start) {
-          setMessage(start.message || "")
-          setVideoUrl(start.videoUrl || "")
-          setFileUrl(start.fileUrl || "")
-          setFileName(start.fileName || "")
+        if (draft) {
+          setMessage(draft.message || "")
+          setVideoUrl(draft.videoUrl || "")
+          setFileUrl(draft.fileUrl || "")
+          setFileName(draft.fileName || "")
+          setDraftRestored(true)
         }
-        if (draft) setDraftRestored(true)
         setLoaded(true)
       })
       .catch(() => { if (!cancelled) setAuthorized(false) })
@@ -96,12 +88,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
 
   const videoInputRef = useRef<HTMLInputElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const deadlineLabel = editableUntil
-    ? new Date(editableUntil).toLocaleString(locale === 'en' ? 'en-GB' : 'de-CH', {
-        weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Zurich',
-      })
-    : ''
 
   const handleVideo = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -223,11 +209,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
           <p className="text-white/60 font-light leading-relaxed max-w-xs text-sm">
             {f.savedText}
           </p>
-          {deadlineLabel && (
-            <p className="mt-4 text-white/60 font-light leading-relaxed max-w-xs text-sm">
-              {f.savedEditHint(deadlineLabel)}
-            </p>
-          )}
           <Link
             href={`/foryou/${code}`}
             className="mt-8 rounded-full border border-white/40 px-6 py-3 text-xs font-bold uppercase tracking-[0.2em] text-white transition-colors hover:bg-white hover:text-[#651A1A]"
@@ -264,11 +245,6 @@ export default function CreateForYouMessage({ params }: { params: { code: string
           <p className="text-[#651A1A]/60 font-light max-w-sm leading-relaxed">
             {f.editorDesc}
           </p>
-          {hasSavedContent && deadlineLabel && (
-            <p className="mt-4 rounded-full bg-[#651A1A]/5 px-4 py-2 text-sm text-[#651A1A]">
-              {f.editableUntil(deadlineLabel)}
-            </p>
-          )}
           {draftRestored && (
             <p className="mt-3 text-sm text-[#651A1A]/70">{f.draftRestored}</p>
           )}
@@ -342,8 +318,9 @@ export default function CreateForYouMessage({ params }: { params: { code: string
             disabled={saving || uploading}
             className="w-full bg-[#651A1A] text-white py-4 rounded-2xl font-black text-sm tracking-[0.2em] uppercase hover:bg-[#4A1313] transition-colors duration-300 shadow-lg shadow-[#651A1A]/20 disabled:opacity-50"
           >
-            {saving ? f.saving : uploading ? f.uploadingShort : hasSavedContent ? f.saveChanges : f.save}
+            {saving ? f.saving : uploading ? f.uploadingShort : f.save}
           </button>
+          <p className="text-center text-xs text-[#651A1A]/50">{f.saveFinalHint}</p>
         </div>
 
         <p className="mt-12 text-center text-xs text-[#651A1A]/30 tracking-wider">

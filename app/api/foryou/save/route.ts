@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getForYouMessage, saveForYouMessage } from '@/lib/foryou-store'
 import { forYouCookieName, verifyForYouSession } from '@/lib/foryou-auth'
 import { getUploadCredentials } from '@/lib/cloudinary'
-import { getForYouOrder } from '@/lib/foryou-order'
 
 const MAX_MESSAGE_LENGTH = 2000
 
@@ -21,16 +20,11 @@ export async function POST(req: NextRequest) {
     const session = verifyForYouSession(req.cookies.get(forYouCookieName(code))?.value, code)
     if (!session) return NextResponse.json({ error: 'Payment authorization required' }, { status: 403 })
 
-    // A saved message can be changed until the delivery slot starts, so a buyer
-    // can save the text now and add the video later. Once the cake may be at the
-    // door it is locked, so what the recipient sees never changes; later changes
-    // go through support. Without a known delivery time it stays locked.
+    // A gift message is final once saved (in the checkout or here): what the
+    // recipient opens is exactly what the buyer made when ordering.
     const existing = await getForYouMessage(code)
     if (existing && (existing.message || existing.videoUrl || existing.fileUrl)) {
-      const order = await getForYouOrder(session.paymentIntentId)
-      if (!order?.editableUntil || Date.now() >= order.editableUntil) {
-        return NextResponse.json({ error: 'Message already saved' }, { status: 409 })
-      }
+      return NextResponse.json({ error: 'Message already saved' }, { status: 409 })
     }
 
     if (!message && !videoUrl && !fileUrl) {

@@ -59,12 +59,9 @@ async function main() {
 
   let intent = { id: 'pi_test123', client_secret: 'pi_test123_secret_test', status: 'succeeded', metadata: { foryouCode: code, isGift: 'yes' } }
   const stored = { code, message: 'Existing message', fileUrl: 'https://res.cloudinary.com/test/image/upload/photo.jpg' }
-  const deliveryStarts = Date.now() + 36 * 3600_000
-  const orderMock = { getForYouOrder: async (id) => id === intent.id ? { editableUntil: deliveryStarts } : null }
   const codeRoute = loadTs('app/api/foryou/code/route.ts', {
     '@/lib/foryou-auth': auth,
     '@/lib/foryou-store': { getForYouMessage: async () => stored },
-    '@/lib/foryou-order': orderMock,
     '@/lib/foryou-checkout': loadTs('lib/foryou-checkout.ts'),
     stripe: class { paymentIntents = { retrieve: async () => intent } },
   })
@@ -102,16 +99,13 @@ async function main() {
   assert.equal((await (await codeRoute.GET(request(`/api/foryou/code?code=${code}`))).json()).authorized, false)
   const authorizedView = await (await codeRoute.GET(request(`/api/foryou/code?code=${code}`, undefined, cookie))).json()
   assert.deepEqual(authorizedView.message, stored)
-  assert.equal(authorizedView.editableUntil, deliveryStarts)
-  assert.equal((await (await codeRoute.GET(request(`/api/foryou/code?code=${code}`))).json()).editableUntil, null)
+  assert.equal((await (await codeRoute.GET(request(`/api/foryou/code?code=${code}`))).json()).message, null)
   console.log('PASS: only a successful payment with its correct client secret grants editing; existing content is restored')
 
   let saved
   const cloudinary = { getUploadCredentials: () => ({ cloudName: 'test', apiKey: 'test' }), cloudinaryConfigured: true, FORYOU_FOLDER: 'emilia/foryou', signUpload: () => 'test-signature' }
-  let editableUntil = null
-  const orderForSave = { getForYouOrder: async () => ({ editableUntil }) }
   const save = loadTs('app/api/foryou/save/route.ts', {
-    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary, '@/lib/foryou-order': orderForSave,
+    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
     '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => null },
   })
   const payload = { code, message: 'Happy birthday' }
@@ -125,33 +119,28 @@ async function main() {
   assert.equal(saved.message, payload.message)
   // Sticker reservado pero sin mensaje todavía: debe dejar guardar
   const saveReserved = loadTs('app/api/foryou/save/route.ts', {
-    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary, '@/lib/foryou-order': orderForSave,
+    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
     '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => ({ code, message: '' }) },
   })
   assert.equal((await saveReserved.POST(request('/api/foryou/save', payload, cookie))).status, 200)
-  // Mensaje ya grabado: se puede cambiar hasta que empieza la franja de entrega
+  // Mensaje ya grabado (en el checkout o en el editor): es definitivo
   const saveExisting = loadTs('app/api/foryou/save/route.ts', {
-    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary, '@/lib/foryou-order': orderForSave,
+    '@/lib/foryou-auth': auth, '@/lib/cloudinary': cloudinary,
     '@/lib/foryou-store': { saveForYouMessage: async data => { saved = data; return true }, getForYouMessage: async () => stored },
   })
-  editableUntil = Date.now() + 3600_000
   saved = undefined
-  assert.equal((await saveExisting.POST(request('/api/foryou/save', { ...payload, message: 'Now with a video' }, cookie))).status, 200)
-  assert.equal(saved.message, 'Now with a video')
-  editableUntil = Date.now() - 1000
-  assert.equal((await saveExisting.POST(request('/api/foryou/save', payload, cookie))).status, 409)
-  editableUntil = null
-  assert.equal((await saveExisting.POST(request('/api/foryou/save', payload, cookie))).status, 409)
-  console.log('PASS: a saved message can change until the delivery slot starts, then (or with no known slot) it is locked; a reserved empty code accepts its first message')
+  assert.equal((await saveExisting.POST(request('/api/foryou/save', { ...payload, message: 'Now with a video' }, cookie))).status, 409)
+  assert.equal(saved, undefined)
+  console.log('PASS: a reserved empty code accepts its first message; once saved, a gift message can no longer be changed')
 
-  // Order metadata → deadline: the slot start in Zurich time.
+  // Order metadata read by the reminders.
   const dates = loadTs('lib/delivery-dates.ts')
   const orderLib = loadTs('lib/foryou-order.ts', { './delivery-dates': dates, stripe: class {} })
   const order = orderLib.forYouOrderFromMetadata({ deliveryDate: '28.9.2027', deliveryTime: '12:00 - 15:00', customerEmail: 'a@b.ch', customerName: 'Anna Muster' })
-  assert.equal(new Date(order.editableUntil).toISOString(), '2027-09-28T10:00:00.000Z')
+  assert.equal(order.deliveryDay.getFullYear(), 2027)
   assert.equal(order.customerFirstName, 'Anna')
-  assert.equal(orderLib.forYouOrderFromMetadata({ deliveryDate: '', deliveryTime: '' }).editableUntil, null)
-  console.log('PASS: the edit deadline is the start of the delivery slot in Zurich time')
+  assert.equal(orderLib.forYouOrderFromMetadata({ deliveryDate: '', deliveryTime: '' }).deliveryDay, null)
+  console.log('PASS: the order behind a code gives the reminders its delivery day and buyer')
 
   // Link in the e-mails: works on any device, bad links just land on the editor.
   const editUrl = new URL(auth.forYouEditUrl(code, intent.id))
@@ -301,11 +290,14 @@ async function main() {
   assert.deepEqual(reserved.at(-1), { code: '2001', paymentIntentId: 'pi_gift', content: { message: 'Alles Gute & viel Liebe!', videoUrl: video, fileUrl: '' } })
   assert.match(webhookTelegrams.at(-1), /Mensaje ya creado en el checkout: texto · vídeo/)
   assert.equal(emailProps.at(-1).foryouReady, true)
+  // Final: the e-mail shows the message, it does not open the editor.
+  assert.equal(emailProps.at(-1).foryouUrl, 'https://www.emilialab.com/foryou/2001')
   // Without a message from the checkout: the code is reserved empty, as before.
   await webhook.POST(paidEvent({}))
   assert.deepEqual(reserved.at(-1), { code: '2001', paymentIntentId: 'pi_gift', content: undefined })
   assert.match(webhookTelegrams.at(-1), /Sin mensaje todavía/)
   assert.equal(emailProps.at(-1).foryouReady, false)
+  assert.match(emailProps.at(-1).foryouUrl, /\/api\/foryou\/edit\?code=2001/)
   console.log('PASS: after payment the checkout message is stored with the sticker code in one write; the shop and the buyer are told it is ready')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

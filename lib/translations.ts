@@ -110,7 +110,6 @@ export type Translations = {
     editorTitle1: string
     editorTitle2: string
     editorDesc: string
-    editableUntil: (date: string) => string
     draftRestored: string
     messageLabel: string
     messagePlaceholder: string
@@ -130,14 +129,13 @@ export type Translations = {
     nothingToSave: string
     saveFailed: string
     save: string
-    saveChanges: string
+    saveFinalHint: string
     saving: string
     uploadingShort: string
     savedEyebrow: string
     savedTitle1: string
     savedTitle2: string
     savedText: string
-    savedEditHint: (date: string) => string
     preview: string
   }
   experience: {
@@ -431,16 +429,15 @@ export const translations: Record<Locale, Translations> = {
       handcrafted: 'Handgemacht in Zürich',
       loading: 'Laden…',
       notAuthorizedTitle: 'Öffne den Link aus deiner E-Mail',
-      notAuthorizedText: 'Um deine Nachricht zu erstellen oder zu ändern, öffne den Link in deiner Bestellbestätigung per E-Mail – auf jedem Gerät.',
+      notAuthorizedText: 'Um deine Nachricht zu erstellen, öffne den Link in deiner Bestellbestätigung per E-Mail – auf jedem Gerät.',
       viewMessage: 'Nachricht ansehen',
       trouble: 'Probleme?',
       lockedTitle: 'Deine Nachricht ist gespeichert',
-      lockedText: 'Sie ist mit deinem Kuchen unterwegs. Möchtest du sie noch ändern, schreib uns an',
-      lockedTextEnd: 'und wir kümmern uns darum.',
+      lockedText: 'Sie reist mit deinem Kuchen und kann nicht mehr geändert werden. Fragen? Schreib uns an',
+      lockedTextEnd: '– wir helfen gern.',
       editorTitle1: 'Hinterlasse eine Nachricht,',
       editorTitle2: 'die bleibt',
       editorDesc: 'Schreib ein paar Zeilen, nimm ein Video auf oder füge ein Foto hinzu. Wir bewahren alles sicher hinter deinem Code auf.',
-      editableUntil: (date) => `Du kannst deine Nachricht bis ${date} ändern.`,
       draftRestored: 'Wir haben deinen Entwurf wiederhergestellt.',
       messageLabel: 'Deine Nachricht',
       messagePlaceholder: 'Schreib etwas von Herzen…',
@@ -460,14 +457,13 @@ export const translations: Record<Locale, Translations> = {
       nothingToSave: 'Füge zuerst eine Nachricht, ein Video oder ein Foto hinzu.',
       saveFailed: 'Deine Nachricht konnte nicht gespeichert werden. Bitte versuch es noch einmal.',
       save: 'Nachricht speichern',
-      saveChanges: 'Änderungen speichern',
+      saveFinalHint: 'Einmal gespeichert, lässt sich die Nachricht nicht mehr ändern.',
       saving: 'Wird gespeichert…',
       uploadingShort: 'Wird hochgeladen…',
       savedEyebrow: 'Nachricht gespeichert',
       savedTitle1: 'Alles',
       savedTitle2: 'bereit.',
       savedText: 'Wir legen den Code zu deinem Kuchen. Die beschenkte Person scannt ihn – und deine Nachricht öffnet sich.',
-      savedEditHint: (date) => `Du kannst sie bis ${date} über den Link in deiner E-Mail ändern.`,
       preview: 'Ansehen, was sie sehen',
     },
     experience: {
@@ -593,7 +589,7 @@ export const translations: Record<Locale, Translations> = {
       giftVideoTooLarge: 'Zu gross (max. 100 MB). Ein kürzerer Clip klappt.',
       giftPhotoTooLarge: 'Zu gross (max. 25 MB).',
       giftHowItWorks: 'Beim Kuchen liegt ein Code: scannen, und alles öffnet sich.',
-      giftLaterNote: 'Alles optional: Du kannst es auch nach dem Bezahlen hinzufügen und bis zur Lieferung ändern.',
+      giftLaterNote: 'Alles optional: Du kannst es auch nach dem Bezahlen hinzufügen. Einmal gespeichert, lässt es sich nicht mehr ändern.',
       giftPreviewButton: 'Vorschau ansehen',
       giftPreviewLabel: 'Beispiel',
       giftPreviewOwnLabel: 'Vorschau',
@@ -759,16 +755,15 @@ export const translations: Record<Locale, Translations> = {
       handcrafted: 'Handcrafted in Zürich',
       loading: 'Loading…',
       notAuthorizedTitle: 'Open the link from your e-mail',
-      notAuthorizedText: 'To create or change your message, open the link in your order confirmation e-mail – on any device.',
+      notAuthorizedText: 'To create your message, open the link in your order confirmation e-mail – on any device.',
       viewMessage: 'View the message',
       trouble: 'Having trouble?',
       lockedTitle: 'Your message is saved',
-      lockedText: 'It travels with your cake. If you\'d like to change it, write to us at',
-      lockedTextEnd: 'and we\'ll take care of it.',
+      lockedText: 'It travels with your cake and can no longer be changed. Questions? Write to us at',
+      lockedTextEnd: '– we\'re happy to help.',
       editorTitle1: 'Leave a message',
       editorTitle2: 'they\'ll never forget',
       editorDesc: 'Write a note, record a video or add a photo. We\'ll keep it safe behind your code.',
-      editableUntil: (date) => `You can change your message until ${date}.`,
       draftRestored: 'We restored your draft.',
       messageLabel: 'Your message',
       messagePlaceholder: 'Write something from the heart…',
@@ -788,14 +783,13 @@ export const translations: Record<Locale, Translations> = {
       nothingToSave: 'Add a message, a video or a photo first.',
       saveFailed: 'Could not save your message. Please try again.',
       save: 'Save my message',
-      saveChanges: 'Save changes',
+      saveFinalHint: 'Once saved, your message can\'t be changed.',
       saving: 'Saving…',
       uploadingShort: 'Uploading…',
       savedEyebrow: 'Message saved',
       savedTitle1: 'All',
       savedTitle2: 'set.',
       savedText: 'We add the code to your cake. They scan it – and your message opens.',
-      savedEditHint: (date) => `You can change it until ${date} with the link in your e-mail.`,
       preview: 'See what they\'ll see',
     },
     experience: {
@@ -921,7 +915,7 @@ export const translations: Record<Locale, Translations> = {
       giftVideoTooLarge: 'Too large (max 100 MB). A shorter clip works.',
       giftPhotoTooLarge: 'Too large (max 25 MB).',
       giftHowItWorks: 'A code comes with the cake: they scan it and everything opens.',
-      giftLaterNote: 'All optional: you can also add it after paying and change it until delivery.',
+      giftLaterNote: 'All optional: you can also add it after paying. Once saved, it can\'t be changed.',
       giftPreviewButton: 'See the preview',
       giftPreviewLabel: 'Example',
       giftPreviewOwnLabel: 'Preview',

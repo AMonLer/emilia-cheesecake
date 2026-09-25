@@ -27,8 +27,9 @@ interface OrderConfirmationEmailProps {
   postalCode: string
   deliveryDate: string
   deliveryTime: string
-  // Gift orders: signed link to create or change the For You message.
-  foryouEditUrl?: string
+  // Gift orders: signed link to create the For You message, or the message
+  // itself when it was made in the checkout (it is final then).
+  foryouUrl?: string
   // The buyer already made the message in the checkout.
   foryouReady?: boolean
   deliveryNote?: string
@@ -44,7 +45,7 @@ export default function OrderConfirmationEmail({
   postalCode = '',
   deliveryDate = '',
   deliveryTime = '',
-  foryouEditUrl,
+  foryouUrl,
   foryouReady = false,
   deliveryNote = '',
 }: OrderConfirmationEmailProps) {
@@ -139,18 +140,18 @@ export default function OrderConfirmationEmail({
               )}
             </Section>
 
-            {foryouEditUrl && (
+            {foryouUrl && (
               <Section style={foryouBox}>
                 <Heading as="h2" style={foryouTitle}>
                   {foryouReady ? 'Ihre Botschaft ist gespeichert' : 'Ihre persönliche Botschaft'}
                 </Heading>
                 <Text style={foryouText}>
                   {foryouReady
-                    ? 'Die beschenkte Person öffnet sie über den Code beim Kuchen. Sie können sie bis zum Beginn der Lieferung jederzeit ansehen und ändern.'
-                    : 'Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen. Sie können die Botschaft bis zum Beginn der Lieferung jederzeit ändern.'}
+                    ? 'Die beschenkte Person öffnet sie über den Code beim Kuchen.'
+                    : 'Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen.'}
                 </Text>
-                <Button href={foryouEditUrl} style={foryouButton}>
-                  {foryouReady ? 'Botschaft ansehen oder ändern' : 'Botschaft erstellen'}
+                <Button href={foryouUrl} style={foryouButton}>
+                  {foryouReady ? 'Botschaft ansehen' : 'Botschaft erstellen'}
                 </Button>
               </Section>
             )}

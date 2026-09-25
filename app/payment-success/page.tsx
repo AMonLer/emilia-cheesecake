@@ -248,25 +248,12 @@ function PaymentSuccessContent() {
                 ? 'Beim Kuchen liegt ein Code: Wer ihn scannt, sieht alles, was du vorbereitet hast.'
                 : 'A code comes with the cake: whoever scans it sees everything you prepared.'}
             </p>
-            <div className="grid grid-cols-2 gap-3">
-              <Link
-                href={`/foryou/${foryouCode}`}
-                className="block rounded-xl bg-white py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-[#651A1A] transition-colors duration-300 hover:bg-[#F5E6D3]"
-              >
-                {locale === 'de' ? 'Ansehen' : 'View'}
-              </Link>
-              <Link
-                href={`/foryou/${foryouCode}/create`}
-                className="block rounded-xl border border-white/40 py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-white transition-colors duration-300 hover:bg-white hover:text-[#651A1A]"
-              >
-                {locale === 'de' ? 'Ändern' : 'Edit'}
-              </Link>
-            </div>
-            <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
-              {locale === 'de'
-                ? 'Du kannst sie bis zur Lieferung ändern. Den Link bekommst du auch per E-Mail.'
-                : 'You can change it until delivery. You also get the link by e-mail.'}
-            </p>
+            <Link
+              href={`/foryou/${foryouCode}`}
+              className="block w-full rounded-xl bg-white py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-[#651A1A] transition-colors duration-300 hover:bg-[#F5E6D3]"
+            >
+              {locale === 'de' ? 'Ansehen' : 'View'}
+            </Link>
           </div>
         )}
 
@@ -293,8 +280,8 @@ function PaymentSuccessContent() {
             </Link>
             <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
               {locale === 'de'
-                ? 'Den Link bekommst du auch per E-Mail. Du kannst die Nachricht bis zur Lieferung ändern.'
-                : 'You also get the link by e-mail and can change your message until delivery.'}
+                ? 'Den Link bekommst du auch per E-Mail.'
+                : 'You also get the link by e-mail.'}
             </p>
           </div>
         )}
