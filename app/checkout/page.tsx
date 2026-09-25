@@ -10,7 +10,7 @@ import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
 import DeliveryPicker from "@/components/checkout/DeliveryPicker"
-import GiftPreview from "@/components/checkout/GiftPreview"
+import GiftMessage, { type GiftUploadState } from "@/components/checkout/GiftMessage"
 import CartSizeToggle from "@/components/cart/CartSizeToggle"
 import QuantityStepper from "@/components/cart/QuantityStepper"
 import { loadStripe } from "@stripe/stripe-js"
@@ -23,6 +23,7 @@ import {
   isSlotBookable,
 } from "@/lib/delivery-dates"
 import { computeOrderTotals, isKnownDiscountCode, normalizeDiscountCode } from "@/lib/pricing"
+import { EMPTY_GIFT, hasGiftContent, type CheckoutGift } from "@/lib/foryou-checkout"
 import { readConsent, trackCheckoutStep, trackEvent, type CheckoutStep } from "@/lib/tracking"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
@@ -164,6 +165,13 @@ function CheckoutContent() {
   // What Stripe will charge, as the API computed it; the pay button shows this.
   const [paymentAmount, setPaymentAmount] = useState(0)
   const [isGift, setIsGift] = useState(false)
+  // Message, video and photo for the recipient, made before paying.
+  const [gift, setGift] = useState<CheckoutGift>(EMPTY_GIFT)
+  const [giftUpload, setGiftUpload] = useState<GiftUploadState>({ progress: null, failed: false })
+  // "Continue" tapped while a file was still uploading: go on once it is up.
+  const [waitingForUpload, setWaitingForUpload] = useState(false)
+  const [cancelUploadsToken, setCancelUploadsToken] = useState(0)
+  const detailsFormRef = useRef<HTMLFormElement>(null)
   const [upsellAdded, setUpsellAdded] = useState(false)
   const [postalCodeError, setPostalCodeError] = useState("")
   const [discountCodeInput, setDiscountCodeInput] = useState("")
@@ -277,6 +285,9 @@ function CheckoutContent() {
         if (d.deliveryNote) setDeliveryNote(d.deliveryNote)
         if (typeof d.newsletter === 'boolean') setNewsletter(d.newsletter)
         if (typeof d.isGift === 'boolean') setIsGift(d.isGift)
+        if (d.gift && typeof d.gift === 'object') {
+          setGift({ message: String(d.gift.message || ''), videoUrl: String(d.gift.videoUrl || ''), photoUrl: String(d.gift.photoUrl || '') })
+        }
         if (d.appliedDiscountCode) {
           setAppliedDiscountCode(d.appliedDiscountCode)
           setDiscountCodeInput(d.appliedDiscountCode)
@@ -332,11 +343,13 @@ function CheckoutContent() {
         email, phone, firstName, lastName, address, city, postalCode,
         isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode,
         deliveryNote, newsletter,
+        // In-app browsers reload the page after a video is picked: the message must survive.
+        gift,
         deliveryDate: deliveryDate ? deliveryDate.toISOString() : null,
         deliveryTime,
       }))
     } catch { }
-  }, [formRestored, email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryNote, newsletter, deliveryDate, deliveryTime])
+  }, [formRestored, email, phone, firstName, lastName, address, city, postalCode, isGift, recipientFirstName, recipientLastName, recipientIsCompany, recipientCompany, recipientPhone, appliedDiscountCode, deliveryNote, newsletter, gift, deliveryDate, deliveryTime])
 
   // Si el reloj avanza mientras el checkout está abierto, lo ya elegido puede dejar de
   // cumplir la antelación. Lo soltamos y lo decimos, en vez de dejar pagar algo imposible.
@@ -519,6 +532,12 @@ function CheckoutContent() {
     setFormError("")
     setMissingFields(new Set())
 
+    // A video still on its way: wait for it here rather than pay without it.
+    if (isGift && giftUpload.progress !== null) {
+      setWaitingForUpload(true)
+      return
+    }
+
     // The slot may have expired while the buyer was typing: back to the delivery step.
     if (!deliveryStillBookable() || !deliveryDate) {
       setStep(1)
@@ -553,6 +572,7 @@ function CheckoutContent() {
               : '',
             recipientIsCompany: isGift && recipientIsCompany ? 'yes' : '',
             recipientPhone: isGift ? recipientPhone.trim() : '',
+            gift: isGift && hasGiftContent(gift) ? gift : undefined,
             deliveryDate: deliveryDate.toLocaleDateString('de-CH'),
             deliveryTime,
             discountCode: appliedDiscountCode,
@@ -615,6 +635,21 @@ function CheckoutContent() {
       setIsInitializingPayment(false)
     }
   }
+
+  // The file the buyer was waiting for is up: carry on to payment by itself.
+  // If it failed, stay and show why (the gift box says it and offers a retry).
+  useEffect(() => {
+    if (!waitingForUpload || giftUpload.progress !== null) return
+    setWaitingForUpload(false)
+    if (giftUpload.failed) {
+      document.getElementById('giftMessage')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
+    const form = detailsFormRef.current
+    if (!form) return
+    if (typeof form.requestSubmit === 'function') form.requestSubmit()
+    else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+  }, [waitingForUpload, giftUpload])
 
   const goToStep = (target: 1 | 2) => {
     setClientSecret("")
@@ -1107,7 +1142,7 @@ function CheckoutContent() {
               {/* Paso 2 (contacto + dirección) dentro de un <form>: la tecla
                   "ir/enter" del teclado móvil envía el paso en vez de no hacer nada. */}
               {step === 2 && (
-                <form onSubmit={handleContinueToPayment} noValidate>
+                <form ref={detailsFormRef} onSubmit={handleContinueToPayment} noValidate>
                   {/* La entrega ya elegida, a la vista y con vuelta atrás en un toque */}
                   <div className="mb-8 flex items-center gap-3 rounded-xl border border-[#E6D5C0] bg-[#FFFCF8] px-4 py-3">
                     <Truck className="h-5 w-5 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
@@ -1152,7 +1187,15 @@ function CheckoutContent() {
                           </span>
                         </div>
                       </button>
-                      {isGift && <GiftPreview labels={c} />}
+                      {isGift && (
+                        <GiftMessage
+                          gift={gift}
+                          setGift={setGift}
+                          onUploadState={setGiftUpload}
+                          cancelToken={cancelUploadsToken}
+                          labels={c}
+                        />
+                      )}
                     </div>
                   )}
 
@@ -1320,16 +1363,25 @@ function CheckoutContent() {
                         currencyClassName="text-[0.55em] opacity-80"
                       />
                     </div>
-                    <button type="submit" disabled={isInitializingPayment} className={primaryButton}>
-                      {isInitializingPayment ? (
+                    <button type="submit" disabled={isInitializingPayment || waitingForUpload} className={primaryButton}>
+                      {isInitializingPayment || waitingForUpload ? (
                         <span className="inline-flex items-center justify-center gap-2">
                           <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                          {c.processing}
+                          {waitingForUpload ? c.giftWaitingUpload(giftUpload.progress ?? 0) : c.processing}
                         </span>
                       ) : (
                         c.continueToPayment
                       )}
                     </button>
+                    {waitingForUpload && (
+                      <button
+                        type="button"
+                        onClick={() => setCancelUploadsToken((n) => n + 1)}
+                        className="mt-2 w-full py-1 text-center text-sm text-gray-600 underline underline-offset-2 hover:text-black"
+                      >
+                        {c.giftSkipUpload}
+                      </button>
+                    )}
                   </div>
                 </form>
               )}
@@ -1347,10 +1399,29 @@ function CheckoutContent() {
                   </button>
 
                   <h2 className="text-xl font-black mb-2">{c.paymentTitle}</h2>
-                  <p className="mb-5 flex items-center gap-2 text-sm capitalize text-gray-600">
+                  <p className={`${isGift ? 'mb-2' : 'mb-5'} flex items-center gap-2 text-sm capitalize text-gray-600`}>
                     <Truck className="h-4 w-4 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
                     {deliverySummary}
                   </p>
+                  {/* The gift message, confirmed right before paying */}
+                  {isGift && (
+                    <p className="mb-5 flex items-start gap-2 text-sm text-gray-600">
+                      <Gift className="mt-0.5 h-4 w-4 shrink-0 text-[#651A1A]" strokeWidth={1.75} />
+                      <span>
+                        {hasGiftContent(gift)
+                          ? `${c.giftSummary}: ${[gift.message.trim() && c.giftPartMessage, gift.videoUrl && c.giftPartVideo, gift.photoUrl && c.giftPartPhoto].filter(Boolean).join(' · ')}`
+                          : c.giftSummaryEmpty}
+                        {' '}
+                        <button
+                          type="button"
+                          onClick={() => goToStep(2)}
+                          className="font-bold text-[#651A1A] underline underline-offset-2 hover:text-black"
+                        >
+                          {c.change}
+                        </button>
+                      </span>
+                    </p>
+                  )}
                   <Elements
                     stripe={stripePromise}
                     options={{

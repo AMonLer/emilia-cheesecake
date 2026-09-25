@@ -8,6 +8,7 @@ import { createOrderInNotion } from '@/lib/notion'
 import { forYouRangeForItems, nextFreeForYouCode } from '@/lib/foryou-code'
 import { listUsedForYouCodes, reserveForYouCode } from '@/lib/foryou-store'
 import { forYouEditUrl } from '@/lib/foryou-auth'
+import { giftFromMetadata } from '@/lib/foryou-checkout'
 import { sendTelegramMessage } from '@/lib/telegram'
 import crypto from 'crypto'
 
@@ -124,6 +125,9 @@ export async function POST(req: NextRequest) {
       // va en la grande). Se asigna tras cobrar para no quemar stickers en pagos
       // abandonados, y se reserva en Notion para no entregar el mismo dos veces.
       const isGift = metadata.isGift === 'yes'
+      // Message, video or photo the buyer already made in the checkout.
+      const gift = isGift ? giftFromMetadata(metadata) : null
+      const giftContent = gift ? { message: gift.message, videoUrl: gift.videoUrl, fileUrl: gift.photoUrl } : undefined
       let foryouCode = metadata.foryouCode || ''
       let foryouAlert = ''
       if (isGift && !foryouCode) {
@@ -132,7 +136,7 @@ export async function POST(req: NextRequest) {
           const next = nextFreeForYouCode(await listUsedForYouCodes(), range)
           if (!next) {
             foryouAlert = `\n⚠️ <b>SIN STICKERS FOR YOU</b> en el rango ${range === 'large' ? '3001–3200 (grande)' : '2000–2300 (pequeña)'}: reimprimir y asignar uno a mano`
-          } else if (await reserveForYouCode(next, paymentIntent.id)) {
+          } else if (await reserveForYouCode(next, paymentIntent.id, giftContent)) {
             await stripe.paymentIntents.update(paymentIntent.id, { metadata: { foryouCode: next } })
             foryouCode = next
           } else {
@@ -145,8 +149,12 @@ export async function POST(req: NextRequest) {
       }
 
       // Regalo: si el cliente lo marcó, hay que pegar el sticker con su código
+      const giftParts = gift ? [gift.message && 'texto', gift.videoUrl && 'vídeo', gift.photoUrl && 'foto'].filter(Boolean).join(' · ') : ''
+      const giftStatus = gift
+        ? `\n✅ Mensaje ya creado en el checkout: ${giftParts}${foryouAlert ? ' (está en la metadata del pago en Stripe)' : ''}`
+        : '\n✉️ Sin mensaje todavía: le llega el enlace por email'
       const giftBlock = isGift
-        ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${tg('recipientName') || '—'}${metadata.recipientPhone ? ` · Tel: ${tg('recipientPhone')}` : ''}\n`
+        ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}${giftStatus}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${tg('recipientName') || '—'}${metadata.recipientPhone ? ` · Tel: ${tg('recipientPhone')}` : ''}\n`
         : ''
 
       // Enviar notificación por Telegram
@@ -189,6 +197,7 @@ ${productsText}
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
           foryouEditUrl: foryouCode ? forYouEditUrl(foryouCode, paymentIntent.id) : undefined,
+          foryouReady: Boolean(foryouCode && gift),
           deliveryNote,
         })
       )

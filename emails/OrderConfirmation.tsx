@@ -29,6 +29,8 @@ interface OrderConfirmationEmailProps {
   deliveryTime: string
   // Gift orders: signed link to create or change the For You message.
   foryouEditUrl?: string
+  // The buyer already made the message in the checkout.
+  foryouReady?: boolean
   deliveryNote?: string
 }
 
@@ -43,6 +45,7 @@ export default function OrderConfirmationEmail({
   deliveryDate = '',
   deliveryTime = '',
   foryouEditUrl,
+  foryouReady = false,
   deliveryNote = '',
 }: OrderConfirmationEmailProps) {
   return (
@@ -139,16 +142,15 @@ export default function OrderConfirmationEmail({
             {foryouEditUrl && (
               <Section style={foryouBox}>
                 <Heading as="h2" style={foryouTitle}>
-                  Ihre persönliche Botschaft
+                  {foryouReady ? 'Ihre Botschaft ist gespeichert' : 'Ihre persönliche Botschaft'}
                 </Heading>
                 <Text style={foryouText}>
-                  Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht
-                  hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen.
-                  Sie können die Botschaft bis zum Beginn der Lieferung jederzeit
-                  ändern.
+                  {foryouReady
+                    ? 'Die beschenkte Person öffnet sie über den Code beim Kuchen. Sie können sie bis zum Beginn der Lieferung jederzeit ansehen und ändern.'
+                    : 'Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen. Sie können die Botschaft bis zum Beginn der Lieferung jederzeit ändern.'}
                 </Text>
                 <Button href={foryouEditUrl} style={foryouButton}>
-                  Botschaft erstellen
+                  {foryouReady ? 'Botschaft ansehen oder ändern' : 'Botschaft erstellen'}
                 </Button>
               </Section>
             )}

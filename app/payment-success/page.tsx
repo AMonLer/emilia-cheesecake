@@ -39,6 +39,8 @@ function PaymentSuccessContent() {
   const ps = t.paymentSuccess
   const [status, setStatus] = useState<PaymentStatus>('checking')
   const [foryouCode, setForyouCode] = useState<string | null>(null)
+  // The buyer already made the message in the checkout.
+  const [foryouReady, setForyouReady] = useState(false)
   const confirmedRef = useRef(false)
   // Bumped by "check again" to restart the polling after it gave up.
   const [checkRound, setCheckRound] = useState(0)
@@ -67,8 +69,12 @@ function PaymentSuccessContent() {
           })
             .then((res) => res.json())
             .then((data) => {
-              if (data?.code) setForyouCode(data.code)
-              else if (data?.pending && attempt < 15) setTimeout(() => fetchForYouCode(attempt + 1), 2000)
+              if (data?.code) {
+                setForyouCode(data.code)
+                setForyouReady(data.hasMessage === true)
+              } else if (data?.pending && attempt < 15) {
+                setTimeout(() => fetchForYouCode(attempt + 1), 2000)
+              }
             })
             .catch(() => {})
         }
@@ -102,9 +108,12 @@ function PaymentSuccessContent() {
     }
 
     // Atajo SOLO para desarrollo: ?demo=1 muestra el bloque sin pago real
-    if (searchParams.get('demo') === '1' && process.env.NODE_ENV !== 'production') {
+    // (?demo=ready: con la botschaft ya creada en el checkout)
+    const demo = searchParams.get('demo')
+    if ((demo === '1' || demo === 'ready') && process.env.NODE_ENV !== 'production') {
       setStatus('succeeded')
       setForyouCode('2000')
+      setForyouReady(demo === 'ready')
       return
     }
 
@@ -226,7 +235,42 @@ function PaymentSuccessContent() {
           )}
         </div>
 
-        {!isPending && foryouCode && (
+        {!isPending && foryouCode && foryouReady && (
+          <div className="mb-10 animate-slide-up rounded-2xl bg-[#651A1A] p-8 text-left text-white">
+            <p className="text-xs tracking-[0.3em] uppercase font-bold text-[#F5E6D3]/70 mb-3">
+              {locale === 'de' ? 'Deine Überraschung' : 'Your surprise'}
+            </p>
+            <h2 className="text-2xl font-black tracking-tight mb-3 leading-tight">
+              {locale === 'de' ? 'Deine Botschaft ist gespeichert' : 'Your message is saved'}
+            </h2>
+            <p className="text-white/70 font-light text-sm leading-relaxed mb-6">
+              {locale === 'de'
+                ? 'Beim Kuchen liegt ein Code: Wer ihn scannt, sieht alles, was du vorbereitet hast.'
+                : 'A code comes with the cake: whoever scans it sees everything you prepared.'}
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href={`/foryou/${foryouCode}`}
+                className="block rounded-xl bg-white py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-[#651A1A] transition-colors duration-300 hover:bg-[#F5E6D3]"
+              >
+                {locale === 'de' ? 'Ansehen' : 'View'}
+              </Link>
+              <Link
+                href={`/foryou/${foryouCode}/create`}
+                className="block rounded-xl border border-white/40 py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-white transition-colors duration-300 hover:bg-white hover:text-[#651A1A]"
+              >
+                {locale === 'de' ? 'Ändern' : 'Edit'}
+              </Link>
+            </div>
+            <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
+              {locale === 'de'
+                ? 'Du kannst sie bis zur Lieferung ändern. Den Link bekommst du auch per E-Mail.'
+                : 'You can change it until delivery. You also get the link by e-mail.'}
+            </p>
+          </div>
+        )}
+
+        {!isPending && foryouCode && !foryouReady && (
           <div className="mb-10 animate-slide-up rounded-2xl bg-[#651A1A] p-8 text-left text-white">
             <p className="text-xs tracking-[0.3em] uppercase font-bold text-[#F5E6D3]/70 mb-3">
               {locale === 'de' ? 'Eine persönliche Überraschung' : 'A personal surprise'}

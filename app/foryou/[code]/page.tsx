@@ -1,6 +1,6 @@
 import { getForYouMessage } from "@/lib/foryou-store"
 import { isForYouCode } from "@/lib/foryou-auth"
-import { videoDeliveryUrl, videoPosterUrl, imageDeliveryUrl, attachmentDeliveryUrl } from "@/lib/cloudinary"
+import { videoDeliveryUrl, videoPosterUrl, imageDeliveryUrl, attachmentDeliveryUrl } from "@/lib/cloudinary-urls"
 import RecipientView from "@/components/foryou/RecipientView"
 
 export const dynamic = "force-dynamic"

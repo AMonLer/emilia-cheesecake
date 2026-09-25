@@ -249,10 +249,15 @@ export async function listUsedForYouCodes(): Promise<Set<string>> {
 
 /**
  * Reserva un código de sticker nada más cobrarse el pedido, para no entregarlo
- * dos veces. La fila queda con Status "Assigned" hasta que el cliente graba su
- * mensaje (saveForYouMessage la encuentra por código y la actualiza).
+ * dos veces. La fila queda con Status "Assigned"; si el cliente creó el mensaje
+ * en el checkout ya lleva el contenido, y si no, saveForYouMessage la encuentra
+ * por código y la actualiza cuando lo grabe.
  */
-export async function reserveForYouCode(code: string, paymentIntentId: string): Promise<boolean> {
+export async function reserveForYouCode(
+  code: string,
+  paymentIntentId: string,
+  content?: Pick<ForYouMessage, 'message' | 'videoUrl' | 'fileUrl'>,
+): Promise<boolean> {
   if (!notion || !foryouDataSourceId) {
     console.warn('Notion For You no configurado, saltando')
     return false
@@ -264,6 +269,10 @@ export async function reserveForYouCode(code: string, paymentIntentId: string): 
         Code: { title: [{ text: { content: code } }] },
         Status: { select: { name: 'Assigned' } },
         ...(paymentIntentId ? { 'Stripe ID': { rich_text: [{ text: { content: paymentIntentId } }] } } : {}),
+        // Made in the checkout, before paying: one write, so never a second row for the code.
+        ...(content?.message ? { Message: { rich_text: [{ text: { content: content.message } }] } } : {}),
+        ...(content?.videoUrl ? { 'Video URL': { url: content.videoUrl } } : {}),
+        ...(content?.fileUrl ? { 'File URL': { url: content.fileUrl } } : {}),
       },
     })
     return true

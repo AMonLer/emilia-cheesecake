@@ -51,9 +51,12 @@ class FakeStripe {
     },
   }
 }
+const giftLib = loadTypeScript('lib/foryou-checkout.ts')
 const { POST } = loadTypeScript('app/api/create-payment-intent/route.ts', {
   '@/lib/delivery-dates': dates,
   '@/lib/pricing': pricing,
+  '@/lib/foryou-checkout': giftLib,
+  '@/lib/cloudinary': { getUploadCredentials: () => ({ cloudName: 'test-cloud', apiKey: 'test' }) },
   stripe: FakeStripe,
 })
 
@@ -207,7 +210,29 @@ async function main() {
   body = await (await request({ deliveryDate: FUTURE_DAY }, { id: 'pi_missing', clientSecret: 'x' })).json()
   assert.ok(body.clientSecret)
 
-  console.log(`PASS (TZ=${Intl.DateTimeFormat().resolvedOptions().timeZone}): closures, 24h lead time in Zurich time, server-side slot and totals, single chargeable PaymentIntent. No real Stripe calls.`)
+  // --- Gift message made in the checkout travels with the payment
+  const media = 'https://res.cloudinary.com/test-cloud/video/upload/v1/emilia/foryou/checkout/clip.mov'
+  const longMessage = ('Alles Gute, liebe Mama! Ich wünschte, ich wäre da. 🎂 ').repeat(45).trim()
+  body = await (await request({
+    deliveryDate: FUTURE_DAY,
+    isGift: true,
+    gift: { message: longMessage, videoUrl: media, photoUrl: 'https://evil.example/x.jpg' },
+  })).json()
+  let metadata = intents.get(body.paymentIntentId).metadata
+  assert.equal(metadata.giftVideoUrl, media)
+  assert.equal(metadata.giftPhotoUrl, undefined, 'Media from anywhere but our Cloudinary is dropped')
+  assert.ok(Object.keys(metadata).length <= 50, 'Stripe allows 50 metadata keys')
+  for (const value of Object.values(metadata)) {
+    if (value === metadata.items) continue
+    assert.ok(Buffer.byteLength(value, 'utf8') <= 500, 'Every metadata value stays under Stripe\'s 500 cap')
+  }
+  assert.deepEqual(giftLib.giftFromMetadata(metadata), { message: longMessage.slice(0, giftLib.GIFT_MESSAGE_MAX).replace(/[\uD800-\uDBFF]$/, ''), videoUrl: media, photoUrl: '' })
+  // Not a gift → nothing of the message is kept, even if the browser sent one.
+  body = await (await request({ deliveryDate: FUTURE_DAY, isGift: false, gift: { message: 'Hallo' } })).json()
+  metadata = intents.get(body.paymentIntentId).metadata
+  assert.equal(giftLib.giftFromMetadata(metadata), null)
+
+  console.log(`PASS (TZ=${Intl.DateTimeFormat().resolvedOptions().timeZone}): closures, 24h lead time in Zurich time, server-side slot and totals, single chargeable PaymentIntent, gift message kept with the payment. No real Stripe calls.`)
 }
 
 main().catch((error) => {

@@ -65,6 +65,7 @@ async function main() {
     '@/lib/foryou-auth': auth,
     '@/lib/foryou-store': { getForYouMessage: async () => stored },
     '@/lib/foryou-order': orderMock,
+    '@/lib/foryou-checkout': loadTs('lib/foryou-checkout.ts'),
     stripe: class { paymentIntents = { retrieve: async () => intent } },
   })
   const request = (path, body, cookie) => new NextRequest(`https://example.test${path}`, {
@@ -89,7 +90,11 @@ async function main() {
   assert.deepEqual(await (await codeRoute.POST(request('/api/foryou/code', credentials))).json(), { code: null, pending: false })
   intent.metadata = { foryouCode: code, isGift: 'yes' }
   const response = await codeRoute.POST(request('/api/foryou/code', credentials))
-  assert.equal((await response.json()).code, code)
+  assert.deepEqual(await response.json(), { code, hasMessage: false })
+  // Message already made in the checkout: the confirmation says it is saved.
+  intent.metadata = { foryouCode: code, isGift: 'yes', giftMessage1: 'Alles Gute!' }
+  assert.deepEqual(await (await codeRoute.POST(request('/api/foryou/code', credentials))).json(), { code, hasMessage: true })
+  intent.metadata = { foryouCode: code, isGift: 'yes' }
   const setCookie = response.headers.get('set-cookie')
   assert.match(setCookie, /HttpOnly/i)
   assert.match(setCookie, /SameSite=lax/i)
@@ -206,5 +211,101 @@ async function main() {
   assert.equal((await sign.POST(request('/api/foryou/sign-upload', { code: '2043' }, cookie))).status, 403)
   assert.equal((await sign.POST(request('/api/foryou/sign-upload', { code }, cookie))).status, 200)
   console.log('PASS: saving and upload signing enforce authorization and preserve the Stripe order reference')
+
+  // --- Gift made in the checkout, before paying
+  const giftLib = loadTs('lib/foryou-checkout.ts')
+  const cloud = 'test-cloud'
+  const ok = `https://res.cloudinary.com/${cloud}/image/upload/v1/emilia/foryou/checkout/a.jpg`
+  assert.equal(giftLib.isForYouMediaUrl(ok, cloud), true)
+  for (const bad of [
+    'https://res.cloudinary.com/other-cloud/image/upload/v1/emilia/foryou/checkout/a.jpg',
+    `https://res.cloudinary.com/${cloud}/image/upload/v1/somewhere/else.jpg`,
+    `http://res.cloudinary.com/${cloud}/image/upload/v1/emilia/foryou/a.jpg`,
+    'javascript:alert(1)',
+    `https://res.cloudinary.com/${cloud}/image/upload/v1/emilia/foryou/${'x'.repeat(500)}.jpg`,
+  ]) assert.equal(giftLib.isForYouMediaUrl(bad, cloud), false, bad)
+  assert.equal(giftLib.cleanCheckoutGift({ message: '   ' }, cloud), null)
+  assert.equal(giftLib.cleanCheckoutGift(null, cloud), null)
+  assert.deepEqual(giftLib.cleanCheckoutGift({ message: ' Hi ', photoUrl: ok, videoUrl: 'https://x.test/v.mp4' }, cloud), { message: 'Hi', videoUrl: '', photoUrl: ok })
+  // Round trip through metadata: words, line breaks, umlauts and emoji survive;
+  // no piece is over the cap or starts/ends with whitespace (in case Stripe trims).
+  for (const message of [
+    'Kurz.',
+    ('Liebe Anna,\n\nalles Gute zum 30.! Wir denken an dich. 🥂 ').repeat(40).trim().slice(0, 2000).trim(),
+    'ü'.repeat(2000),
+    '🎂'.repeat(1000),
+    ('a' + ' '.repeat(600) + 'b').repeat(3),
+  ]) {
+    const metadata = giftLib.giftToMetadata({ message, videoUrl: '', photoUrl: '' })
+    for (const value of Object.values(metadata)) {
+      assert.ok(Buffer.byteLength(value, 'utf8') <= 490)
+      if (message.trim() === message && !/\s{400,}/.test(message)) assert.equal(value, value.trim(), 'no whitespace at a cut')
+    }
+    assert.ok(Object.keys(metadata).length <= 14)
+    assert.equal(giftLib.giftFromMetadata(metadata).message, message)
+  }
+  console.log('PASS: a gift made in the checkout keeps only our own media and survives Stripe metadata intact')
+
+  const recentSign = loadTs('app/api/foryou/checkout-upload/route.ts', { '@/lib/cloudinary': cloudinary, '@/lib/foryou-checkout': giftLib })
+  const signRequest = (headers = {}) => new NextRequest('https://example.test/api/foryou/checkout-upload', {
+    method: 'POST', headers: { 'Content-Type': 'application/json', host: 'example.test', 'x-forwarded-for': '203.0.113.7', ...headers }, body: '{}',
+  })
+  assert.equal((await recentSign.POST(signRequest({ 'sec-fetch-site': 'cross-site' }))).status, 403)
+  assert.equal((await recentSign.POST(signRequest({ origin: 'https://evil.example' }))).status, 403)
+  const signed = await recentSign.POST(signRequest({ 'sec-fetch-site': 'same-origin', origin: 'https://example.test' }))
+  assert.equal(signed.status, 200)
+  assert.equal((await signed.json()).folder, 'emilia/foryou/checkout')
+  let last
+  for (let i = 0; i < 12; i++) last = await recentSign.POST(signRequest({ 'sec-fetch-site': 'same-origin' }))
+  assert.equal(last.status, 429, 'One address cannot sign uploads without end')
+  assert.equal((await recentSign.POST(signRequest({ 'sec-fetch-site': 'same-origin', 'x-forwarded-for': '198.51.100.2' }))).status, 200)
+  console.log('PASS: checkout uploads are signed only for this site, into their own folder, within a budget per address')
+
+  // --- After payment: the webhook stores the checkout message under the sticker code
+  const reserved = []
+  const webhookTelegrams = []
+  const emailProps = []
+  const loadWebhook = () => loadTs('app/api/webhooks/stripe/route.ts', {
+    stripe: class {
+      webhooks = { constructEvent: (body) => JSON.parse(body) }
+      paymentIntents = { update: async () => ({}) }
+    },
+    resend: { Resend: class { emails = { send: async () => ({}) } } },
+    '@react-email/render': { render: async () => '<html></html>' },
+    '@/emails/OrderConfirmation': (props) => { emailProps.push(props); return null },
+    '@/emails/AdminNotification': () => null,
+    '@/lib/notion': { createOrderInNotion: async () => {} },
+    '@/lib/foryou-code': stickerLib,
+    '@/lib/foryou-store': {
+      listUsedForYouCodes: async () => new Set(['2000']),
+      reserveForYouCode: async (code, paymentIntentId, content) => { reserved.push({ code, paymentIntentId, content }); return true },
+    },
+    '@/lib/foryou-auth': auth,
+    '@/lib/foryou-checkout': giftLib,
+    '@/lib/telegram': { sendTelegramMessage: async (text) => { webhookTelegrams.push(text) } },
+  })
+  const webhook = loadWebhook()
+  const paidEvent = (metadata) => new NextRequest('https://example.test/api/webhooks/stripe', {
+    method: 'POST',
+    headers: { 'stripe-signature': 'test' },
+    body: JSON.stringify({
+      type: 'payment_intent.succeeded',
+      data: { object: { id: 'pi_gift', amount: 5130, payment_method_types: ['card'], metadata: {
+        isGift: 'yes', foryouCode: '', trackingConsent: 'denied', items: JSON.stringify([{ name: 'CLASSIC', size: '2-3', quantity: 1, price: 15.9 }]),
+        customerEmail: 'buyer@example.test', deliveryDate: '28.9.2027', deliveryTime: '09:00 - 12:00', ...metadata,
+      } } },
+    }),
+  })
+  const video = `https://res.cloudinary.com/${cloud}/video/upload/v1/emilia/foryou/checkout/v.mov`
+  await webhook.POST(paidEvent({ ...giftLib.giftToMetadata({ message: 'Alles Gute & viel Liebe!', videoUrl: video, photoUrl: '' }) }))
+  assert.deepEqual(reserved.at(-1), { code: '2001', paymentIntentId: 'pi_gift', content: { message: 'Alles Gute & viel Liebe!', videoUrl: video, fileUrl: '' } })
+  assert.match(webhookTelegrams.at(-1), /Mensaje ya creado en el checkout: texto · vídeo/)
+  assert.equal(emailProps.at(-1).foryouReady, true)
+  // Without a message from the checkout: the code is reserved empty, as before.
+  await webhook.POST(paidEvent({}))
+  assert.deepEqual(reserved.at(-1), { code: '2001', paymentIntentId: 'pi_gift', content: undefined })
+  assert.match(webhookTelegrams.at(-1), /Sin mensaje todavía/)
+  assert.equal(emailProps.at(-1).foryouReady, false)
+  console.log('PASS: after payment the checkout message is stored with the sticker code in one write; the shop and the buyer are told it is ready')
 }
 main().catch(error => { console.error(error); process.exitCode = 1 })

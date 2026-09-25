@@ -3,6 +3,7 @@ import Stripe from 'stripe'
 import { createForYouSession, forYouCookieName, forYouCookieOptions, isForYouCode, verifyForYouSession } from '@/lib/foryou-auth'
 import { getForYouMessage } from '@/lib/foryou-store'
 import { getForYouOrder } from '@/lib/foryou-order'
+import { giftFromMetadata } from '@/lib/foryou-checkout'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -41,7 +42,9 @@ export async function POST(req: NextRequest) {
       // La página de confirmación reintenta unos segundos hasta que aparezca.
       return NextResponse.json({ code: null, pending: intent.metadata?.isGift === 'yes' })
     }
-    const response = NextResponse.json({ code }, { headers: { 'Cache-Control': 'no-store' } })
+    // Made in the checkout: the confirmation says it is saved instead of asking for it.
+    const hasMessage = Boolean(giftFromMetadata(intent.metadata))
+    const response = NextResponse.json({ code, hasMessage }, { headers: { 'Cache-Control': 'no-store' } })
     response.cookies.set(forYouCookieName(code), createForYouSession(code, intent.id), forYouCookieOptions)
     return response
   } catch (error: any) {

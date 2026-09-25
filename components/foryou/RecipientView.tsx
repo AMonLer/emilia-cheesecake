@@ -25,7 +25,7 @@ export default function RecipientView({
 }: {
   state: "message" | "greeting" | "notFound"
   content?: RecipientContent
-  // Example shown in the checkout: no link out of the checkout.
+  // Shown inside the checkout (the buyer's own message, or an example): no link out of it.
   preview?: boolean
 }) {
   const { t } = useLanguage()

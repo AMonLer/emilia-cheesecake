@@ -58,15 +58,19 @@ export async function listUsedForYouCodes(): Promise<Set<string>> {
   return new Set(Object.keys(readLocal()))
 }
 
-// En local la reserva deja una fila vacía en el JSON: el código consta como
-// entregado y /foryou/[code] muestra "tu mensaje está en camino" hasta que se grabe.
-export async function reserveForYouCode(code: string, paymentIntentId: string): Promise<boolean> {
-  if (useNotion) return reserveInNotion(code, paymentIntentId)
+// En local la reserva deja una fila en el JSON (vacía, o con lo creado en el
+// checkout): el código consta como entregado.
+export async function reserveForYouCode(
+  code: string,
+  paymentIntentId: string,
+  content?: Pick<ForYouMessage, 'message' | 'videoUrl' | 'fileUrl'>,
+): Promise<boolean> {
+  if (useNotion) return reserveInNotion(code, paymentIntentId, content)
   if (process.env.NODE_ENV === 'production') return false
   try {
     const store = readLocal()
     if (store[code]) return false
-    store[code] = { code, message: '', paymentIntentId }
+    store[code] = { code, message: content?.message || '', videoUrl: content?.videoUrl || '', fileUrl: content?.fileUrl || '', paymentIntentId }
     fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8')
     return true
   } catch (err) {

@@ -25,31 +25,4 @@ export function getUploadCredentials() {
   return { cloudName, apiKey }
 }
 
-// --- Delivery URL helpers -------------------------------------------------
-// Cloudinary's secure_url points at the original file. Inserting transformation
-// flags after "/upload/" lets it transcode + optimize on the fly (f_auto picks a
-// format the viewer's browser supports — this is what fixes iPhone HEVC on Android).
-
-export function videoDeliveryUrl(secureUrl: string): string {
-  return secureUrl.replace('/upload/', '/upload/f_auto,q_auto/')
-}
-
-export function videoPosterUrl(secureUrl: string): string {
-  return secureUrl
-    .replace('/upload/', '/upload/so_0,f_jpg,q_auto/')
-    .replace(/\.[^/.]+$/, '.jpg')
-}
-
-export function imageDeliveryUrl(secureUrl: string): string {
-  return secureUrl.replace('/upload/', '/upload/f_auto,q_auto/')
-}
-
-// Fuerza la descarga (Content-Disposition: attachment) con un nombre legible.
-// El atributo download de <a> no funciona cross-origin, así que lo hace el servidor.
-export function attachmentDeliveryUrl(secureUrl: string, fileName?: string): string {
-  const base = (fileName || 'attachment')
-    .replace(/\.[^/.]+$/, '')
-    .replace(/[^a-z0-9-_]+/gi, '_')
-    .slice(0, 80)
-  return secureUrl.replace('/upload/', `/upload/fl_attachment:${base}/`)
-}
+// Delivery URL helpers live in ./cloudinary-urls (usable in the browser too).

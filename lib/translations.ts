@@ -247,13 +247,35 @@ export type Translations = {
     deliveryNotePlaceholder: string
     giftTitle: string
     giftSubtitle: string
-    giftStep1: string
-    giftStep2: string
-    giftStep3: string
+    giftMessageLabel: string
+    giftOptional: string
+    giftMessagePlaceholder: string
+    giftAddVideo: string
+    giftAddPhoto: string
+    giftVideoHint: string
+    giftPhotoHint: string
+    giftUploading: string
+    giftCancelUpload: string
+    giftRemoveVideo: string
+    giftRemovePhoto: string
+    giftUploadFailed: string
+    giftRetry: string
+    giftVideoTooLarge: string
+    giftPhotoTooLarge: string
+    giftHowItWorks: string
+    giftLaterNote: string
     giftPreviewButton: string
     giftPreviewLabel: string
+    giftPreviewOwnLabel: string
     giftPreviewClose: string
     giftSampleMessage: string
+    giftWaitingUpload: (percent: number) => string
+    giftSkipUpload: string
+    giftSummary: string
+    giftSummaryEmpty: string
+    giftPartMessage: string
+    giftPartVideo: string
+    giftPartPhoto: string
     formError: string
     postalCodeError: string
     deliveryTitle: string
@@ -555,13 +577,35 @@ export const translations: Record<Locale, Translations> = {
       deliveryNotePlaceholder: 'z.B. Klingel „Muster“, 3. Stock',
       giftTitle: 'Es ist ein Geschenk',
       giftSubtitle: 'Mit persönlicher Video-, Foto- oder Textbotschaft – inklusive',
-      giftStep1: 'Du bezahlst wie gewohnt.',
-      giftStep2: 'Danach fügst du Video, Foto oder Nachricht hinzu.',
-      giftStep3: 'Beim Kuchen liegt ein Code: scannen, und alles öffnet sich.',
-      giftPreviewButton: 'So sieht es aus',
+      giftMessageLabel: 'Deine Nachricht',
+      giftOptional: 'optional',
+      giftMessagePlaceholder: 'Schreib etwas von Herzen…',
+      giftAddVideo: 'Video',
+      giftAddPhoto: 'Foto',
+      giftVideoHint: 'bis 100 MB',
+      giftPhotoHint: 'Galerie oder Kamera',
+      giftUploading: 'Lädt hoch…',
+      giftCancelUpload: 'Abbrechen',
+      giftRemoveVideo: 'Video entfernen',
+      giftRemovePhoto: 'Foto entfernen',
+      giftUploadFailed: 'Hat nicht geklappt.',
+      giftRetry: 'Nochmal',
+      giftVideoTooLarge: 'Zu gross (max. 100 MB). Ein kürzerer Clip klappt.',
+      giftPhotoTooLarge: 'Zu gross (max. 25 MB).',
+      giftHowItWorks: 'Beim Kuchen liegt ein Code: scannen, und alles öffnet sich.',
+      giftLaterNote: 'Alles optional: Du kannst es auch nach dem Bezahlen hinzufügen und bis zur Lieferung ändern.',
+      giftPreviewButton: 'Vorschau ansehen',
       giftPreviewLabel: 'Beispiel',
+      giftPreviewOwnLabel: 'Vorschau',
       giftPreviewClose: 'Schliessen',
       giftSampleMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniess jeden Bissen.',
+      giftWaitingUpload: (percent) => `Wird hochgeladen… ${percent} %`,
+      giftSkipUpload: 'Ohne diese Datei weiter',
+      giftSummary: 'Deine Botschaft ist dabei',
+      giftSummaryEmpty: 'Deine Botschaft kannst du nach dem Bezahlen hinzufügen.',
+      giftPartMessage: 'Nachricht',
+      giftPartVideo: 'Video',
+      giftPartPhoto: 'Foto',
       formError: 'Bitte füll alle Pflichtfelder aus (rot markiert).',
       postalCodeError: 'Leider liefern wir nur im Umkreis von 10 km um Zürich Zentrum. Deine Postleitzahl liegt ausserhalb unseres Liefergebiets.',
       deliveryTitle: 'Lieferung',
@@ -861,13 +905,35 @@ export const translations: Record<Locale, Translations> = {
       deliveryNotePlaceholder: 'e.g. doorbell "Smith", 3rd floor',
       giftTitle: 'It\'s a gift',
       giftSubtitle: 'With a personal video, photo or note – included',
-      giftStep1: 'You pay as usual.',
-      giftStep2: 'Afterwards you add a video, photo or note.',
-      giftStep3: 'A code comes with the cake: they scan it and everything opens.',
-      giftPreviewButton: 'See how it looks',
+      giftMessageLabel: 'Your message',
+      giftOptional: 'optional',
+      giftMessagePlaceholder: 'Write something from the heart…',
+      giftAddVideo: 'Video',
+      giftAddPhoto: 'Photo',
+      giftVideoHint: 'up to 100 MB',
+      giftPhotoHint: 'Gallery or camera',
+      giftUploading: 'Uploading…',
+      giftCancelUpload: 'Cancel',
+      giftRemoveVideo: 'Remove video',
+      giftRemovePhoto: 'Remove photo',
+      giftUploadFailed: 'That didn\'t work.',
+      giftRetry: 'Try again',
+      giftVideoTooLarge: 'Too large (max 100 MB). A shorter clip works.',
+      giftPhotoTooLarge: 'Too large (max 25 MB).',
+      giftHowItWorks: 'A code comes with the cake: they scan it and everything opens.',
+      giftLaterNote: 'All optional: you can also add it after paying and change it until delivery.',
+      giftPreviewButton: 'See the preview',
       giftPreviewLabel: 'Example',
+      giftPreviewOwnLabel: 'Preview',
       giftPreviewClose: 'Close',
       giftSampleMessage: 'Happy birthday, Mum! I wish I could be there. Enjoy every bite.',
+      giftWaitingUpload: (percent) => `Uploading… ${percent}%`,
+      giftSkipUpload: 'Continue without this file',
+      giftSummary: 'Your message is included',
+      giftSummaryEmpty: 'You can add your message after paying.',
+      giftPartMessage: 'Message',
+      giftPartVideo: 'Video',
+      giftPartPhoto: 'Photo',
       formError: 'Please fill in all required fields (highlighted in red).',
       postalCodeError: 'Unfortunately we only deliver within 10 km of Zurich city centre. Your postcode is outside our delivery area.',
       deliveryTitle: 'Delivery',

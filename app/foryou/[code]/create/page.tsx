@@ -4,58 +4,13 @@ import { useEffect, useState, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useLanguage } from "@/contexts/LanguageContext"
+import { requestUploadSignature, shrinkPhoto, uploadToCloudinary } from "@/lib/foryou-upload"
 
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024 // 100 MB
 const MAX_FILE_BYTES = 25 * 1024 * 1024 // 25 MB
 
-type UploadResult = {
-  secureUrl: string
-  resourceType: string
-  format: string
-}
-
-async function uploadToCloudinary(
-  file: File,
-  onProgress: (pct: number) => void,
-  code: string,
-): Promise<UploadResult> {
-  const signRes = await fetch("/api/foryou/sign-upload", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
-  })
-  if (!signRes.ok) throw new Error("Could not start upload")
-  const { timestamp, signature, folder, cloudName, apiKey } = await signRes.json()
-
-  const form = new FormData()
-  form.append("file", file)
-  form.append("api_key", apiKey)
-  form.append("timestamp", String(timestamp))
-  form.append("signature", signature)
-  form.append("folder", folder)
-
-  return new Promise<UploadResult>((resolve, reject) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open("POST", `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`)
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(Math.round((e.loaded / e.total) * 100))
-    }
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const data = JSON.parse(xhr.responseText)
-        resolve({
-          secureUrl: data.secure_url,
-          resourceType: data.resource_type,
-          format: data.format,
-        })
-      } else {
-        reject(new Error("Upload failed"))
-      }
-    }
-    xhr.onerror = () => reject(new Error("Upload failed"))
-    xhr.send(form)
-  })
-}
+// Uploads for a paid order: signed against this browser's editing session.
+const signFor = (code: string) => () => requestUploadSignature("/api/foryou/sign-upload", { code })
 
 type Draft = { message: string; videoUrl: string; fileUrl: string; fileName: string }
 
@@ -158,7 +113,7 @@ export default function CreateForYouMessage({ params }: { params: { code: string
     }
     try {
       setVideoProgress(0)
-      const res = await uploadToCloudinary(file, setVideoProgress, code)
+      const res = await uploadToCloudinary(file, file.name || "video", signFor(code), setVideoProgress)
       setVideoUrl(res.secureUrl)
     } catch {
       setError(f.videoFailed)
@@ -177,7 +132,8 @@ export default function CreateForYouMessage({ params }: { params: { code: string
     }
     try {
       setFileProgress(0)
-      const res = await uploadToCloudinary(file, setFileProgress, code)
+      const { blob, name } = file.type.startsWith("image/") ? await shrinkPhoto(file) : { blob: file as Blob, name: file.name }
+      const res = await uploadToCloudinary(blob, name, signFor(code), setFileProgress)
       setFileUrl(res.secureUrl)
       setFileName(file.name)
     } catch {

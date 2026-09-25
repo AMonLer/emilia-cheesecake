@@ -7,6 +7,8 @@ import {
   parseDeliveryDate,
 } from '@/lib/delivery-dates'
 import { computeOrderTotals } from '@/lib/pricing'
+import { cleanCheckoutGift, giftToMetadata } from '@/lib/foryou-checkout'
+import { getUploadCredentials } from '@/lib/cloudinary'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
   apiVersion: '2024-12-18.acacia' as any,
@@ -89,6 +91,9 @@ export async function POST(req: NextRequest) {
     // webhook asigna el siguiente libre tras cobrar (así no se queman stickers
     // en pagos abandonados). Aquí solo queda constancia de si es regalo.
     const isGift = Boolean(orderData?.isGift)
+    // Message, video or photo made in the checkout: kept with the payment until
+    // the webhook stores it under the sticker code.
+    const gift = isGift ? cleanCheckoutGift(orderData?.gift, getUploadCredentials().cloudName) : null
 
     // Crear Payment Intent con metadata del pedido
     const paymentIntent = await stripe.paymentIntents.create({
@@ -119,6 +124,7 @@ export async function POST(req: NextRequest) {
         // The webhook skips the Meta server event when the buyer declined tracking.
         trackingConsent: orderData?.trackingConsent === 'denied' ? 'denied' : orderData?.trackingConsent === 'granted' ? 'granted' : 'unset',
         items: JSON.stringify(orderData?.items || []),
+        ...giftToMetadata(gift),
       },
     })
 
