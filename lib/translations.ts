@@ -144,10 +144,11 @@ export type Translations = {
     locationLabel: string
     desc: string
   }
-  influencer: {
+  reviews: {
     eyebrow: string
-    eyebrowItalic: string
     heading: string
+    source: string
+    allOnGoogle: string
   }
   gallery: {
     heading: string
@@ -442,10 +443,11 @@ export const translations: Record<Locale, Translations> = {
       locationLabel: 'AUS ZÜRICH',
       desc: 'Der erste San Sebastian Cheesecake in Zürich — handgemacht mit den besten Zutaten, frisch auf Bestellung.',
     },
-    influencer: {
-      eyebrow: 'Was andere',
-      eyebrowItalic: 'sagen',
-      heading: 'GESEHEN AUF',
+    reviews: {
+      eyebrow: 'Google-Rezensionen',
+      heading: 'Das sagen unsere Kunden',
+      source: 'Google-Rezension',
+      allOnGoogle: 'Alle Rezensionen auf Google',
     },
     gallery: {
       heading: 'Unsere',
@@ -738,10 +740,11 @@ export const translations: Record<Locale, Translations> = {
       locationLabel: 'FROM ZURICH',
       desc: 'The first San Sebastian Cheesecake in Zurich — handmade with the finest ingredients, freshly baked to order.',
     },
-    influencer: {
-      eyebrow: 'What others',
-      eyebrowItalic: 'say',
-      heading: 'SEEN ON',
+    reviews: {
+      eyebrow: 'Google reviews',
+      heading: 'What our customers say',
+      source: 'Google review',
+      allOnGoogle: 'All reviews on Google',
     },
     gallery: {
       heading: 'Our',

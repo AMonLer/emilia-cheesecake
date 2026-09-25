@@ -58,10 +58,6 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* All numbers use Roboto font */
-  .price, [data-price], .font-roboto {
-    font-family: var(--font-roboto), sans-serif;
-  }
 
   /* Adding marquee animation for scrolling text banner */
   @keyframes marquee {
@@ -172,5 +168,16 @@
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #D4AF85;
     border-radius: 20px;
+  }
+}
+
+/* Swipe rows (reviews, related cakes) without a scrollbar strip under them */
+@layer utilities {
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

@@ -24,7 +24,6 @@ module.exports = {
       fontFamily: {
         sans: ["var(--font-inter)", "sans-serif"],
         serif: ["var(--font-playfair)", "serif"],
-        roboto: ["var(--font-roboto)", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

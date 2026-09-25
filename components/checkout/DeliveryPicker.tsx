@@ -124,7 +124,7 @@ export default function DeliveryPicker({
               .custom-datepicker .react-datepicker__day-names,
               .custom-datepicker .react-datepicker__week { display: flex; justify-content: space-between; padding: 0; }
               /* Percentage widths so the 7-column grid never overflows a 320px viewport */
-              .custom-datepicker .react-datepicker__day-name { color: #651A1A; font-family: var(--font-geist-sans), sans-serif; font-weight: 600; width: 14.28%; max-width: 2.75rem; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em; margin: 0; text-align: center; }
+              .custom-datepicker .react-datepicker__day-name { color: #651A1A; font-family: var(--font-inter), sans-serif; font-weight: 600; width: 14.28%; max-width: 2.75rem; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em; margin: 0; text-align: center; }
               .custom-datepicker .react-datepicker__day { width: 14.28%; max-width: 2.75rem; height: 2.6rem; display: flex; align-items: center; justify-content: center; line-height: 1; border-radius: 9999px; margin: 0; font-size: 0.95rem; color: #1a1a1a; transition: background-color 0.2s, color 0.2s, transform 0.12s; -webkit-tap-highlight-color: transparent; }
               .custom-datepicker .react-datepicker__day:hover:not(.react-datepicker__day--disabled) { background-color: #E6D5C0; color: #651A1A; }
               .custom-datepicker .react-datepicker__day:active:not(.react-datepicker__day--disabled) { background-color: #E6D5C0; color: #651A1A; transform: scale(0.9); }

@@ -16,6 +16,9 @@ interface FeedbackEmailProps {
 }
 
 const TALLY_URL = 'https://tally.so/r/KY1yag'
+// Asked of every customer, whatever they thought: Google does not allow
+// inviting only the happy ones.
+const GOOGLE_REVIEW_URL = 'https://search.google.com/local/writereview?placeid=ChIJiybo9XYNkEcRF6bq_sDbEdI'
 
 // Versión de texto plano: Gmail la usa para clasificar (y de paso mejora el
 // spam score). Debe decir lo mismo que el HTML de abajo.
@@ -30,6 +33,9 @@ Ihr Feedback ist der beste Weg, Emilia noch besser zu machen. Wenn Sie mir eine 
 ${TALLY_URL}
 
 Sie können auch einfach auf diese E-Mail antworten.
+
+Und wenn Sie mögen: Eine kurze Bewertung auf Google hilft anderen, uns zu finden.
+${GOOGLE_REVIEW_URL}
 
 Herzliche Grüsse
 Emilia
@@ -64,6 +70,13 @@ export default function FeedbackEmail({ customerName = 'Kunde', gender }: Feedba
           </Text>
           <Text style={p}>
             Sie können auch einfach auf diese E-Mail antworten.
+          </Text>
+          <Text style={p}>
+            Und wenn Sie mögen: Eine kurze{' '}
+            <Link href={GOOGLE_REVIEW_URL} style={link}>
+              Bewertung auf Google
+            </Link>{' '}
+            hilft anderen, uns zu finden.
           </Text>
           <Text style={pLast}>
             Herzliche Grüsse

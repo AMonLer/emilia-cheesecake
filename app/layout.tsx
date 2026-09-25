@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata, Viewport } from "next"
-import { Inter, Playfair_Display, Roboto } from "next/font/google"
+import { Inter, Playfair_Display } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { CartProvider } from "@/contexts/CartContext"
 import { LanguageProvider } from "@/contexts/LanguageContext"
@@ -9,8 +9,10 @@ import CookieConsent from "@/components/CookieConsent"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
-const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-playfair" })
-const roboto = Roboto({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-roboto" })
+// The italic cut is loaded on purpose: every serif accent on the site is italic
+// ("Cheesecakes", "Deine persönliche Botschaft"), and without it the browser
+// only slanted the upright letters. 500 is the weight those accents use.
+const playfair = Playfair_Display({ subsets: ["latin"], weight: ["400", "500", "700"], style: ["normal", "italic"], variable: "--font-playfair" })
 
 const siteTitle = "Emilia - Artisan Cheesecakes | Lieferung in Zürich"
 const siteDescription = "Die besten handgemachten Käsekuchen. Lieferung in Zürich und Umgebung."
@@ -124,7 +126,7 @@ export default function RootLayout({
           `}
         </Script>
       </head>
-      <body className={`${inter.variable} ${playfair.variable} ${roboto.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
         <LanguageProvider>
           <CartProvider>
             {children}
