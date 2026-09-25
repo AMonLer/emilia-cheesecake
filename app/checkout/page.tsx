@@ -10,6 +10,7 @@ import { VisaIcon, MastercardIcon, ApplePayIcon, TwintIcon } from "@/components/
 import Navbar from "@/components/Navbar"
 import PriceDisplay from "@/components/PriceDisplay"
 import DeliveryPicker from "@/components/checkout/DeliveryPicker"
+import GiftPreview from "@/components/checkout/GiftPreview"
 import CartSizeToggle from "@/components/cart/CartSizeToggle"
 import QuantityStepper from "@/components/cart/QuantityStepper"
 import { loadStripe } from "@stripe/stripe-js"
@@ -1123,17 +1124,20 @@ function CheckoutContent() {
                     </button>
                   </div>
 
-                  {/* Gift option: one compact row. As a big card with a long paragraph
-                      it pushed the form half a screen down for everyone who is not
-                      buying a gift, which is most people. */}
+                  {/* Gift option: one compact row for everyone; switched on, it opens to
+                      show what the recipient gets (mini preview + full example), so the
+                      buyer sees how it works before paying. */}
                   {SHOW_GIFT_OPTION && (
-                    <div className="mb-8">
+                    <div className={`mb-8 rounded-2xl border-2 px-4 py-3.5 transition-colors duration-200 ${isGift ? "border-[#651A1A] bg-[#F5E6D3]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}>
                       <button
                         type="button"
                         role="switch"
                         aria-checked={isGift}
-                        onClick={() => setIsGift(!isGift)}
-                        className={`w-full text-left rounded-2xl border-2 px-4 py-3.5 transition-colors duration-200 ${isGift ? "border-[#651A1A] bg-[#F5E6D3]" : "border-gray-200 bg-white hover:border-[#651A1A]/40"}`}
+                        onClick={() => {
+                          if (!isGift) trackEvent('gift_on')
+                          setIsGift(!isGift)
+                        }}
+                        className="w-full text-left"
                       >
                         <div className="flex items-center gap-3">
                           <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors duration-200 ${isGift ? "bg-[#651A1A] text-white" : "bg-[#FBF6EF] text-[#651A1A]"}`}>
@@ -1147,12 +1151,8 @@ function CheckoutContent() {
                             <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition-all duration-200 ${isGift ? "left-6" : "left-1"}`} />
                           </span>
                         </div>
-                        {isGift && (
-                          <p className="mt-3 border-t border-[#651A1A]/15 pt-3 text-xs leading-relaxed text-[#651A1A]">
-                            {c.giftActiveNote}
-                          </p>
-                        )}
                       </button>
+                      {isGift && <GiftPreview labels={c} />}
                     </div>
                   )}
 

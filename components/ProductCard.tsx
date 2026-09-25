@@ -115,7 +115,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                         />
                     </div>
                     <div className="flex-1 min-w-0 text-left">
-                        {tag && <MonthlySpecialBadge size="sm" label={tag.label} className="mb-1.5" />}
+                        {tag && <MonthlySpecialBadge size="sm" label={tag.label} subLabel={tag.subLabel} className="mb-1.5" />}
                         <h3 className="font-black text-sm tracking-tight">{name}</h3>
                         {priceSmall && (
                             <div className="flex items-baseline gap-1 mt-0.5 text-[#651A1A]">

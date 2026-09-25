@@ -43,7 +43,7 @@ export function MonthlySpecialSash({ label, subLabel }: { label: string; subLabe
         <Sparkles className="h-2.5 w-2.5 shrink-0 md:h-3 md:w-3" strokeWidth={2.25} aria-hidden="true" />
       </p>
       {subLabel && (
-        <p className="mt-1 hidden font-serif text-[11px] italic leading-none text-[#651A1A]/80 md:block">{subLabel}</p>
+        <p className="mt-1 font-serif text-[10px] italic leading-none text-[#651A1A]/80 md:text-[11px]">{subLabel}</p>
       )}
     </div>
   )

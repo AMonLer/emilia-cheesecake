@@ -247,7 +247,13 @@ export type Translations = {
     deliveryNotePlaceholder: string
     giftTitle: string
     giftSubtitle: string
-    giftActiveNote: string
+    giftStep1: string
+    giftStep2: string
+    giftStep3: string
+    giftPreviewButton: string
+    giftPreviewLabel: string
+    giftPreviewClose: string
+    giftSampleMessage: string
     formError: string
     postalCodeError: string
     deliveryTitle: string
@@ -549,7 +555,13 @@ export const translations: Record<Locale, Translations> = {
       deliveryNotePlaceholder: 'z.B. Klingel „Muster“, 3. Stock',
       giftTitle: 'Es ist ein Geschenk',
       giftSubtitle: 'Mit persönlicher Video-, Foto- oder Textbotschaft – inklusive',
-      giftActiveNote: 'Nach der Zahlung fügst du Video, Foto oder Nachricht hinzu. Sie öffnet sich über den Code beim Kuchen.',
+      giftStep1: 'Du bezahlst wie gewohnt.',
+      giftStep2: 'Danach fügst du Video, Foto oder Nachricht hinzu.',
+      giftStep3: 'Beim Kuchen liegt ein Code: scannen, und alles öffnet sich.',
+      giftPreviewButton: 'So sieht es aus',
+      giftPreviewLabel: 'Beispiel',
+      giftPreviewClose: 'Schliessen',
+      giftSampleMessage: 'Alles Gute zum Geburtstag, Mama! Ich wünschte, ich wäre da. Geniess jeden Bissen.',
       formError: 'Bitte füll alle Pflichtfelder aus (rot markiert).',
       postalCodeError: 'Leider liefern wir nur im Umkreis von 10 km um Zürich Zentrum. Deine Postleitzahl liegt ausserhalb unseres Liefergebiets.',
       deliveryTitle: 'Lieferung',
@@ -849,7 +861,13 @@ export const translations: Record<Locale, Translations> = {
       deliveryNotePlaceholder: 'e.g. doorbell "Smith", 3rd floor',
       giftTitle: 'It\'s a gift',
       giftSubtitle: 'With a personal video, photo or note – included',
-      giftActiveNote: 'After payment you add your video, photo or note. It opens with the code that comes with the cake.',
+      giftStep1: 'You pay as usual.',
+      giftStep2: 'Afterwards you add a video, photo or note.',
+      giftStep3: 'A code comes with the cake: they scan it and everything opens.',
+      giftPreviewButton: 'See how it looks',
+      giftPreviewLabel: 'Example',
+      giftPreviewClose: 'Close',
+      giftSampleMessage: 'Happy birthday, Mum! I wish I could be there. Enjoy every bite.',
       formError: 'Please fill in all required fields (highlighted in red).',
       postalCodeError: 'Unfortunately we only deliver within 10 km of Zurich city centre. Your postcode is outside our delivery area.',
       deliveryTitle: 'Delivery',

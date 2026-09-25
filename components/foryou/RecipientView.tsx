@@ -21,9 +21,12 @@ export type RecipientContent = {
 export default function RecipientView({
   state,
   content,
+  preview = false,
 }: {
   state: "message" | "greeting" | "notFound"
   content?: RecipientContent
+  // Example shown in the checkout: no link out of the checkout.
+  preview?: boolean
 }) {
   const { t } = useLanguage()
   const f = t.forYouPages
@@ -35,7 +38,7 @@ export default function RecipientView({
           {/* El mensaje primero: se lee gratis, sin scroll ni decisión, y
               prepara emocionalmente el vídeo. flex-1 centra el texto cuando
               no hay media debajo. */}
-          <div className="flex-1 flex flex-col items-center justify-center px-8 py-14 text-center">
+          <div className={`flex-1 flex flex-col items-center justify-center px-8 text-center ${preview ? "pb-14 pt-24" : "py-14"}`}>
             <p className="text-white/35 text-[0.65rem] tracking-[0.4em] uppercase font-bold mb-8">
               {f.messageForYou}
             </p>
@@ -109,7 +112,7 @@ export default function RecipientView({
       )}
 
       {/* Whoever just tasted the cake is the warmest lead the shop has. */}
-      {state !== "notFound" && (
+      {state !== "notFound" && !preview && (
         <div className="border-t border-white/10 px-8 py-10 text-center">
           <p className="mb-4 text-white/80 font-medium">{f.ctaTitle}</p>
           <Link
