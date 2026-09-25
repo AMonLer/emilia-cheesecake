@@ -27,8 +27,8 @@ const sign = () => requestUploadSignature("/api/foryou/checkout-upload", {})
 
 // The gift message, made right in the checkout: the moment someone buys a gift
 // is when they think of the person. Files upload in the background while the
-// buyer fills in the address; nothing here is required, and all of it can be
-// added or changed after paying too.
+// buyer fills in the address. Nothing here is required, but it is the only
+// place: after paying, only the shop can add or change it (by e-mail).
 export default function GiftMessage({
   gift,
   setGift,

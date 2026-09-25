@@ -1,5 +1,5 @@
 import { getForYouMessage } from "@/lib/foryou-store"
-import { isForYouCode } from "@/lib/foryou-auth"
+import { isForYouCode } from "@/lib/foryou-code"
 import { videoDeliveryUrl, videoPosterUrl, imageDeliveryUrl, attachmentDeliveryUrl } from "@/lib/cloudinary-urls"
 import RecipientView from "@/components/foryou/RecipientView"
 

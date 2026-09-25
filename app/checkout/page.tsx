@@ -1417,7 +1417,7 @@ function CheckoutContent() {
                           onClick={() => goToStep(2)}
                           className="font-bold text-[#651A1A] underline underline-offset-2 hover:text-black"
                         >
-                          {c.change}
+                          {hasGiftContent(gift) ? c.change : c.giftSummaryAdd}
                         </button>
                       </span>
                     </p>

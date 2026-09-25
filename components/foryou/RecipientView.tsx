@@ -90,9 +90,6 @@ export default function RecipientView({
           <p className="text-white/70 font-light leading-relaxed max-w-sm">
             {f.defaultText}
           </p>
-          <p className="mt-6 text-white/40 font-light text-sm max-w-xs">
-            {f.defaultNote}
-          </p>
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center px-8 py-14 text-center">

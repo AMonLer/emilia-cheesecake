@@ -128,53 +128,6 @@ export type ForYouMessage = {
   paymentIntentId?: string
 }
 
-async function findForYouPageId(code: string): Promise<string | null> {
-  if (!notion || !foryouDataSourceId) return null
-  const res = await (notion as any).dataSources.query({
-    data_source_id: foryouDataSourceId,
-    filter: { property: 'Code', title: { equals: code } },
-    page_size: 1,
-  })
-  return res.results[0]?.id ?? null
-}
-
-/**
- * Creates or updates the personal message for a code. Re-submitting from the
- * same code overwrites the previous record instead of creating duplicates.
- */
-export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
-  if (!notion || !foryouDataSourceId) {
-    console.warn('Notion For You no configurado, saltando')
-    return false
-  }
-
-  const properties: Record<string, any> = {
-    Code: { title: [{ text: { content: rec.code } }] },
-    Message: { rich_text: [{ text: { content: rec.message || '' } }] },
-    'Video URL': { url: rec.videoUrl || null },
-    'File URL': { url: rec.fileUrl || null },
-    'File Name': { rich_text: [{ text: { content: rec.fileName || '' } }] },
-    ...(rec.paymentIntentId ? { 'Stripe ID': { rich_text: [{ text: { content: rec.paymentIntentId } }] } } : {}),
-  }
-
-  try {
-    const existingId = await findForYouPageId(rec.code)
-    if (existingId) {
-      await notion.pages.update({ page_id: existingId, properties })
-    } else {
-      await notion.pages.create({
-        parent: { type: 'data_source_id', data_source_id: foryouDataSourceId } as any,
-        properties: { ...properties, Status: { select: { name: 'New' } } },
-      })
-    }
-    console.log('✅ Mensaje For You guardado en Notion')
-    return true
-  } catch (err) {
-    console.error('Error guardando mensaje For You en Notion:', err)
-    return false
-  }
-}
-
 // strict: throw on Notion errors instead of answering "no such code".
 export async function getForYouMessage(code: string, strict = false): Promise<ForYouMessage | null> {
   if (!notion || !foryouDataSourceId) return null
@@ -206,23 +159,6 @@ function forYouMessageFromPage(page: any, code?: string): ForYouMessage {
   }
 }
 
-/** Every code handed out, with its message (empty if the buyer has not written one yet). */
-export async function listForYouMessages(): Promise<ForYouMessage[]> {
-  const messages: ForYouMessage[] = []
-  if (!notion || !foryouDataSourceId) return messages
-  let cursor: string | undefined
-  do {
-    const res = await (notion as any).dataSources.query({
-      data_source_id: foryouDataSourceId,
-      page_size: 100,
-      ...(cursor ? { start_cursor: cursor } : {}),
-    })
-    for (const page of res.results) messages.push(forYouMessageFromPage(page))
-    cursor = res.has_more ? (res.next_cursor ?? undefined) : undefined
-  } while (cursor)
-  return messages
-}
-
 /** Todos los códigos de sticker ya entregados (haya mensaje grabado o solo reserva). */
 export async function listUsedForYouCodes(): Promise<Set<string>> {
   const used = new Set<string>()
@@ -249,9 +185,9 @@ export async function listUsedForYouCodes(): Promise<Set<string>> {
 
 /**
  * Reserva un código de sticker nada más cobrarse el pedido, para no entregarlo
- * dos veces. La fila queda con Status "Assigned"; si el cliente creó el mensaje
- * en el checkout ya lleva el contenido, y si no, saveForYouMessage la encuentra
- * por código y la actualiza cuando lo grabe.
+ * dos veces, con el mensaje que el cliente creó en el checkout (si lo hizo).
+ * Después del pago solo la tienda lo cambia, a mano en Notion, si el cliente
+ * lo pide por email.
  */
 export async function reserveForYouCode(
   code: string,

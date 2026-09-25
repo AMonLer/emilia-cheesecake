@@ -7,7 +7,6 @@ import AdminNotificationEmail from '@/emails/AdminNotification'
 import { createOrderInNotion } from '@/lib/notion'
 import { forYouRangeForItems, nextFreeForYouCode } from '@/lib/foryou-code'
 import { listUsedForYouCodes, reserveForYouCode } from '@/lib/foryou-store'
-import { forYouEditUrl } from '@/lib/foryou-auth'
 import { giftFromMetadata } from '@/lib/foryou-checkout'
 import { sendTelegramMessage } from '@/lib/telegram'
 import crypto from 'crypto'
@@ -152,7 +151,7 @@ export async function POST(req: NextRequest) {
       const giftParts = gift ? [gift.message && 'texto', gift.videoUrl && 'vídeo', gift.photoUrl && 'foto'].filter(Boolean).join(' · ') : ''
       const giftStatus = gift
         ? `\n✅ Mensaje ya creado en el checkout: ${giftParts}${foryouAlert ? ' (está en la metadata del pago en Stripe)' : ''}`
-        : '\n✉️ Sin mensaje todavía: le llega el enlace por email'
+        : '\n✉️ Sin mensaje personal (si el cliente lo pide por email, se añade a mano en Notion)'
       const giftBlock = isGift
         ? `\n🎁 <b>MENSAJE PERSONAL</b>${foryouCode ? `\n👉 Pegar sticker <code>${foryouCode}</code> → https://emilialab.com/foryou/${foryouCode}` : ''}${foryouAlert}${giftStatus}\n🧡 Für: ${metadata.recipientIsCompany === 'yes' ? '🏢 Firma: ' : ''}${tg('recipientName') || '—'}${metadata.recipientPhone ? ` · Tel: ${tg('recipientPhone')}` : ''}\n`
         : ''
@@ -196,11 +195,9 @@ ${productsText}
           postalCode: metadata.postalCode || '',
           deliveryDate: metadata.deliveryDate || '',
           deliveryTime: metadata.deliveryTime || '',
-          // Made in the checkout: final, so the button shows it instead of opening the editor.
-          foryouUrl: foryouCode
-            ? gift ? `https://www.emilialab.com/foryou/${foryouCode}` : forYouEditUrl(foryouCode, paymentIntent.id)
-            : undefined,
-          foryouReady: Boolean(foryouCode && gift),
+          // Gift messages are made in the checkout; afterwards only the shop changes them.
+          foryouUrl: foryouCode && gift ? `https://www.emilialab.com/foryou/${foryouCode}` : undefined,
+          giftWithoutMessage: isGift && !gift,
           deliveryNote,
         })
       )

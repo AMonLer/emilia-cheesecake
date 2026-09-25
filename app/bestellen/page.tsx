@@ -22,7 +22,7 @@ function ForYouIntent() {
 }
 
 // Tira contextual solo al venir del CTA For You: explica que el mensaje se
-// graba después del pago, para que elegir la tarta no parezca un callejón.
+// añade en el checkout, para que elegir la tarta no parezca un callejón.
 function ForYouBanner() {
   const searchParams = useSearchParams()
   const { t } = useLanguage()
@@ -36,9 +36,9 @@ function ForYouBanner() {
         <span className="font-bold">1. {s.flowStep1}</span>
         <span aria-hidden="true">→</span>
         <span>2. {s.flowStep2}</span>
+        <span className="text-[#651A1A]/60">({s.flowNote})</span>
         <span aria-hidden="true">→</span>
         <span>3. {s.flowStep3}</span>
-        <span className="text-[#651A1A]/60">({s.flowNote})</span>
       </p>
     </div>
   )

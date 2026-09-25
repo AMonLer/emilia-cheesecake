@@ -190,6 +190,8 @@ function PaymentSuccessContent() {
 
   const isSlow = status === 'slow'
   const isPending = status === 'processing' || isSlow
+  // The sticker code in the subject, so the shop finds the gift right away.
+  const foryouMailto = `mailto:info@emilialab.com?subject=${encodeURIComponent(`For You ${foryouCode ?? ''}`)}`
 
   return (
     <div className="min-h-screen bg-[#FAF9F6] flex items-center justify-center px-4 py-12">
@@ -235,54 +237,41 @@ function PaymentSuccessContent() {
           )}
         </div>
 
-        {!isPending && foryouCode && foryouReady && (
+        {/* Gift: the message is made in the checkout; afterwards only the shop
+            can add or change it, when the buyer writes to us. */}
+        {!isPending && foryouCode && (
           <div className="mb-10 animate-slide-up rounded-2xl bg-[#651A1A] p-8 text-left text-white">
             <p className="text-xs tracking-[0.3em] uppercase font-bold text-[#F5E6D3]/70 mb-3">
               {locale === 'de' ? 'Deine Überraschung' : 'Your surprise'}
             </p>
             <h2 className="text-2xl font-black tracking-tight mb-3 leading-tight">
-              {locale === 'de' ? 'Deine Botschaft ist gespeichert' : 'Your message is saved'}
+              {foryouReady
+                ? locale === 'de' ? 'Deine Botschaft ist gespeichert' : 'Your message is saved'
+                : locale === 'de' ? 'Doch noch eine Botschaft?' : 'Add a message after all?'}
             </h2>
             <p className="text-white/70 font-light text-sm leading-relaxed mb-6">
-              {locale === 'de'
-                ? 'Beim Kuchen liegt ein Code: Wer ihn scannt, sieht alles, was du vorbereitet hast.'
-                : 'A code comes with the cake: whoever scans it sees everything you prepared.'}
+              {foryouReady
+                ? locale === 'de'
+                  ? 'Beim Kuchen liegt ein Code: Wer ihn scannt, sieht alles, was du vorbereitet hast.'
+                  : 'A code comes with the cake: whoever scans it sees everything you prepared.'
+                : locale === 'de'
+                  ? 'Beim Kuchen liegt ein Code mit einem Gruss von uns. Möchtest du doch noch eine Nachricht, ein Video oder ein Foto mitschicken? Schreib uns, wir fügen es für dich hinzu.'
+                  : 'A code with a greeting from us comes with the cake. Want to send a message, video or photo after all? Write to us and we\'ll add it for you.'}
             </p>
-            <Link
-              href={`/foryou/${foryouCode}`}
+            <a
+              href={foryouReady ? `/foryou/${foryouCode}` : foryouMailto}
               className="block w-full rounded-xl bg-white py-4 text-center text-sm font-black uppercase tracking-[0.15em] text-[#651A1A] transition-colors duration-300 hover:bg-[#F5E6D3]"
             >
-              {locale === 'de' ? 'Ansehen' : 'View'}
-            </Link>
-          </div>
-        )}
-
-        {!isPending && foryouCode && !foryouReady && (
-          <div className="mb-10 animate-slide-up rounded-2xl bg-[#651A1A] p-8 text-left text-white">
-            <p className="text-xs tracking-[0.3em] uppercase font-bold text-[#F5E6D3]/70 mb-3">
-              {locale === 'de' ? 'Eine persönliche Überraschung' : 'A personal surprise'}
-            </p>
-            <h2 className="text-2xl font-black tracking-tight mb-3 leading-tight">
-              {locale === 'de'
-                ? 'Hinterlasse eine persönliche Nachricht'
-                : 'Leave a personal message'}
-            </h2>
-            <p className="text-white/70 font-light text-sm leading-relaxed mb-6">
-              {locale === 'de'
-                ? 'Schreibe eine Nachricht, nimm ein Video auf oder füge ein Foto hinzu. Wir legen einen Code bei, mit dem dein Lieblingsmensch alles auf unserer Seite sehen kann.'
-                : 'Write a note, record a video or add a photo. We include a code so your favourite person can see it all on our page.'}
-            </p>
-            <Link
-              href={`/foryou/${foryouCode}/create`}
-              className="block w-full bg-white text-[#651A1A] py-4 rounded-xl text-center text-sm font-black tracking-[0.15em] uppercase hover:bg-[#F5E6D3] transition-colors duration-300"
-            >
-              {locale === 'de' ? 'Nachricht erstellen' : 'Create your message'}
-            </Link>
-            <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
-              {locale === 'de'
-                ? 'Den Link bekommst du auch per E-Mail.'
-                : 'You also get the link by e-mail.'}
-            </p>
+              {foryouReady
+                ? locale === 'de' ? 'Ansehen' : 'View'
+                : locale === 'de' ? 'E-Mail schreiben' : 'Write to us'}
+            </a>
+            {foryouReady && (
+              <p className="mt-4 text-center text-xs leading-relaxed text-white/60">
+                {locale === 'de' ? 'Etwas ändern? Schreib uns an ' : 'Want to change something? Write to us at '}
+                <a href={foryouMailto} className="underline underline-offset-2">info@emilialab.com</a>
+              </p>
+            )}
           </div>
         )}
 

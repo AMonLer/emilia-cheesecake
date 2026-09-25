@@ -1,9 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import {
-  saveForYouMessage as saveInNotion,
   getForYouMessage as getFromNotion,
-  listForYouMessages as listFromNotion,
   listUsedForYouCodes as listUsedFromNotion,
   reserveForYouCode as reserveInNotion,
   type ForYouMessage,
@@ -25,30 +23,10 @@ function readLocal(): Record<string, ForYouMessage> {
   }
 }
 
-export async function saveForYouMessage(rec: ForYouMessage): Promise<boolean> {
-  if (useNotion) return saveInNotion(rec)
-  if (process.env.NODE_ENV === 'production') return false
-  try {
-    const store = readLocal()
-    store[rec.code] = rec
-    fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8')
-    return true
-  } catch (err) {
-    console.error('Error guardando mensaje For You en JSON local:', err)
-    return false
-  }
-}
-
 export async function getForYouMessage(code: string, strict = false): Promise<ForYouMessage | null> {
   if (useNotion) return getFromNotion(code, strict)
   if (process.env.NODE_ENV === 'production') return null
   return readLocal()[code] ?? null
-}
-
-export async function listForYouMessages(): Promise<ForYouMessage[]> {
-  if (useNotion) return listFromNotion()
-  if (process.env.NODE_ENV === 'production') return []
-  return Object.values(readLocal())
 }
 
 /** Códigos de sticker ya entregados, para no repetir al asignar el siguiente. */

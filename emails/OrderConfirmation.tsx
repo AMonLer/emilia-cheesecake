@@ -27,11 +27,10 @@ interface OrderConfirmationEmailProps {
   postalCode: string
   deliveryDate: string
   deliveryTime: string
-  // Gift orders: signed link to create the For You message, or the message
-  // itself when it was made in the checkout (it is final then).
+  // Gift with a message made in the checkout: the page the recipient opens.
   foryouUrl?: string
-  // The buyer already made the message in the checkout.
-  foryouReady?: boolean
+  // Gift without a message: after payment it can only be added by the shop.
+  giftWithoutMessage?: boolean
   deliveryNote?: string
 }
 
@@ -46,7 +45,7 @@ export default function OrderConfirmationEmail({
   deliveryDate = '',
   deliveryTime = '',
   foryouUrl,
-  foryouReady = false,
+  giftWithoutMessage = false,
   deliveryNote = '',
 }: OrderConfirmationEmailProps) {
   return (
@@ -140,19 +139,21 @@ export default function OrderConfirmationEmail({
               )}
             </Section>
 
-            {foryouUrl && (
+            {(foryouUrl || giftWithoutMessage) && (
               <Section style={foryouBox}>
                 <Heading as="h2" style={foryouTitle}>
-                  {foryouReady ? 'Ihre Botschaft ist gespeichert' : 'Ihre persönliche Botschaft'}
+                  {foryouUrl ? 'Ihre Botschaft ist gespeichert' : 'Ihre persönliche Botschaft'}
                 </Heading>
                 <Text style={foryouText}>
-                  {foryouReady
-                    ? 'Die beschenkte Person öffnet sie über den Code beim Kuchen.'
-                    : 'Fügen Sie Ihrem Geschenk ein Video, ein Foto oder eine Nachricht hinzu. Die beschenkte Person öffnet sie über den Code beim Kuchen.'}
+                  {foryouUrl
+                    ? 'Die beschenkte Person öffnet sie über den Code beim Kuchen. Möchten Sie noch etwas ändern? Schreiben Sie uns an info@emilialab.com.'
+                    : 'Beim Kuchen liegt ein Code mit einem Gruss von uns. Möchten Sie doch noch eine Nachricht, ein Video oder ein Foto mitschicken? Schreiben Sie uns an info@emilialab.com – wir fügen es für Sie hinzu.'}
                 </Text>
-                <Button href={foryouUrl} style={foryouButton}>
-                  {foryouReady ? 'Botschaft ansehen' : 'Botschaft erstellen'}
-                </Button>
+                {foryouUrl && (
+                  <Button href={foryouUrl} style={foryouButton}>
+                    Botschaft ansehen
+                  </Button>
+                )}
               </Section>
             )}
 
