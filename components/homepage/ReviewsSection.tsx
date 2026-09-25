@@ -8,7 +8,7 @@ import { customerReviews, GOOGLE_REVIEWS_URL } from "@/lib/reviews"
 // two influencer videos. No average score shown on purpose: 4.3 from 7
 // reviews undersells the cakes; add it here once there are enough reviews.
 export default function ReviewsSection() {
-    const { t } = useLanguage()
+    const { t, locale } = useLanguage()
     const r = t.reviews
 
     return (
@@ -30,11 +30,14 @@ export default function ReviewsSection() {
                             className={`flex w-[82vw] max-w-[360px] shrink-0 snap-center flex-col rounded-2xl border border-[#E6D5C0] bg-white p-6 shadow-[0_12px_30px_-22px_rgba(101,26,26,0.5)] md:w-auto md:max-w-none ${index >= 3 ? 'md:hidden' : ''}`}
                         >
                             <span aria-hidden="true" className="font-serif text-5xl italic leading-none text-[#D4AF85]">“</span>
-                            <blockquote className="mt-1 flex-1 text-[0.95rem] leading-relaxed text-[#1a1a1a]/85">
-                                {review.text}
+                            <blockquote lang={locale} className="mt-1 flex-1 text-[0.95rem] leading-relaxed text-[#1a1a1a]/85">
+                                {review.text[locale]}
                             </blockquote>
                             <p className="mt-5 text-sm font-bold text-[#651A1A]">{review.name}</p>
-                            <p className="text-xs text-gray-500">{r.source}</p>
+                            {/* Shown in the page's language; a translation says so. */}
+                            <p className="text-xs text-gray-500">
+                                {r.source}{review.original !== locale ? ` · ${r.translated}` : ''}
+                            </p>
                         </li>
                     ))}
                 </ul>

@@ -148,6 +148,7 @@ export type Translations = {
     eyebrow: string
     heading: string
     source: string
+    translated: string
     allOnGoogle: string
   }
   gallery: {
@@ -449,6 +450,7 @@ export const translations: Record<Locale, Translations> = {
       eyebrow: 'Google-Rezensionen',
       heading: 'Das sagen unsere Kunden',
       source: 'Google-Rezension',
+      translated: 'übersetzt',
       allOnGoogle: 'Alle Rezensionen auf Google',
     },
     gallery: {
@@ -748,6 +750,7 @@ export const translations: Record<Locale, Translations> = {
       eyebrow: 'Google reviews',
       heading: 'What our customers say',
       source: 'Google review',
+      translated: 'translated',
       allOnGoogle: 'All reviews on Google',
     },
     gallery: {
