@@ -23,8 +23,7 @@ import {
   isSlotBookable,
 } from "@/lib/delivery-dates"
 import { computeOrderTotals, isKnownDiscountCode, normalizeDiscountCode } from "@/lib/pricing"
-import { smallSizeBackOnLabel } from "@/lib/availability"
-import { useSizeAvailability } from "@/lib/useSizeAvailability"
+import { isSizeAvailable } from "@/lib/availability"
 import { EMPTY_GIFT, hasGiftContent, type CheckoutGift } from "@/lib/foryou-checkout"
 import { readConsent, trackCheckoutStep, trackEvent, type CheckoutStep } from "@/lib/tracking"
 
@@ -146,9 +145,8 @@ function CheckoutContent() {
   const c = t.checkout
   // A cart saved before a size was paused may still hold it: no order goes
   // through until that line is switched to another size or removed.
-  const sizeAvailable = useSizeAvailability()
-  const hasPausedSize = cartItems.some(item => !sizeAvailable(item.size))
-  const pausedSizeMessage = t.cart.sizeUnavailable(smallSizeBackOnLabel(locale))
+  const hasPausedSize = cartItems.some(item => !isSizeAvailable(item.size))
+  const pausedSizeMessage = t.cart.sizeUnavailable
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -958,7 +956,7 @@ function CheckoutContent() {
               ) : (
                 <>
                   <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
-                  {!sizeAvailable(item.size) && (
+                  {!isSizeAvailable(item.size) && (
                     <p role="alert" className="mt-1 text-xs font-semibold leading-snug text-red-700">{pausedSizeMessage}</p>
                   )}
                 </>
@@ -1379,7 +1377,7 @@ function CheckoutContent() {
 
                   {/* En móvil la oferta y los métodos de pago vivían solo en la columna
                       derecha, que ahora está oculta. Los traemos al punto de decisión. */}
-                  {!upsellAdded && sizeAvailable("2-3") && <div className="lg:hidden mt-6">{upsellBlock}</div>}
+                  {!upsellAdded && isSizeAvailable("2-3") && <div className="lg:hidden mt-6">{upsellBlock}</div>}
                   <div className="lg:hidden mt-4 flex justify-center">{paymentIcons}</div>
 
                   <div className={stickyBar}>
@@ -1514,7 +1512,7 @@ function CheckoutContent() {
             <div className="mt-4">{paymentIcons}</div>
 
             {/* Limited Offer */}
-            {!upsellAdded && sizeAvailable("2-3") && <div className="mt-6">{upsellBlock}</div>}
+            {!upsellAdded && isSizeAvailable("2-3") && <div className="mt-6">{upsellBlock}</div>}
           </div>
         </div>
       </div >

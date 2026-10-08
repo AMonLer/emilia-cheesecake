@@ -2,8 +2,7 @@
 
 import type { CartSize } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
-import { smallSizeBackOnLabel } from "@/lib/availability"
-import { useSizeAvailability } from "@/lib/useSizeAvailability"
+import { isSizeAvailable } from "@/lib/availability"
 
 const SIZES: CartSize[] = ["2-3", "8-10"]
 
@@ -20,8 +19,7 @@ export default function CartSizeToggle({
   personsLabel: string
   className?: string
 }) {
-  const { locale, t } = useLanguage()
-  const sizeAvailable = useSizeAvailability()
+  const { t } = useLanguage()
 
   return (
     <div className={className}>
@@ -31,7 +29,7 @@ export default function CartSizeToggle({
             const selected = option === size
             // A size that is paused cannot be switched to, but a cart saved
             // before the pause may still hold it: show it, with the note below.
-            const paused = !sizeAvailable(option)
+            const paused = !isSizeAvailable(option)
             return (
               <button
                 key={option}
@@ -49,9 +47,9 @@ export default function CartSizeToggle({
         </div>
         <span className="text-xs text-gray-500">{personsLabel}</span>
       </div>
-      {!sizeAvailable(size) && (
+      {!isSizeAvailable(size) && (
         <p role="alert" className="mt-1.5 text-xs font-semibold leading-snug text-red-700">
-          {t.cart.sizeUnavailable(smallSizeBackOnLabel(locale))}
+          {t.cart.sizeUnavailable}
         </p>
       )}
     </div>

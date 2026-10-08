@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
@@ -9,8 +9,7 @@ import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/Payme
 import PriceDisplay from "@/components/PriceDisplay"
 import EarliestDelivery from "@/components/EarliestDelivery"
 import { MonthlySpecialBadge } from "@/components/MonthlySpecialBadge"
-import { smallSizeBackOnLabel } from "@/lib/availability"
-import { useSizeAvailability } from "@/lib/useSizeAvailability"
+import { isSizeAvailable } from "@/lib/availability"
 
 declare global {
   interface Window {
@@ -27,19 +26,12 @@ interface ProductInfoProps {
 export default function ProductInfo({ product, slug, compact = false }: ProductInfoProps) {
     const [selectedSize, setSelectedSize] = useState<string>("8-10")
     const { addToCart: addToCartContext } = useCart()
-    const { locale, t } = useLanguage()
+    const { t } = useLanguage()
     const pi = t.productInfo
-    const sizeAvailable = useSizeAvailability()
-    const smallAvailable = sizeAvailable("2-3")
-    const smallBackOn = pi.backOn(smallSizeBackOnLabel(locale))
-
-    // The pause can start while the page is open: fall back to the size on sale.
-    useEffect(() => {
-        if (!smallAvailable) setSelectedSize((size) => (size === "2-3" ? "8-10" : size))
-    }, [smallAvailable])
+    const smallAvailable = isSizeAvailable("2-3")
 
     const addToCart = () => {
-        if (!selectedSize || !sizeAvailable(selectedSize)) return
+        if (!selectedSize || !isSizeAvailable(selectedSize)) return
 
         // The 2-3 size has its own photo of the cake in its box, named by slug.
         const imageForSize = selectedSize === "2-3"
@@ -150,7 +142,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             </div>
                         </div>
                         {!smallAvailable && (
-                            <p className="mt-1.5 text-[10px] font-bold leading-tight text-[#651A1A]">{smallBackOn}</p>
+                            <p className="mt-1.5 text-[10px] font-bold leading-tight text-[#651A1A]">{pi.backSoon}</p>
                         )}
                         {selectedSize === "2-3" && (
                             <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
@@ -337,7 +329,7 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                             </div>
                         </div>
                         {!smallAvailable && (
-                            <p className="mt-1.5 text-xs font-bold leading-tight text-[#651A1A]">{smallBackOn}</p>
+                            <p className="mt-1.5 text-xs font-bold leading-tight text-[#651A1A]">{pi.backSoon}</p>
                         )}
                         {selectedSize === "2-3" && (
                             <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">

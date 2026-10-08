@@ -5,7 +5,7 @@ import Image from "next/image"
 import { useLanguage } from "@/contexts/LanguageContext"
 import EarliestDelivery from "@/components/EarliestDelivery"
 import { products } from "@/lib/products"
-import { useSizeAvailability } from "@/lib/useSizeAvailability"
+import { isSizeAvailable } from "@/lib/availability"
 
 // Cheapest cake on sale, so the hero can say "ab 15.90 CHF" without hard-coding it.
 const cheapestPrice = (sizeAvailable: (size: string) => boolean) => Math.min(
@@ -19,7 +19,7 @@ const cheapestPrice = (sizeAvailable: (size: string) => boolean) => Math.min(
 export default function HeroSection() {
   const { t } = useLanguage()
   const h = t.hero
-  const FROM_PRICE = cheapestPrice(useSizeAvailability())
+  const FROM_PRICE = cheapestPrice(isSizeAvailable)
 
   return (
     <section className="relative">

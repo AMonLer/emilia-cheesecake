@@ -15,8 +15,7 @@ import { computeOrderTotals, VOLUME_DISCOUNT_FROM } from '@/lib/pricing'
 import EarliestDelivery from '@/components/EarliestDelivery'
 import CartSizeToggle from '@/components/cart/CartSizeToggle'
 import QuantityStepper from '@/components/cart/QuantityStepper'
-import { useSizeAvailability } from '@/lib/useSizeAvailability'
-import { smallSizeBackOnLabel } from '@/lib/availability'
+import { isSizeAvailable } from '@/lib/availability'
 
 export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const router = useRouter()
@@ -36,8 +35,7 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const totals = computeOrderTotals(totalPrice)
   // A cart saved before a size was paused may still hold it: the line says so
   // (CartSizeToggle) and the checkout stays shut until it is switched or removed.
-  const sizeAvailable = useSizeAvailability()
-  const hasPausedSize = cartItems.some(item => !sizeAvailable(item.size))
+  const hasPausedSize = cartItems.some(item => !isSizeAvailable(item.size))
 
   const handleCheckout = () => {
     if (hasPausedSize) return
@@ -376,9 +374,9 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                             ) : (
                               <>
                                 <p className="text-xs text-gray-500 mt-1 font-light">{item.size} {t.cart.persons}</p>
-                                {!sizeAvailable(item.size) && (
+                                {!isSizeAvailable(item.size) && (
                                   <p role="alert" className="mt-1 text-xs font-semibold leading-snug text-red-700">
-                                    {t.cart.sizeUnavailable(smallSizeBackOnLabel(locale))}
+                                    {t.cart.sizeUnavailable}
                                   </p>
                                 )}
                               </>

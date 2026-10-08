@@ -28,7 +28,7 @@ export type Translations = {
     discount: string
     offer: string
     persons: string
-    sizeUnavailable: (date: string) => string
+    sizeUnavailable: string
     remove: string
     decrease: string
     increase: string
@@ -148,7 +148,7 @@ export type Translations = {
     chooseSize: string
     persons810: string
     persons23: string
-    backOn: (date: string) => string
+    backSoon: string
     addToCart: string
     addToCartLong: string
     guarantee: string
@@ -320,7 +320,7 @@ export const translations: Record<Locale, Translations> = {
       discount: 'Rabatt (10%)',
       offer: 'ANGEBOT',
       persons: 'Personen',
-      sizeUnavailable: (date) => `Die Größe 2–3 ist erst ab ${date} wieder verfügbar. Wähle 8–10 oder entferne den Kuchen.`,
+      sizeUnavailable: 'Die Größe 2–3 ist gerade nicht verfügbar. Wähle 8–10 oder entferne den Kuchen.',
       remove: 'Entfernen',
       decrease: 'Menge verringern',
       increase: 'Menge erhöhen',
@@ -440,7 +440,7 @@ export const translations: Record<Locale, Translations> = {
       chooseSize: 'Größe wählen',
       persons810: '8–10 Pers.',
       persons23: '2–3 Pers.',
-      backOn: (date) => `Wieder ab ${date}`,
+      backSoon: 'Bald wieder da',
       addToCart: 'IN DEN WARENKORB',
       addToCartLong: 'IN DEN WARENKORB LEGEN',
       guarantee: '100% Zufriedenheitsgarantie',
@@ -610,7 +610,7 @@ export const translations: Record<Locale, Translations> = {
       discount: 'Discount (10%)',
       offer: 'OFFER',
       persons: 'persons',
-      sizeUnavailable: (date) => `The 2–3 size is back on ${date}. Switch to 8–10 or remove the cake.`,
+      sizeUnavailable: 'The 2–3 size is not available right now. Switch to 8–10 or remove the cake.',
       remove: 'Remove',
       decrease: 'Decrease quantity',
       increase: 'Increase quantity',
@@ -730,7 +730,7 @@ export const translations: Record<Locale, Translations> = {
       chooseSize: 'Choose size',
       persons810: '8–10 pers.',
       persons23: '2–3 pers.',
-      backOn: (date) => `Back on ${date}`,
+      backSoon: 'Back soon',
       addToCart: 'ADD TO CART',
       addToCartLong: 'ADD TO CART',
       guarantee: '100% Satisfaction Guarantee',

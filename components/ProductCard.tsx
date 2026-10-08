@@ -10,8 +10,7 @@ import { MonthlySpecialBadge, MonthlySpecialSash } from "@/components/MonthlySpe
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useScrollLock } from "@/lib/useScrollLock"
-import { smallSizeBackOnLabel } from "@/lib/availability"
-import { useSizeAvailability } from "@/lib/useSizeAvailability"
+import { isSizeAvailable } from "@/lib/availability"
 
 interface ProductCardProps {
     href: string
@@ -40,8 +39,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const { addToCart } = useCart()
     const { t, locale } = useLanguage()
-    const sizeAvailable = useSizeAvailability()
-    const smallAvailable = sizeAvailable("2-3")
+    const smallAvailable = isSizeAvailable("2-3")
     // "ab" price: the cheapest size that can actually be ordered right now.
     const fromPrice = smallAvailable ? priceSmall : priceLarge
 
@@ -87,7 +85,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     }
 
     const handleAddToCart = (size: "2-3" | "8-10") => {
-        if (!slug || !priceSmall || !priceLarge || !sizeAvailable(size)) return
+        if (!slug || !priceSmall || !priceLarge || !isSizeAvailable(size)) return
         setSelectedSize(size)
         addToCart({
             id: `${slug}-${size}-${Date.now()}`,
@@ -366,7 +364,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                 </div>
                                 {!smallAvailable && (
                                     <p className="mt-1.5 text-xs font-bold leading-tight text-[#651A1A]">
-                                        {t.productInfo.backOn(smallSizeBackOnLabel(locale))}
+                                        {t.productInfo.backSoon}
                                     </p>
                                 )}
                                 {selectedSize === "2-3" && (
