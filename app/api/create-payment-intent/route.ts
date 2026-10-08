@@ -7,6 +7,7 @@ import {
   parseDeliveryDate,
 } from '@/lib/delivery-dates'
 import { computeOrderTotals } from '@/lib/pricing'
+import { isSizeAvailable } from '@/lib/availability'
 import { cleanCheckoutGift, giftToMetadata } from '@/lib/foryou-checkout'
 import { getUploadCredentials } from '@/lib/cloudinary'
 
@@ -66,6 +67,15 @@ export async function POST(req: NextRequest) {
     if (!isDeliverySlot(deliveryTime) || !isSlotBookable(deliveryDate, deliveryTime, new Date(Date.now() - LEAD_TIME_GRACE_MS))) {
       return NextResponse.json(
         { error: 'Please choose a delivery slot that respects the lead time.', code: 'DELIVERY_SLOT_UNAVAILABLE' },
+        { status: 400 }
+      )
+    }
+
+    // Same for a size that is paused: a cart saved earlier may still hold it.
+    const items: unknown[] = Array.isArray(orderData?.items) ? orderData.items : []
+    if (items.some((item: any) => !isSizeAvailable(String(item?.size ?? '')))) {
+      return NextResponse.json(
+        { error: 'One of the sizes in this order is not available right now.', code: 'SIZE_UNAVAILABLE' },
         { status: 400 }
       )
     }

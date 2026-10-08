@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import Image from "next/image"
@@ -9,6 +9,8 @@ import { VisaIcon, MastercardIcon, ApplePayIcon } from "@/components/icons/Payme
 import PriceDisplay from "@/components/PriceDisplay"
 import EarliestDelivery from "@/components/EarliestDelivery"
 import { MonthlySpecialBadge } from "@/components/MonthlySpecialBadge"
+import { smallSizeBackOnLabel } from "@/lib/availability"
+import { useSizeAvailability } from "@/lib/useSizeAvailability"
 
 declare global {
   interface Window {
@@ -25,11 +27,19 @@ interface ProductInfoProps {
 export default function ProductInfo({ product, slug, compact = false }: ProductInfoProps) {
     const [selectedSize, setSelectedSize] = useState<string>("8-10")
     const { addToCart: addToCartContext } = useCart()
-    const { t } = useLanguage()
+    const { locale, t } = useLanguage()
     const pi = t.productInfo
+    const sizeAvailable = useSizeAvailability()
+    const smallAvailable = sizeAvailable("2-3")
+    const smallBackOn = pi.backOn(smallSizeBackOnLabel(locale))
+
+    // The pause can start while the page is open: fall back to the size on sale.
+    useEffect(() => {
+        if (!smallAvailable) setSelectedSize((size) => (size === "2-3" ? "8-10" : size))
+    }, [smallAvailable])
 
     const addToCart = () => {
-        if (!selectedSize) return
+        if (!selectedSize || !sizeAvailable(selectedSize)) return
 
         // The 2-3 size has its own photo of the cake in its box, named by slug.
         const imageForSize = selectedSize === "2-3"
@@ -113,12 +123,15 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
 
                     <button
                         onClick={() => setSelectedSize("2-3")}
-                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
+                        disabled={!smallAvailable}
+                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${!smallAvailable
+                            ? "bg-gray-50 border-gray-100 cursor-not-allowed"
+                            : selectedSize === "2-3"
                             ? "bg-[#F5E6D3] border-black"
                             : "bg-white border-gray-100"
                             }`}
                     >
-                        <div className="flex items-center gap-2">
+                        <div className={`flex items-center gap-2 ${smallAvailable ? "" : "opacity-45"}`}>
                             <div className="relative w-10 h-10 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
@@ -136,6 +149,9 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 </div>
                             </div>
                         </div>
+                        {!smallAvailable && (
+                            <p className="mt-1.5 text-[10px] font-bold leading-tight text-[#651A1A]">{smallBackOn}</p>
+                        )}
                         {selectedSize === "2-3" && (
                             <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
                                 <Check className="w-3 h-3 text-white" strokeWidth={3} />
@@ -286,12 +302,15 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
 
                     <button
                         onClick={() => setSelectedSize("2-3")}
-                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
+                        disabled={!smallAvailable}
+                        className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${!smallAvailable
+                            ? "bg-gray-50 border-gray-100 cursor-not-allowed"
+                            : selectedSize === "2-3"
                             ? "bg-[#F5E6D3] border-black"
                             : "bg-white border-gray-100 hover:border-black/30"
                             }`}
                     >
-                        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className={`flex items-center gap-2 sm:gap-3 flex-1 min-w-0 ${smallAvailable ? "" : "opacity-45"}`}>
                             <div className="relative w-10 h-10 sm:w-12 sm:h-12 flex-shrink-0">
                                 <Image
                                     src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
@@ -317,6 +336,9 @@ export default function ProductInfo({ product, slug, compact = false }: ProductI
                                 </div>
                             </div>
                         </div>
+                        {!smallAvailable && (
+                            <p className="mt-1.5 text-xs font-bold leading-tight text-[#651A1A]">{smallBackOn}</p>
+                        )}
                         {selectedSize === "2-3" && (
                             <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
                                 <Check className="w-3 h-3 text-white" strokeWidth={3} />

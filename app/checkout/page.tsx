@@ -23,6 +23,8 @@ import {
   isSlotBookable,
 } from "@/lib/delivery-dates"
 import { computeOrderTotals, isKnownDiscountCode, normalizeDiscountCode } from "@/lib/pricing"
+import { smallSizeBackOnLabel } from "@/lib/availability"
+import { useSizeAvailability } from "@/lib/useSizeAvailability"
 import { EMPTY_GIFT, hasGiftContent, type CheckoutGift } from "@/lib/foryou-checkout"
 import { readConsent, trackCheckoutStep, trackEvent, type CheckoutStep } from "@/lib/tracking"
 
@@ -142,6 +144,11 @@ function CheckoutContent() {
   const { cartItems, totalPrice, removeItem, addToCart, updateQuantity, updateSize } = useCart()
   const { locale, t } = useLanguage()
   const c = t.checkout
+  // A cart saved before a size was paused may still hold it: no order goes
+  // through until that line is switched to another size or removed.
+  const sizeAvailable = useSizeAvailability()
+  const hasPausedSize = cartItems.some(item => !sizeAvailable(item.size))
+  const pausedSizeMessage = t.cart.sizeUnavailable(smallSizeBackOnLabel(locale))
   const [email, setEmail] = useState("")
   const [phone, setPhone] = useState("")
   const [firstName, setFirstName] = useState("")
@@ -181,6 +188,14 @@ function CheckoutContent() {
   const [missingFields, setMissingFields] = useState<Set<string>>(new Set())
   const [deliveryError, setDeliveryError] = useState("")
   const [paymentInitError, setPaymentInitError] = useState("")
+  // That message goes away as soon as the line is switched or removed.
+  useEffect(() => {
+    if (hasPausedSize) return
+    const clear = (current: string) => (current === pausedSizeMessage ? "" : current)
+    setDeliveryError(clear)
+    setFormError(clear)
+    setPaymentInitError(clear)
+  }, [hasPausedSize, pausedSizeMessage])
   // Amber notice at the top of the details step (payment not completed, order changed).
   const [notice, setNotice] = useState("")
   // Loading del paso 2: crear el PaymentIntent tarda >1s; sin esto el botón
@@ -459,6 +474,10 @@ function CheckoutContent() {
 
   const handleContinueToDetails = (e: React.FormEvent) => {
     e.preventDefault()
+    if (hasPausedSize) {
+      setDeliveryError(pausedSizeMessage)
+      return
+    }
     if (!deliveryStillBookable()) return
     setDeliveryError("")
     setStep(2)
@@ -467,6 +486,10 @@ function CheckoutContent() {
   const handleContinueToPayment = async (e: React.FormEvent) => {
     e.preventDefault()
     if (isInitializingPayment) return
+    if (hasPausedSize) {
+      setFormError(pausedSizeMessage)
+      return
+    }
 
     // El navegador interno de Instagram (Android) a veces autocompleta los campos
     // sin disparar onChange: el input se ve lleno pero el estado está vacío y la
@@ -609,6 +632,8 @@ function CheckoutContent() {
         setDeliveryTime("")
         setDeliveryError(c.slotExpired)
         setStep(1)
+      } else if (data.code === 'SIZE_UNAVAILABLE') {
+        setPaymentInitError(pausedSizeMessage)
       } else if (data.clientSecret) {
         const amount = typeof data.amount === 'number' ? data.amount : finalPrice
         try {
@@ -931,7 +956,12 @@ function CheckoutContent() {
                   className="mt-1.5"
                 />
               ) : (
-                <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
+                <>
+                  <p className="text-xs text-gray-600">{item.size} {c.persons}</p>
+                  {!sizeAvailable(item.size) && (
+                    <p role="alert" className="mt-1 text-xs font-semibold leading-snug text-red-700">{pausedSizeMessage}</p>
+                  )}
+                </>
               )}
               <div className="mt-2 flex items-center justify-between gap-2">
                 {slug ? (
@@ -1349,7 +1379,7 @@ function CheckoutContent() {
 
                   {/* En móvil la oferta y los métodos de pago vivían solo en la columna
                       derecha, que ahora está oculta. Los traemos al punto de decisión. */}
-                  {!upsellAdded && <div className="lg:hidden mt-6">{upsellBlock}</div>}
+                  {!upsellAdded && sizeAvailable("2-3") && <div className="lg:hidden mt-6">{upsellBlock}</div>}
                   <div className="lg:hidden mt-4 flex justify-center">{paymentIcons}</div>
 
                   <div className={stickyBar}>
@@ -1484,7 +1514,7 @@ function CheckoutContent() {
             <div className="mt-4">{paymentIcons}</div>
 
             {/* Limited Offer */}
-            {!upsellAdded && <div className="mt-6">{upsellBlock}</div>}
+            {!upsellAdded && sizeAvailable("2-3") && <div className="mt-6">{upsellBlock}</div>}
           </div>
         </div>
       </div >

@@ -10,6 +10,8 @@ import { MonthlySpecialBadge, MonthlySpecialSash } from "@/components/MonthlySpe
 import { useCart } from "@/contexts/CartContext"
 import { useLanguage } from "@/contexts/LanguageContext"
 import { useScrollLock } from "@/lib/useScrollLock"
+import { smallSizeBackOnLabel } from "@/lib/availability"
+import { useSizeAvailability } from "@/lib/useSizeAvailability"
 
 interface ProductCardProps {
     href: string
@@ -38,6 +40,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
     const [selectedSize, setSelectedSize] = useState<string | null>(null)
     const { addToCart } = useCart()
     const { t, locale } = useLanguage()
+    const sizeAvailable = useSizeAvailability()
+    const smallAvailable = sizeAvailable("2-3")
+    // "ab" price: the cheapest size that can actually be ordered right now.
+    const fromPrice = smallAvailable ? priceSmall : priceLarge
 
     // The sheet is portalled to <body>, so it needs to wait for the client.
     const [mounted, setMounted] = useState(false)
@@ -81,7 +87,7 @@ export default function ProductCard({ href, image1, image2, name, description, p
     }
 
     const handleAddToCart = (size: "2-3" | "8-10") => {
-        if (!slug || !priceSmall || !priceLarge) return
+        if (!slug || !priceSmall || !priceLarge || !sizeAvailable(size)) return
         setSelectedSize(size)
         addToCart({
             id: `${slug}-${size}-${Date.now()}`,
@@ -117,10 +123,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
                     <div className="flex-1 min-w-0 text-left">
                         {tag && <MonthlySpecialBadge size="sm" label={tag.label} subLabel={tag.subLabel} className="mb-1.5" />}
                         <h3 className="font-black text-sm tracking-tight">{name}</h3>
-                        {priceSmall && (
+                        {fromPrice && (
                             <div className="flex items-baseline gap-1 mt-0.5 text-[#651A1A]">
                                 <span className="text-xs font-medium opacity-60">{locale === 'de' ? 'ab' : 'from'}</span>
-                                <PriceDisplay amount={priceSmall} className="text-base" />
+                                <PriceDisplay amount={fromPrice} className="text-base" />
                             </div>
                         )}
                     </div>
@@ -223,10 +229,10 @@ export default function ProductCard({ href, image1, image2, name, description, p
                 </div>
                 <div className="p-3 md:p-6 text-center flex flex-col flex-1">
                     <h3 className="font-black text-sm md:text-lg tracking-tight">{name}</h3>
-                    {priceSmall && (
+                    {fromPrice && (
                         <div className="flex items-baseline justify-center gap-1 mt-0.5 md:mt-1 mb-1 md:mb-2 text-[#651A1A]">
                             <span className="text-xs md:text-sm font-medium opacity-60">ab</span>
-                            <PriceDisplay amount={priceSmall} className="text-base md:text-xl" />
+                            <PriceDisplay amount={fromPrice} className="text-base md:text-xl" />
                         </div>
                     )}
                     <p className="hidden md:block text-sm leading-relaxed text-gray-700 flex-1">{description}</p>
@@ -326,12 +332,15 @@ export default function ProductCard({ href, image1, image2, name, description, p
                             {/* 2-3 Personen */}
                             <button
                                 onClick={() => handleAddToCart("2-3")}
-                                className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${selectedSize === "2-3"
+                                disabled={!smallAvailable}
+                                className={`relative rounded-xl p-3 transition-all duration-200 border-2 text-left ${!smallAvailable
+                                    ? "bg-gray-50 border-gray-100 cursor-not-allowed"
+                                    : selectedSize === "2-3"
                                     ? "bg-[#F5E6D3] border-black"
                                     : "bg-white border-gray-100 active:border-black/30"
                                     }`}
                             >
-                                <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <div className={`flex items-center gap-3 flex-1 min-w-0 ${smallAvailable ? "" : "opacity-45"}`}>
                                     <div className="relative w-12 h-12 flex-shrink-0">
                                         <Image
                                             src={selectedSize === "2-3" ? "/cajita1.png" : "/cajita.png"}
@@ -355,6 +364,11 @@ export default function ProductCard({ href, image1, image2, name, description, p
                                         </div>
                                     </div>
                                 </div>
+                                {!smallAvailable && (
+                                    <p className="mt-1.5 text-xs font-bold leading-tight text-[#651A1A]">
+                                        {t.productInfo.backOn(smallSizeBackOnLabel(locale))}
+                                    </p>
+                                )}
                                 {selectedSize === "2-3" && (
                                     <div className="absolute top-2 right-2 bg-black rounded-full p-0.5">
                                         <Check className="w-3 h-3 text-white" strokeWidth={3} />

@@ -5,15 +5,21 @@ import Image from "next/image"
 import { useLanguage } from "@/contexts/LanguageContext"
 import EarliestDelivery from "@/components/EarliestDelivery"
 import { products } from "@/lib/products"
+import { useSizeAvailability } from "@/lib/useSizeAvailability"
 
-// Cheapest cake, so the hero can say "ab 15.90 CHF" without hard-coding it.
-const FROM_PRICE = Math.min(
-  ...Object.values(products).flatMap((product: any) => Object.values(product.prices) as number[])
+// Cheapest cake on sale, so the hero can say "ab 15.90 CHF" without hard-coding it.
+const cheapestPrice = (sizeAvailable: (size: string) => boolean) => Math.min(
+  ...Object.values(products).flatMap((product: any) =>
+    Object.entries(product.prices as Record<string, number>)
+      .filter(([size]) => sizeAvailable(size))
+      .map(([, price]) => price)
+  )
 ).toFixed(2)
 
 export default function HeroSection() {
   const { t } = useLanguage()
   const h = t.hero
+  const FROM_PRICE = cheapestPrice(useSizeAvailability())
 
   return (
     <section className="relative">
