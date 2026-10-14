@@ -20,6 +20,8 @@ function loadTypeScript(relativePath, replacements = {}) {
 
 const dates = loadTypeScript('lib/delivery-dates.ts')
 const pricing = loadTypeScript('lib/pricing.ts')
+const availability = loadTypeScript('lib/availability.ts')
+const { products } = loadTypeScript('lib/products.ts')
 
 // In-memory Stripe: enough of paymentIntents for the route, no network.
 const intents = new Map()
@@ -55,6 +57,7 @@ const giftLib = loadTypeScript('lib/foryou-checkout.ts')
 const { POST } = loadTypeScript('app/api/create-payment-intent/route.ts', {
   '@/lib/delivery-dates': dates,
   '@/lib/pricing': pricing,
+  '@/lib/availability': availability,
   '@/lib/foryou-checkout': giftLib,
   '@/lib/cloudinary': { getUploadCredentials: () => ({ cloudName: 'test-cloud', apiKey: 'test' }) },
   stripe: FakeStripe,
@@ -147,6 +150,19 @@ async function main() {
   assert.equal(response.status, 400, 'A slot today is always inside the 24h lead time')
   assert.match((await response.json()).code, /^DELIVERY_(SLOT|DATE)_UNAVAILABLE$/)
   assert.equal(stripeCalls.create.length, 0)
+
+  // --- Restocked sizes reach payment for every flavour, with the right amount.
+  for (const [slug, product] of Object.entries(products)) {
+    for (const size of ['2-3', '8-10']) {
+      const price = product.prices[size]
+      const items = [{ id: `${slug}-${size}-test`, name: product.name, size, price, quantity: 1 }]
+      const result = await request({ deliveryDate: FUTURE_DAY, subtotal: price, items })
+      assert.equal(result.status, 200, `${slug} (${size}) must be orderable`)
+      const payment = stripeCalls.create.at(-1)
+      assert.equal(payment.amount, Math.round(pricing.computeOrderTotals(price).total * 100))
+      assert.deepEqual(JSON.parse(payment.metadata.items), items, 'The chosen size reaches the order metadata')
+    }
+  }
 
   // --- Totals are computed on the server, not taken from the browser
   assert.deepEqual(
