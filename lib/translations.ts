@@ -4,12 +4,39 @@ export type Translations = {
   nav: {
     aboutUs: string
     order: string
+    business: string
   }
   hero: {
     eyebrow: string
     cta: string
     trust: string
     fromPrice: (price: string) => string
+  }
+  // The three promises under the hero: what people ask before they order.
+  benefits: {
+    freshTitle: string
+    freshText: string
+    deliveryTitle: string
+    deliveryText: string
+    giftTitle: string
+    giftText: string
+  }
+  monthly: {
+    eyebrow: string
+    label: string
+    text: string
+    note: string
+    cta: string
+  }
+  business: {
+    eyebrow: string
+    title: string
+    titleSerif: string
+    text: string
+    points: string[]
+    cta: string
+    ctaNote: string
+    mailSubject: string
   }
   cart: {
     title: string
@@ -296,12 +323,38 @@ export const translations: Record<Locale, Translations> = {
     nav: {
       aboutUs: 'Über Uns',
       order: 'Bestellen',
+      business: 'Für Firmen',
     },
     hero: {
       eyebrow: 'San Sebastian Cheesecake · Zürich',
       cta: 'JETZT BESTELLEN',
       trust: 'Frisch auf Bestellung gebacken · Lieferung in Zürich & Umgebung',
       fromPrice: (price) => `ab ${price} CHF`,
+    },
+    benefits: {
+      freshTitle: 'Frisch gebacken',
+      freshText: 'Jeder Cheesecake wird erst nach deiner Bestellung gebacken.',
+      deliveryTitle: 'Lieferung in Zürich',
+      deliveryText: 'Und Umgebung. Ab 100 CHF gratis, dazu 10 % Rabatt.',
+      giftTitle: 'Als Geschenk',
+      giftText: 'Mit Video-, Foto- oder Textbotschaft, inklusive.',
+    },
+    monthly: {
+      eyebrow: 'Torte des Monats',
+      label: 'Limitierte Edition',
+      text: 'Cremige Haselnuss-Kakao-Creme auf unserem seidigen Käsekuchen.',
+      note: 'Nur für kurze Zeit, solange der Vorrat reicht.',
+      cta: 'Noisette bestellen',
+    },
+    business: {
+      eyebrow: 'Für Firmen',
+      title: 'Cheesecake fürs Büro.',
+      titleSerif: 'Für Meetings, Apéros und Kundengeschenke.',
+      text: 'Ganze Cheesecakes oder Minis als Einzelportion, für einen Anlass oder jede Woche an einem festen Tag. Geliefert in Zürich und Umgebung.',
+      points: ['Einmalig oder jede Woche', 'Erst probieren, dann bestellen'],
+      cta: 'Anfrage senden',
+      ctaNote: 'Schreib uns, und wir bringen euch etwas zum Probieren vorbei.',
+      mailSubject: 'Anfrage für unsere Firma',
     },
     cart: {
       title: 'Warenkorb',
@@ -586,12 +639,38 @@ export const translations: Record<Locale, Translations> = {
     nav: {
       aboutUs: 'About Us',
       order: 'Order',
+      business: 'For Companies',
     },
     hero: {
       eyebrow: 'San Sebastian Cheesecake · Zurich',
       cta: 'ORDER NOW',
       trust: 'Freshly baked to order · Delivery in Zurich & surroundings',
       fromPrice: (price) => `from CHF ${price}`,
+    },
+    benefits: {
+      freshTitle: 'Freshly baked',
+      freshText: 'Every cheesecake is baked only after you order it.',
+      deliveryTitle: 'Delivered in Zurich',
+      deliveryText: 'And surroundings. Free from CHF 100, plus 10% off.',
+      giftTitle: 'Send it as a gift',
+      giftText: 'With a video, photo or text message, included.',
+    },
+    monthly: {
+      eyebrow: 'Cake of the month',
+      label: 'Limited edition',
+      text: 'Creamy hazelnut-cocoa cream on our silky cheesecake.',
+      note: 'Only for a short time, while stocks last.',
+      cta: 'Order Noisette',
+    },
+    business: {
+      eyebrow: 'For companies',
+      title: 'Cheesecake for the office.',
+      titleSerif: 'For meetings, apéros and client gifts.',
+      text: 'Whole cheesecakes or single-portion minis, for one occasion or every week on a fixed day. Delivered in Zurich and surroundings.',
+      points: ['One-off or every week', 'Taste first, then order'],
+      cta: 'Send a request',
+      ctaNote: 'Write to us and we will bring you something to taste.',
+      mailSubject: 'Request for our company',
     },
     cart: {
       title: 'Cart',

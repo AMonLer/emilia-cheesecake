@@ -49,6 +49,7 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
   const mobileLinks = [
     { href: '/bestellen', label: t.nav.order },
     { href: '/uber-uns', label: t.nav.aboutUs },
+    { href: '/#firmen', label: t.nav.business },
     { href: '/versand', label: t.footer.shipping },
     { href: '/faq', label: t.footer.faq },
   ]
@@ -142,6 +143,14 @@ export default function Navbar({ minimal = false }: { minimal?: boolean }) {
                 className="group relative hidden sm:block text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase"
               >
                 {t.nav.aboutUs}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />
+              </Link>
+              {/* md, not sm: three links next to the logo only fit from tablet width. */}
+              <Link
+                href="/#firmen"
+                className="group relative hidden md:block text-[#F5E6D3] hover:text-white transition-colors duration-300 text-xs font-medium tracking-[0.2em] uppercase whitespace-nowrap"
+              >
+                {t.nav.business}
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#D4AF85] transition-all duration-300 group-hover:w-full" />
               </Link>
             </div>
