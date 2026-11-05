@@ -6,7 +6,8 @@ import {
   isSlotBookable,
   parseDeliveryDate,
 } from '@/lib/delivery-dates'
-import { computeOrderTotals } from '@/lib/pricing'
+import { computeOrderTotals, isSingleUseCode, normalizeDiscountCode } from '@/lib/pricing'
+import { isSingleUseCodeSpent, SINGLE_USE_CODE_METADATA_KEY } from '@/lib/single-use-codes'
 import { isSizeAvailable } from '@/lib/availability'
 import { cleanCheckoutGift, giftToMetadata } from '@/lib/foryou-checkout'
 import { getUploadCredentials } from '@/lib/cloudinary'
@@ -91,6 +92,14 @@ export async function POST(req: NextRequest) {
 
     const subtotal = Number(orderData?.subtotal || 0)
     const discountCode = String(orderData?.discountCode || '')
+    // A single-use code that already paid an order cannot be used again.
+    const singleUseCode = isSingleUseCode(discountCode) ? normalizeDiscountCode(discountCode) : ''
+    if (singleUseCode && await isSingleUseCodeSpent(stripe, singleUseCode)) {
+      return NextResponse.json(
+        { error: 'This discount code has already been used.', code: 'DISCOUNT_CODE_USED' },
+        { status: 400 }
+      )
+    }
     const totals = computeOrderTotals(subtotal, discountCode)
     if (!(totals.total > 0)) {
       return NextResponse.json({ error: 'Invalid order amount.' }, { status: 400 })
@@ -126,6 +135,7 @@ export async function POST(req: NextRequest) {
         deliveryTime,
         discountCode,
         discountPercent: discountPercent ? String(discountPercent) : '',
+        [SINGLE_USE_CODE_METADATA_KEY]: singleUseCode,
         subtotal: subtotal ? subtotal.toFixed(2) : '',
         shippingCost: totals.shipping ? totals.shipping.toFixed(2) : '',
         // Doorbell, floor, door code… for the courier (Stripe caps metadata values).

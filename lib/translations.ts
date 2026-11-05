@@ -283,6 +283,7 @@ export type Translations = {
     discountCodePlaceholder: string
     applyCode: string
     invalidCode: string
+    codeUsed: string
     subtotal: string
     shipping: string
     free: string
@@ -601,6 +602,7 @@ export const translations: Record<Locale, Translations> = {
       discountCodePlaceholder: 'Rabattcode',
       applyCode: 'Anwenden',
       invalidCode: 'Rabattcode ungültig',
+      codeUsed: 'Dieser Code wurde schon verwendet.',
       subtotal: 'Zwischensumme',
       shipping: 'Versand',
       free: 'Gratis',
@@ -917,6 +919,7 @@ export const translations: Record<Locale, Translations> = {
       discountCodePlaceholder: 'Discount code',
       applyCode: 'Apply',
       invalidCode: 'Invalid discount code',
+      codeUsed: 'This code has already been used.',
       subtotal: 'Subtotal',
       shipping: 'Shipping',
       free: 'Free',

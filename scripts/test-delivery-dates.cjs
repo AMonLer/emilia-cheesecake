@@ -51,17 +51,40 @@ class FakeStripe {
       intents.get(id).status = 'canceled'
       return intents.get(id)
     },
+    // Only the metadata query the single-use check sends.
+    search: async ({ query }) => {
+      const match = /^metadata\['(\w+)'\]:'([^']+)'$/.exec(query)
+      if (!match) throw new Error(`Unexpected search query: ${query}`)
+      const [, key, value] = match
+      return { data: [...intents.values()].filter((intent) => intent.metadata?.[key] === value).map((intent) => ({ ...intent })) }
+    },
   }
 }
 const giftLib = loadTypeScript('lib/foryou-checkout.ts')
+const singleUseCodes = loadTypeScript('lib/single-use-codes.ts', { '@/lib/pricing': pricing })
 const { POST } = loadTypeScript('app/api/create-payment-intent/route.ts', {
   '@/lib/delivery-dates': dates,
   '@/lib/pricing': pricing,
+  '@/lib/single-use-codes': singleUseCodes,
   '@/lib/availability': availability,
   '@/lib/foryou-checkout': giftLib,
   '@/lib/cloudinary': { getUploadCredentials: () => ({ cloudName: 'test-cloud', apiKey: 'test' }) },
   stripe: FakeStripe,
 })
+const { POST: CHECK_CODE } = loadTypeScript('app/api/check-discount-code/route.ts', {
+  '@/lib/pricing': pricing,
+  '@/lib/single-use-codes': singleUseCodes,
+  stripe: FakeStripe,
+})
+
+async function checkCode(code) {
+  const response = await CHECK_CODE(new Request('http://localhost/api/check-discount-code', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  }))
+  return response.json()
+}
 
 // Far enough ahead that the lead time never interferes with these checks.
 const FUTURE_DAY = '28.9.2027'
@@ -167,13 +190,40 @@ async function main() {
   // --- Totals are computed on the server, not taken from the browser
   assert.deepEqual(
     { ...pricing.computeOrderTotals(42.9), discount: undefined },
-    { shipping: 8.4, discountRate: 0, discount: undefined, total: 51.3, promoCodeApplied: false, isAdminOrder: false },
+    { shipping: 8.4, discountRate: 0, discount: undefined, total: 51.3, promoCodeApplied: false, isAdminOrder: false, singleUseCode: false },
   )
   assert.equal(pricing.computeOrderTotals(100).total, 90)
   assert.equal(pricing.computeOrderTotals(42.9, ' HolaSwitzerland ').total, 47.01)
   assert.equal(pricing.computeOrderTotals(120, 'holaswitzerland').total, 102)
   assert.equal(pricing.computeOrderTotals(42.9, 'EMILIA1').total, 1)
   assert.equal(pricing.isKnownDiscountCode('nope'), false)
+
+  // --- Single-use code: 25% off the cakes (not delivery), one paid order only
+  assert.equal(pricing.isKnownDiscountCode(' Emilia25K7 '), true)
+  assert.equal(pricing.isSingleUseCode('constructor'), false, 'Object keys are not codes')
+  assert.equal(pricing.computeOrderTotals(42.9, 'EMILIA25K7').total, 40.57, '25% off the cake, delivery still 8.40')
+  assert.equal(pricing.computeOrderTotals(120, 'emilia25k7').total, 90, 'Replaces the 10% volume discount')
+  assert.deepEqual(await checkCode('EMILIA25K7'), { valid: true, spent: false })
+  assert.deepEqual(await checkCode('holaswitzerland'), { valid: true })
+  assert.deepEqual(await checkCode('nope'), { valid: false })
+  let codeResponse = await request({ deliveryDate: FUTURE_DAY, subtotal: 42.9, discountCode: ' Emilia25K7 ' })
+  assert.equal(codeResponse.status, 200)
+  const codeIntent = stripeCalls.create.at(-1)
+  assert.equal(codeIntent.amount, 4057)
+  assert.equal(codeIntent.metadata.singleUseCode, 'emilia25k7')
+  assert.equal(codeIntent.metadata.discountPercent, '25')
+  // Not paid yet: the code still works (an abandoned checkout does not burn it).
+  assert.deepEqual(await checkCode('emilia25k7'), { valid: true, spent: false })
+  intents.get(`pi_new_${stripeCalls.create.length}`).status = 'succeeded'
+  assert.deepEqual(await checkCode('EMILIA25K7'), { valid: false, spent: true })
+  const createdBefore = stripeCalls.create.length
+  codeResponse = await request({ deliveryDate: FUTURE_DAY, subtotal: 42.9, discountCode: 'EMILIA25K7' })
+  assert.equal(codeResponse.status, 400)
+  assert.equal((await codeResponse.json()).code, 'DISCOUNT_CODE_USED')
+  assert.equal(stripeCalls.create.length, createdBefore, 'A used code never reaches Stripe')
+  assert.equal(stripeCalls.create.at(-1).metadata.singleUseCode, 'emilia25k7')
+  response = await request({ deliveryDate: FUTURE_DAY, subtotal: 42.9 })
+  assert.equal(stripeCalls.create.at(-1).metadata.singleUseCode, '', 'Orders without the code are not tagged')
   response = await request({ deliveryDate: FUTURE_DAY, subtotal: 42.9, shippingCost: 0 })
   let body = await response.json()
   assert.equal(response.status, 200)

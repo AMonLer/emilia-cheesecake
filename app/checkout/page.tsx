@@ -22,7 +22,7 @@ import {
   isDateBookable,
   isSlotBookable,
 } from "@/lib/delivery-dates"
-import { computeOrderTotals, isKnownDiscountCode, normalizeDiscountCode } from "@/lib/pricing"
+import { computeOrderTotals, isKnownDiscountCode, isSingleUseCode, normalizeDiscountCode } from "@/lib/pricing"
 import { isSizeAvailable } from "@/lib/availability"
 import { EMPTY_GIFT, hasGiftContent, type CheckoutGift } from "@/lib/foryou-checkout"
 import { readConsent, trackCheckoutStep, trackEvent, type CheckoutStep } from "@/lib/tracking"
@@ -381,7 +381,8 @@ function CheckoutContent() {
 
   const { shipping: shippingCost, discount, discountRate, total: finalPrice, promoCodeApplied: hasCodeDiscount } =
     computeOrderTotals(totalPrice, appliedDiscountCode)
-  const discountLabel = `${Math.round(discountRate * 100)}% Rabatt${hasCodeDiscount ? ' (HolaSwitzerland)' : ''}`
+  const codeName = isSingleUseCode(appliedDiscountCode) ? normalizeDiscountCode(appliedDiscountCode).toUpperCase() : 'HolaSwitzerland'
+  const discountLabel = `${Math.round(discountRate * 100)}% Rabatt${hasCodeDiscount ? ` (${codeName})` : ''}`
 
   // Everything the charged amount depends on. If it changes while the payment
   // form is open (a code applied, a cake added), that PaymentIntent is stale.
@@ -632,6 +633,10 @@ function CheckoutContent() {
         setStep(1)
       } else if (data.code === 'SIZE_UNAVAILABLE') {
         setPaymentInitError(pausedSizeMessage)
+      } else if (data.code === 'DISCOUNT_CODE_USED') {
+        setAppliedDiscountCode("")
+        setDiscountCodeError(c.codeUsed)
+        setPaymentInitError(c.codeUsed)
       } else if (data.clientSecret) {
         const amount = typeof data.amount === 'number' ? data.amount : finalPrice
         try {
@@ -861,19 +866,39 @@ function CheckoutContent() {
         />
         <button
           type="button"
-          onClick={() => {
+          onClick={async () => {
             if (!normalizeDiscountCode(discountCodeInput)) {
               setAppliedDiscountCode("")
               setDiscountCodeError("")
               return
             }
-            if (isKnownDiscountCode(discountCodeInput)) {
-              setAppliedDiscountCode(discountCodeInput.trim())
-              setDiscountCodeError("")
-            } else {
+            if (!isKnownDiscountCode(discountCodeInput)) {
               setAppliedDiscountCode("")
               setDiscountCodeError(c.invalidCode)
+              return
             }
+            // A single-use code may already have paid an order: ask the server first.
+            if (isSingleUseCode(discountCodeInput)) {
+              try {
+                const response = await fetch('/api/check-discount-code', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ code: discountCodeInput }),
+                })
+                const data = await response.json()
+                if (!data.valid) {
+                  setAppliedDiscountCode("")
+                  setDiscountCodeError(data.spent ? c.codeUsed : c.invalidCode)
+                  return
+                }
+              } catch {
+                setAppliedDiscountCode("")
+                setDiscountCodeError(c.invalidCode)
+                return
+              }
+            }
+            setAppliedDiscountCode(discountCodeInput.trim())
+            setDiscountCodeError("")
           }}
           className="shrink-0 whitespace-nowrap px-4 py-3 bg-gray-100 text-gray-600 rounded-lg font-bold text-sm transition-colors hover:bg-gray-200 active:bg-gray-300"
         >
