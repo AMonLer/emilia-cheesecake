@@ -381,8 +381,9 @@ function CheckoutContent() {
 
   const { shipping: shippingCost, discount, discountRate, total: finalPrice, promoCodeApplied: hasCodeDiscount } =
     computeOrderTotals(totalPrice, appliedDiscountCode)
-  const codeName = isSingleUseCode(appliedDiscountCode) ? normalizeDiscountCode(appliedDiscountCode).toUpperCase() : 'HolaSwitzerland'
-  const discountLabel = `${Math.round(discountRate * 100)}% Rabatt${hasCodeDiscount ? ` (${codeName})` : ''}`
+  const discountLabel = isSingleUseCode(appliedDiscountCode)
+    ? `Rabatt (${normalizeDiscountCode(appliedDiscountCode).toUpperCase()})`
+    : `${Math.round(discountRate * 100)}% Rabatt${hasCodeDiscount ? ' (HolaSwitzerland)' : ''}`
 
   // Everything the charged amount depends on. If it changes while the payment
   // form is open (a code applied, a cake added), that PaymentIntent is stale.

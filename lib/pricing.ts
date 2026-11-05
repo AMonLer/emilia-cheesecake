@@ -8,10 +8,10 @@ export const VOLUME_DISCOUNT_RATE = 0.1
 const PROMO_CODE = 'holaswitzerland'
 const ADMIN_CODE = 'emilia1'
 
-// Codes that pay for one order only, with their discount on the cakes (not on
-// delivery). The payment API refuses a code once an order paid with it.
+// Codes that pay for one order only, each worth a fixed amount in CHF off the
+// cakes (never off delivery). The payment API refuses a code once an order paid with it.
 const SINGLE_USE_CODES: Record<string, number> = {
-  emilia25k7: 0.25,
+  emilia25k7: 25,
 }
 
 export function normalizeDiscountCode(code: unknown): string {
@@ -45,13 +45,16 @@ export function computeOrderTotals(subtotal: number, discountCode: unknown = '')
   const promoCodeApplied = code === PROMO_CODE || singleUseCode
   const isAdminOrder = code === ADMIN_CODE
   const shipping = subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_FEE
-  // A single-use code replaces the volume discount instead of adding to it.
+  // A single-use code is a fixed amount (never more than the cakes cost) and
+  // replaces the volume discount instead of adding to it.
   const discountRate = singleUseCode
-    ? SINGLE_USE_CODES[code]
+    ? 0
     : code === PROMO_CODE
       ? (subtotal >= 100 ? 0.15 : 0.1)
       : subtotal >= VOLUME_DISCOUNT_FROM ? VOLUME_DISCOUNT_RATE : 0
-  const discount = subtotal * discountRate
+  const discount = singleUseCode
+    ? Math.min(SINGLE_USE_CODES[code], Math.max(subtotal, 0))
+    : subtotal * discountRate
   // Test orders: the owner's code charges 1 CHF so a real payment runs end to end.
   const total = isAdminOrder ? 1 : roundToCents(subtotal - discount + shipping)
   return { shipping, discountRate, discount, total, promoCodeApplied, isAdminOrder, singleUseCode }

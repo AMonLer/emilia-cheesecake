@@ -136,6 +136,7 @@ export async function POST(req: NextRequest) {
         discountCode,
         discountPercent: discountPercent ? String(discountPercent) : '',
         [SINGLE_USE_CODE_METADATA_KEY]: singleUseCode,
+        discountAmount: totals.discount > 0 ? totals.discount.toFixed(2) : '',
         subtotal: subtotal ? subtotal.toFixed(2) : '',
         shippingCost: totals.shipping ? totals.shipping.toFixed(2) : '',
         // Doorbell, floor, door code… for the courier (Stripe caps metadata values).
