@@ -30,6 +30,10 @@ export function getBlockedDeliveryDates(currentYear: number): Date[] {
       start: new Date(2026, 8, 25),
       end: new Date(2026, 8, 27),
     }),
+    ...eachDayOfInterval({
+      start: new Date(2026, 10, 20),
+      end: new Date(2026, 10, 23),
+    }),
     // Christmas also covers January of the current year.
     ...[currentYear - 1, currentYear, currentYear + 1].flatMap((year) =>
       eachDayOfInterval({
